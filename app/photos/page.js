@@ -2,90 +2,102 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 
-const EVENTS = [
-  {
-    id: "mall-takeover",
-    title: "Mall Takeover",
-    subtitle: "Energy takes over the space",
-    glow: "rgba(0,200,255,0.6)",
-    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063"
-  },
-  {
-    id: "matchaty",
-    title: "MatchaTy",
-    subtitle: "Curated rhythm & aesthetic",
-    glow: "rgba(120,255,160,0.6)",
-    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba"
-  },
-  {
-    id: "sudplazza",
-    title: "SudPlazza",
-    subtitle: "Deeper sounds, late energy",
-    glow: "rgba(168,85,247,0.6)",
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
-  }
-];
-
-export default function Home() {
-  const [enter, setEnter] = useState(false);
+export default function PhotosPage() {
+  const [events, setEvents] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setEnter(true), 1200);
+    loadEvents();
   }, []);
 
+  async function loadEvents() {
+    const { data, error } = await supabase
+      .from("events")
+      .select("*")
+      .order("event_date", { ascending: false });
+
+    console.log("EVENTS:", data, error);
+
+    setEvents(data || []);
+    setLoading(false);
+  }
+
+  const filtered = events.filter((e) =>
+    (e.title || "").toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <main style={styles.page}>
+    <div style={styles.page}>
 
-      {/* 🎬 CINEMATIC ENTRY */}
-      {!enter && (
-        <div style={styles.intro}>
-          <div style={styles.introGlow}></div>
-          <h1 style={styles.introLogo}>NOOISE</h1>
-        </div>
+      {/* HEADER */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>Find Your Photos</h1>
+        <p style={styles.subtitle}>
+          Select an event and relive the moment
+        </p>
+      </div>
+
+      {/* SEARCH */}
+      <input
+        placeholder="Search events..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={styles.search}
+      />
+
+      {/* LOADING */}
+      {loading && (
+        <p style={{ opacity: 0.6 }}>Loading events...</p>
       )}
 
-      {/* MAIN CONTENT */}
-      {enter && (
-        <>
-          <div style={styles.hero}>
-            <h1 style={styles.logo}>NOOISE</h1>
-            <p style={styles.tagline}>
-              Select your moment
-            </p>
-          </div>
+      {/* GRID */}
+      <div style={styles.grid}>
+        {filtered.map((event) => (
+          <Link
+            key={event.id}
+            href={`/photos/${event.slug}`}
+            style={{ textDecoration: "none" }}
+          >
+            <div style={styles.card}>
 
-          <div style={styles.container}>
-            {EVENTS.map((event) => (
-              <Link key={event.id} href={`/photos/${event.id}`} style={{ textDecoration: "none" }}>
-                <div style={styles.card}>
+              <div
+                style={{
+                  ...styles.image,
+                  backgroundImage: `url(${event.cover_image_url || ""})`
+                }}
+              />
 
-                  <div
-                    style={{
-                      ...styles.image,
-                      backgroundImage: `url(${event.image})`
-                    }}
-                  />
+              <div style={styles.overlay} />
 
-                  <div
-                    style={{
-                      ...styles.glow,
-                      background: `radial-gradient(circle, ${event.glow}, transparent)`
-                    }}
-                  />
+              <div style={styles.content}>
+                <h2 style={styles.titleText}>{event.title}</h2>
 
-                  <div style={styles.content}>
-                    <h2 style={styles.title}>{event.title}</h2>
-                    <p style={styles.subtitle}>{event.subtitle}</p>
+                <div style={styles.meta}>
+                  <span>
+                    {event.event_date
+                      ? new Date(event.event_date).toLocaleDateString()
+                      : ""}
+                  </span>
+
+                  <div style={styles.vibe}>
+                    {event.vibe?.map((v, i) => (
+                      <span key={i} style={styles.vibeTag}>
+                        {v}
+                      </span>
+                    ))}
                   </div>
-
                 </div>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
-    </main>
+
+              </div>
+
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -94,66 +106,46 @@ const styles = {
     background: "#05050a",
     minHeight: "100vh",
     color: "white",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
+    padding: "20px"
   },
 
-  /* 🎬 INTRO */
-  intro: {
-    position: "fixed",
-    inset: 0,
-    background: "#05050a",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 999
+  header: {
+    marginBottom: 10
   },
 
-  introLogo: {
-    fontSize: 40,
-    letterSpacing: 8,
-    fontWeight: 600,
-    animation: "fadeIn 1.2s ease"
+  title: {
+    fontSize: 24,
+    fontWeight: 700
   },
 
-  introGlow: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    background: "radial-gradient(circle, rgba(168,85,247,0.5), transparent)",
-    filter: "blur(80px)"
+  subtitle: {
+    opacity: 0.6,
+    fontSize: 13,
+    marginTop: 4
   },
 
-  /* HERO */
-  hero: {
-    padding: "40px 20px 10px"
+  search: {
+    width: "100%",
+    padding: "12px",
+    borderRadius: 12,
+    border: "1px solid rgba(255,255,255,0.1)",
+    background: "rgba(255,255,255,0.05)",
+    color: "white",
+    marginBottom: 14,
+    outline: "none"
   },
 
-  logo: {
-    fontSize: 30,
-    letterSpacing: 6,
-    fontWeight: 600
-  },
-
-  tagline: {
-    opacity: 0.5,
-    marginTop: 8,
-    fontSize: 14,
-    letterSpacing: 1
-  },
-
-  container: {
-    padding: 16,
+  grid: {
     display: "flex",
     flexDirection: "column",
-    gap: 18
+    gap: 14
   },
 
   card: {
     position: "relative",
-    height: 190,
-    borderRadius: 24,
-    overflow: "hidden",
-    transition: "transform 0.4s ease"
+    height: 170,
+    borderRadius: 18,
+    overflow: "hidden"
   },
 
   image: {
@@ -161,33 +153,44 @@ const styles = {
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "brightness(0.65)"
+    filter: "brightness(0.75)"
   },
 
-  glow: {
+  overlay: {
     position: "absolute",
-    width: 320,
-    height: 320,
-    filter: "blur(100px)",
-    top: -80,
-    left: -40
+    inset: 0,
+    background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)"
   },
 
   content: {
     position: "absolute",
-    bottom: 20,
-    left: 20
+    bottom: 12,
+    left: 12,
+    right: 12
   },
 
-  title: {
-    fontSize: 22,
-    fontWeight: 600,
-    letterSpacing: 1
+  titleText: {
+    fontSize: 18,
+    fontWeight: 700
   },
 
-  subtitle: {
-    fontSize: 13,
-    opacity: 0.7,
-    marginTop: 6
+  meta: {
+    marginTop: 6,
+    display: "flex",
+    justifyContent: "space-between",
+    fontSize: 11,
+    opacity: 0.8
+  },
+
+  vibe: {
+    display: "flex",
+    gap: 6
+  },
+
+  vibeTag: {
+    fontSize: 10,
+    padding: "3px 8px",
+    borderRadius: 20,
+    background: "rgba(255,255,255,0.12)"
   }
 };
