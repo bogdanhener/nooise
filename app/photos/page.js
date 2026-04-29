@@ -5,51 +5,46 @@ import { supabase } from "../../lib/supabase";
 
 export default function Photos() {
   const [photos, setPhotos] = useState([]);
-  const [debug, setDebug] = useState(null);
 
   useEffect(() => {
     load();
   }, []);
 
   async function load() {
-    console.log("🚀 STARTING SUPABASE FETCH...");
-
-    const res = await supabase
+    const { data, error } = await supabase
       .from("event_photos")
-      .select("*");
+      .select("image_url");
 
-    console.log("📦 FULL RESPONSE:", res);
-
-    setDebug(res);
-
-    if (res.error) {
-      console.log("❌ SUPABASE ERROR:", res.error);
+    if (!error) {
+      setPhotos(data || []);
+    } else {
+      console.error(error);
     }
-
-    setPhotos(res.data || []);
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h1>Photos Debug Page</h1>
-
-      {/* 🔥 DEBUG OUTPUT */}
-      <div style={{
-        background: "#111",
-        color: "#0f0",
-        padding: 15,
-        borderRadius: 10,
-        fontSize: 12,
-        marginBottom: 20,
-        whiteSpace: "pre-wrap"
+    <div style={{
+      padding: 20,
+      background: "#0b0b0f",
+      minHeight: "100vh",
+      color: "white"
+    }}>
+      
+      {/* HEADER */}
+      <h1 style={{
+        textAlign: "center",
+        marginBottom: 30,
+        fontSize: 28,
+        letterSpacing: 2
       }}>
-        <strong>DEBUG OUTPUT:</strong>
-        {"\n"}
-        {JSON.stringify(debug, null, 2)}
-      </div>
+        NOOISE — Photos
+      </h1>
 
-      {/* 🧪 PHOTO GRID */}
-      <div style={{ columnCount: 2, columnGap: 10 }}>
+      {/* GALLERY */}
+      <div style={{
+        columnCount: 2,
+        columnGap: 10
+      }}>
         {photos.map((p, i) => (
           <img
             key={i}
@@ -58,11 +53,13 @@ export default function Photos() {
             style={{
               width: "100%",
               marginBottom: 10,
-              borderRadius: 12
+              borderRadius: 14,
+              breakInside: "avoid"
             }}
           />
         ))}
       </div>
+
     </div>
   );
 }
