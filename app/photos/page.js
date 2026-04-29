@@ -11,9 +11,14 @@ export default function Photos() {
   }, []);
 
   async function load() {
-    const { data, error } = await supabase
-      .from("event_photos")
-      .select("image_url");
+   console.log("TEST START");
+
+    const res = await supabase.from("event_photos").select("*");
+
+    console.log("FULL RESPONSE:", res);
+
+    setPhotos(res.data || []);
+}
 
     console.log("DATA:", data);
     console.log("ERROR:", error);
