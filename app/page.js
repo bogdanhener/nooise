@@ -37,6 +37,7 @@ export default function Home() {
           {/* ACTIONS */}
           <div style={styles.container}>
 
+            {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
               <div style={styles.cardPrimary}>
                 <h2 style={styles.cardTitle}>Find Your Photos</h2>
@@ -44,7 +45,7 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* ⭐ NEXT EVENT (NEW PREMIUM CARD) */}
+            {/* NEXT EVENT */}
             <a
               href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
               target="_blank"
@@ -55,9 +56,14 @@ export default function Home() {
 
                 <div style={styles.eventGlow} />
 
-                <h2 style={styles.cardTitle}>
-                  NOOISE x Crama Thesaurus
+                {/* ⭐ FIXED TITLE */}
+                <h2 style={styles.eventTitle}>
+                  Next Event
                 </h2>
+
+                <h3 style={styles.cardTitle}>
+                  NOOISE x Crama Thesaurus
+                </h3>
 
                 <p style={styles.eventSubtitle}>
                   Winery Session
@@ -74,6 +80,21 @@ export default function Home() {
               </div>
             </a>
 
+          </div>
+
+          {/* FOOTER */}
+          <div style={styles.footer}>
+            <p style={styles.footerText}>
+              2026 © Nooise ·{" "}
+              <a
+                href="https://www.instagram.com/bogdanhener/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.footerLink}
+              >
+                designed by bogdanhener
+              </a>
+            </p>
           </div>
 
         </div>
@@ -165,7 +186,8 @@ const styles = {
 
   linkFix: {
     textDecoration: "none",
-    width: "100%"
+    width: "100%",
+    color: "inherit"
   },
 
   /* PRIMARY CARD */
@@ -177,7 +199,7 @@ const styles = {
     boxShadow: "0 0 25px rgba(255, 200, 100, 0.15)"
   },
 
-  /* ⭐ EVENT CARD (NEW PREMIUM STYLE) */
+  /* EVENT CARD */
   eventCard: {
     padding: 18,
     borderRadius: 16,
@@ -185,7 +207,8 @@ const styles = {
     border: "1px solid rgba(255, 215, 120, 0.25)",
     position: "relative",
     overflow: "hidden",
-    boxShadow: "0 0 30px rgba(255, 200, 80, 0.08)"
+    boxShadow: "0 0 30px rgba(255, 200, 80, 0.08)",
+    color: "white"
   },
 
   eventGlow: {
@@ -198,24 +221,38 @@ const styles = {
     filter: "blur(50px)"
   },
 
+  /* ⭐ FIXED MISSING TITLE */
+  eventTitle: {
+    fontSize: 12,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    opacity: 0.7,
+    marginBottom: 10,
+    color: "#ffcf6a",
+    position: "relative"
+  },
+
   cardTitle: {
     fontSize: 16,
     fontWeight: 700,
-    position: "relative"
+    position: "relative",
+    color: "white"
   },
 
   eventSubtitle: {
     fontSize: 13,
     marginTop: 4,
     opacity: 0.85,
-    position: "relative"
+    position: "relative",
+    color: "white"
   },
 
   eventDate: {
     fontSize: 12,
     marginTop: 8,
     opacity: 0.7,
-    position: "relative"
+    position: "relative",
+    color: "white"
   },
 
   ticket: {
@@ -226,9 +263,21 @@ const styles = {
     position: "relative"
   },
 
-  cardText: {
+  /* FOOTER */
+  footer: {
+    marginTop: 50,
+    textAlign: "center",
+    paddingBottom: 30
+  },
+
+  footerText: {
     fontSize: 12,
-    opacity: 0.7,
-    marginTop: 4
+    opacity: 0.6
+  },
+
+  footerLink: {
+    color: "#ffcf6a",
+    textDecoration: "none",
+    fontWeight: 600
   }
 };
