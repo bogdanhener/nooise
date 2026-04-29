@@ -9,6 +9,9 @@ export default function EventGallery() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // fullscreen state
+  const [activeIndex, setActiveIndex] = useState(null);
+
   useEffect(() => {
     if (params?.id) loadImages();
   }, [params]);
@@ -60,40 +63,52 @@ export default function EventGallery() {
       });
   }
 
+  function openFullscreen(index) {
+    setActiveIndex(index);
+  }
+
+  function closeFullscreen() {
+    setActiveIndex(null);
+  }
+
+  function next() {
+    setActiveIndex((prev) => (prev + 1) % images.length);
+  }
+
+  function prev() {
+    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+  }
+
   return (
     <div style={styles.page}>
-
-      {/* BACKGROUND GLOW */}
-      <div style={styles.bgGlow}></div>
 
       {/* HEADER */}
       <div style={styles.header}>
         <h1 style={styles.title}>{params?.id}</h1>
-        <p style={styles.subtitle}>Find your moment</p>
+        <p style={styles.subtitle}>Swipe. Feel. Relive.</p>
       </div>
 
-      {/* LOADING */}
-      {loading ? (
-        <div style={styles.loading}>Loading memories...</div>
-      ) : (
-
+      {/* GRID */}
+      {!loading && (
         <div style={styles.grid} className="grid">
 
           {images.map((url, i) => (
             <div key={i} style={styles.card}>
 
               {/* IMAGE */}
-              <img src={url} style={styles.image} />
+              <img
+                src={url}
+                style={styles.image}
+                onClick={() => openFullscreen(i)}
+              />
 
-              {/* HOVER OVERLAY */}
-              <div style={styles.overlay}>
-                <button
-                  onClick={() => downloadImage(url, i)}
-                  style={styles.download}
-                >
-                  ⬇
-                </button>
-              </div>
+              {/* DOWNLOAD ICON (FIXED VISIBILITY) */}
+              <button
+                onClick={() => downloadImage(url, i)}
+                style={styles.download}
+              >
+                ⬇
+              </button>
 
             </div>
           ))}
@@ -101,10 +116,47 @@ export default function EventGallery() {
         </div>
       )}
 
+      {/* LOADING */}
+      {loading && (
+        <div style={styles.loading}>Loading memories...</div>
+      )}
+
+      {/* FULLSCREEN VIEWER */}
+      {activeIndex !== null && (
+        <div style={styles.fullscreen}>
+
+          {/* CLOSE */}
+          <div style={styles.close} onClick={closeFullscreen}>✕</div>
+
+          {/* LEFT */}
+          <div style={styles.left} onClick={prev} />
+
+          {/* IMAGE */}
+          <img
+            src={images[activeIndex]}
+            style={styles.fullImage}
+          />
+
+          {/* RIGHT */}
+          <div style={styles.right} onClick={next} />
+
+          {/* DOWNLOAD */}
+          <button
+            style={styles.fullDownload}
+            onClick={() => downloadImage(images[activeIndex], activeIndex)}
+          >
+            ⬇ Download
+          </button>
+
+        </div>
+      )}
+
       {/* RESPONSIVE GRID */}
       <style jsx>{`
         .grid {
+          display: grid;
           grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
         }
 
         @media (min-width: 768px) {
@@ -123,36 +175,22 @@ export default function EventGallery() {
   );
 }
 
-/* 💎 PREMIUM STYLES */
+/* 💎 STYLES */
 const styles = {
   page: {
     minHeight: "100vh",
     background: "#07070c",
     color: "white",
-    padding: 16,
-    position: "relative",
-    overflow: "hidden"
-  },
-
-  bgGlow: {
-    position: "absolute",
-    top: "-200px",
-    left: "-200px",
-    width: "500px",
-    height: "500px",
-    background: "radial-gradient(circle, rgba(255,0,128,0.25), transparent 60%)",
-    filter: "blur(80px)"
+    padding: 14
   },
 
   header: {
-    marginBottom: 18
+    marginBottom: 15
   },
 
   title: {
     fontSize: 20,
-    letterSpacing: 1,
-    textTransform: "capitalize",
-    marginBottom: 4
+    textTransform: "capitalize"
   },
 
   subtitle: {
@@ -165,48 +203,84 @@ const styles = {
     paddingTop: 20
   },
 
-  grid: {
-    display: "grid",
-    gap: 10
-  },
+  grid: {},
 
   card: {
     position: "relative",
     borderRadius: 16,
-    overflow: "hidden",
-    background: "#111",
-    transform: "translateZ(0)",
-    transition: "0.3s ease"
+    overflow: "hidden"
   },
 
   image: {
     width: "100%",
     aspectRatio: "1 / 1",
     objectFit: "cover",
-    display: "block",
-    transition: "0.3s ease"
-  },
-
-  overlay: {
-    position: "absolute",
-    inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)",
-    opacity: 0,
-    transition: "0.3s ease",
-    display: "flex",
-    justifyContent: "flex-end",
-    alignItems: "flex-start",
-    padding: 10
+    cursor: "pointer",
+    display: "block"
   },
 
   download: {
-    width: 36,
-    height: 36,
+    position: "absolute",
+    top: 8,
+    right: 8,
+    width: 38,
+    height: 38,
     borderRadius: "50%",
-    background: "rgba(0,0,0,0.6)",
-    border: "1px solid rgba(255,255,255,0.1)",
+    background: "rgba(0,0,0,0.75)",
+    border: "1px solid rgba(255,255,255,0.15)",
     color: "white",
-    cursor: "pointer",
-    backdropFilter: "blur(10px)"
+    fontSize: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5
+  },
+
+  fullscreen: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.95)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 999
+  },
+
+  fullImage: {
+    maxWidth: "90%",
+    maxHeight: "90%",
+    objectFit: "contain"
+  },
+
+  close: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    fontSize: 26,
+    cursor: "pointer"
+  },
+
+  left: {
+    position: "absolute",
+    left: 0,
+    width: "50%",
+    height: "100%"
+  },
+
+  right: {
+    position: "absolute",
+    right: 0,
+    width: "50%",
+    height: "100%"
+  },
+
+  fullDownload: {
+    position: "absolute",
+    bottom: 20,
+    padding: "10px 16px",
+    borderRadius: 30,
+    background: "white",
+    color: "black",
+    border: "none"
   }
 };
