@@ -1,57 +1,97 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
-const EVENTS = [
-  { id: "mall-takeover", title: "Mall Takeover", type: "day" },
-  { id: "matchaty", title: "MatchaTy", type: "day" },
-  { id: "sudplazza", title: "SudPlazza", type: "night" }
-];
+import { supabase } from "../../lib/supabase";
 
 export default function PhotosPage() {
+  const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
-  const filtered = EVENTS.filter((e) =>
-    e.title.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  async function loadEvents() {
+    const { data } = await supabase
+      .from("events")
+      .select("id, name, slug, cover_image_url, vibe, event_date")
+      .order("event_date", { ascending: false });
+
+    setEvents(data || []);
+  }
+
+  const filtered = events
+    .filter((e) =>
+      e.name.toLowerCase().includes(search.toLowerCase())
+    )
+    .filter((e) =>
+      filter === "all" ? true : e.vibe?.includes(filter)
+    );
 
   return (
     <div style={styles.page}>
 
       {/* HEADER */}
       <div style={styles.header}>
-        <h1 style={styles.title}>Find Your Photos</h1>
-        <p style={styles.subtitle}>
-          Select an event to view your moments
-        </p>
-      </div>
+        <h1 style={styles.title}>Find Your Moment</h1>
 
-      {/* SEARCH BAR (FORCED TOP) */}
-      <div style={styles.searchWrap}>
+        {/* SEARCH */}
         <input
+          placeholder="Search event..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search event..."
           style={styles.search}
         />
+
+        {/* FILTER */}
+        <div style={styles.filters}>
+          {["all", "day", "night"].map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                ...styles.filterBtn,
+                background:
+                  filter === f ? "white" : "rgba(255,255,255,0.1)",
+                color: filter === f ? "black" : "white"
+              }}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* EVENT CARDS */}
+      {/* GRID */}
       <div style={styles.grid}>
         {filtered.map((event) => (
-          <Link
-            key={event.id}
-            href={`/photos/${event.id}`}
-            style={{ textDecoration: "none" }}
-          >
+          <Link key={event.id} href={`/photos/${event.slug}`}>
             <div style={styles.card}>
+
+              {/* IMAGE */}
+              <img
+                src={event.cover_image_url}
+                style={styles.cover}
+              />
+
+              {/* OVERLAY */}
               <div style={styles.overlay} />
 
+              {/* CONTENT */}
               <div style={styles.content}>
-                <h2 style={styles.cardTitle}>{event.title}</h2>
-                <span style={styles.tag}>{event.type}</span>
+                <h2 style={styles.cardTitle}>{event.name}</h2>
+
+                <div style={styles.tags}>
+                  {event.vibe?.map((v, i) => (
+                    <span key={i} style={styles.tag}>
+                      {v}
+                    </span>
+                  ))}
+                </div>
               </div>
+
             </div>
           </Link>
         ))}
@@ -61,87 +101,95 @@ export default function PhotosPage() {
 }
 
 const styles = {
+
   page: {
     background: "#05050a",
     minHeight: "100vh",
-    padding: "20px 16px",
     color: "white"
   },
 
   header: {
-    marginBottom: 14
+    padding: "20px 16px"
   },
 
   title: {
     fontSize: 24,
-    fontWeight: 700,
-    color: "white"
-  },
-
-  subtitle: {
-    fontSize: 13,
-    opacity: 0.6,
-    marginTop: 4,
-    color: "white"
-  },
-
-  searchWrap: {
-    marginBottom: 16
+    fontWeight: 600,
+    marginBottom: 12
   },
 
   search: {
     width: "100%",
-    padding: "12px 14px",
+    padding: 12,
     borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.15)",
-    background: "rgba(255,255,255,0.05)",
+    border: "none",
+    background: "rgba(255,255,255,0.08)",
     color: "white",
-    outline: "none"
+    marginBottom: 12
+  },
+
+  filters: {
+    display: "flex",
+    gap: 8
+  },
+
+  filterBtn: {
+    padding: "6px 12px",
+    borderRadius: 20,
+    border: "none",
+    cursor: "pointer"
   },
 
   grid: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: 12,
+    padding: 16
   },
 
   card: {
     position: "relative",
-    height: 110,
+    height: 160,
     borderRadius: 16,
-    overflow: "hidden",
-    background: "linear-gradient(135deg, #7c3aed, #ec4899, #f97316)"
+    overflow: "hidden"
+  },
+
+  cover: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover"
   },
 
   overlay: {
     position: "absolute",
     inset: 0,
-    background: "rgba(0,0,0,0.35)"
+    background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)"
   },
 
   content: {
     position: "absolute",
-    inset: 0,
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    padding: "14px"
-  },
-
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: "white",
+    bottom: 10,
+    left: 10,
     zIndex: 2
   },
 
-  tag: {
-    marginTop: 6,
-    fontSize: 11,
-    padding: "4px 8px",
-    borderRadius: 20,
-    background: "rgba(255,255,255,0.15)",
-    width: "fit-content",
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: 600,
     color: "white"
+  },
+
+  tags: {
+    display: "flex",
+    gap: 6,
+    marginTop: 4
+  },
+
+  tag: {
+    fontSize: 10,
+    padding: "2px 6px",
+    borderRadius: 6,
+    background: "rgba(255,255,255,0.2)"
   }
 };
