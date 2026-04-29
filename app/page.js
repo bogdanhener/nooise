@@ -148,13 +148,18 @@ const styles = {
   /* MAIN */
   main: {
     width: "100%",
-    minHeight: "100dvh"
+    minHeight: "100dvh",
+    display: "flex",
+    flexDirection: "column"
   },
 
   hero: {
     textAlign: "center",
-    paddingTop: 80,
-    marginBottom: 40
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    paddingBottom: 40
   },
 
   logo: {
@@ -195,9 +200,11 @@ const styles = {
   cardPrimary: {
     padding: "18px 20px",
     borderRadius: 18,
-    background: "linear-gradient(135deg, #7c3aed, #ec4899, #f97316)",
-    color: "white",
-    boxShadow: "0 8px 32px rgba(236,72,153,0.25)"
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,215,120,0.2)",
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
   },
 
   cardRow: {
@@ -222,6 +229,7 @@ const styles = {
 
   cardArrow: {
     fontSize: 20,
+    color: "#ffcf6a",
     opacity: 0.8
   },
 
