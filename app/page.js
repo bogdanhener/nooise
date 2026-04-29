@@ -6,13 +6,10 @@ export default function Home() {
   return (
     <div style={styles.page}>
 
-      {/* HERO CENTER LOGO */}
+      {/* HERO */}
       <div style={styles.hero}>
 
-        <div style={styles.glowWrapper}>
-          <h1 style={styles.logo}>NOOISE</h1>
-          <div style={styles.glowPulse} />
-        </div>
+        <h1 style={styles.logo}>NOOISE</h1>
 
         <p style={styles.tagline}>
           Events. Energy. Moments.
@@ -52,53 +49,39 @@ const styles = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    padding: "20px",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
+    padding: "20px"
   },
 
-  /* HERO */
   hero: {
     textAlign: "center",
     marginBottom: 50
   },
 
-  glowWrapper: {
-    position: "relative",
-    display: "inline-block"
-  },
-
+  /* 🔥 FIXED GOLD LOGO (VISIBLE + ANIMATED) */
   logo: {
-    fontSize: 44,
+    fontSize: 46,
     fontWeight: 800,
     letterSpacing: 6,
-    color: "white",
-    position: "relative",
-    zIndex: 2,
-    animation: "fadeGold 2.5s ease-in-out forwards"
-  },
 
-  /* GOLD GLOW PULSE */
-  glowPulse: {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    width: 10,
-    height: 10,
-    transform: "translate(-50%, -50%)",
-    borderRadius: "50%",
-    background: "rgba(255, 215, 120, 0.9)",
-    filter: "blur(20px)",
-    animation: "pulseGlow 3s ease-in-out infinite"
+    color: "#ffd98a", // base gold (VISIBLE immediately)
+
+    textShadow: `
+      0 0 10px rgba(255, 215, 120, 0.8),
+      0 0 25px rgba(255, 200, 80, 0.6),
+      0 0 45px rgba(255, 180, 60, 0.3)
+    `,
+
+    animation: "goldPulse 2.8s ease-in-out infinite"
   },
 
   tagline: {
     marginTop: 14,
-    opacity: 0.6,
+    opacity: 0.7,
     fontSize: 14,
-    letterSpacing: 1
+    letterSpacing: 1,
+    color: "#f3e2b3"
   },
 
-  /* CARDS */
   container: {
     width: "100%",
     maxWidth: 420,
@@ -112,7 +95,7 @@ const styles = {
     borderRadius: 16,
     background: "linear-gradient(135deg, #7c3aed, #ec4899, #f97316)",
     color: "white",
-    boxShadow: "0 0 20px rgba(255, 180, 80, 0.15)"
+    boxShadow: "0 0 25px rgba(255, 200, 100, 0.15)"
   },
 
   cardSecondary: {
