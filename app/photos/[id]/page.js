@@ -110,9 +110,10 @@ export default function EventGallery() {
         <h1 style={styles.title}>{params?.id}</h1>
 
         <p style={styles.story}>
-          Swipe through memories from <b>Nooise daytime experience</b>.
+          Step into the Nooise experience</b>.
           <br />
-          Feel the sound, the sun, the crowd.
+          Music. Energy. People.<br />
+	  Find your moment.	
         </p>
       </div>
 
