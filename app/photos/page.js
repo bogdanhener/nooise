@@ -6,53 +6,36 @@ const EVENTS = [
   {
     id: "mall-takeover",
     title: "Mall Takeover",
-    subtitle: "Energy takes over the space",
-    glow: "rgba(0,200,255,0.6)",
-    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+    glow: "rgba(0,200,255,0.6)"
   },
   {
     id: "matchaty",
     title: "MatchaTy",
-    subtitle: "Curated rhythm & aesthetic",
-    glow: "rgba(120,255,160,0.6)",
-    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba"
+    glow: "rgba(120,255,160,0.6)"
   },
   {
     id: "sudplazza",
     title: "SudPlazza",
-    subtitle: "Deeper sounds, late energy",
-    glow: "rgba(168,85,247,0.6)",
-    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+    glow: "rgba(168,85,247,0.6)"
   }
 ];
 
-export default function Home() {
+export default function PhotosPage() {
   return (
-    <main style={styles.page}>
+    <div style={styles.page}>
 
-      {/* HERO */}
-      <div style={styles.hero}>
-        <h1 style={styles.logo}>NOOISE</h1>
-        <p style={styles.tagline}>
-          Select your moment
+      <div style={styles.header}>
+        <h1 style={styles.title}>Find Your Moment</h1>
+        <p style={styles.subtitle}>
+          Select the event you were part of
         </p>
       </div>
 
-      {/* EVENTS */}
-      <div style={styles.container}>
+      <div style={styles.list}>
         {EVENTS.map((event) => (
           <Link key={event.id} href={`/photos/${event.id}`} style={{ textDecoration: "none" }}>
-            <div style={styles.card}>
+            <div style={styles.item}>
 
-              {/* IMAGE */}
-              <div
-                style={{
-                  ...styles.image,
-                  backgroundImage: `url(${event.image})`
-                }}
-              />
-
-              {/* GLOW */}
               <div
                 style={{
                   ...styles.glow,
@@ -60,94 +43,65 @@ export default function Home() {
                 }}
               />
 
-              {/* CONTENT */}
-              <div style={styles.content}>
-                <h2 style={styles.title}>{event.title}</h2>
-                <p style={styles.subtitle}>{event.subtitle}</p>
-              </div>
+              <span style={styles.text}>{event.title}</span>
 
             </div>
           </Link>
         ))}
       </div>
-    </main>
+
+    </div>
   );
 }
 
 const styles = {
-
   page: {
     background: "#05050a",
     minHeight: "100vh",
     color: "white",
-    fontFamily: "sans-serif"
+    padding: 20
   },
 
-  hero: {
-    padding: "30px 20px 10px"
-  },
-
-  logo: {
-    fontSize: 28,
-    letterSpacing: 4,
-    fontWeight: 600
-  },
-
-  tagline: {
-    opacity: 0.6,
-    marginTop: 6,
-    fontSize: 14
-  },
-
-  container: {
-    padding: 16,
-    display: "flex",
-    flexDirection: "column",
-    gap: 16
-  },
-
-  card: {
-    position: "relative",
-    height: 180,
-    borderRadius: 20,
-    overflow: "hidden",
-    cursor: "pointer",
-    transform: "scale(1)",
-    transition: "all 0.3s ease"
-  },
-
-  image: {
-    position: "absolute",
-    inset: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    filter: "brightness(0.7)"
-  },
-
-  glow: {
-    position: "absolute",
-    width: 300,
-    height: 300,
-    filter: "blur(80px)",
-    top: -80,
-    left: -40
-  },
-
-  content: {
-    position: "absolute",
-    bottom: 16,
-    left: 16,
-    zIndex: 2
+  header: {
+    marginBottom: 30
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 600
   },
 
   subtitle: {
-    fontSize: 13,
-    opacity: 0.7,
-    marginTop: 4
+    opacity: 0.6,
+    marginTop: 6,
+    fontSize: 13
+  },
+
+  list: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 14
+  },
+
+  item: {
+    position: "relative",
+    padding: "18px 20px",
+    borderRadius: 16,
+    background: "rgba(255,255,255,0.05)",
+    overflow: "hidden"
+  },
+
+  glow: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    filter: "blur(80px)",
+    top: -60,
+    left: -40
+  },
+
+  text: {
+    fontSize: 16,
+    fontWeight: 500
   }
 };
