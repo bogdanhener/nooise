@@ -1,125 +1,193 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "../../lib/supabase";
+import { useEffect, useState } from "react";
 
-export default function PhotosPage() {
-  const [events, setEvents] = useState([]);
-  const [search, setSearch] = useState("");
+const EVENTS = [
+  {
+    id: "mall-takeover",
+    title: "Mall Takeover",
+    subtitle: "Energy takes over the space",
+    glow: "rgba(0,200,255,0.6)",
+    image: "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+  },
+  {
+    id: "matchaty",
+    title: "MatchaTy",
+    subtitle: "Curated rhythm & aesthetic",
+    glow: "rgba(120,255,160,0.6)",
+    image: "https://images.unsplash.com/photo-1519681393784-d120267933ba"
+  },
+  {
+    id: "sudplazza",
+    title: "SudPlazza",
+    subtitle: "Deeper sounds, late energy",
+    glow: "rgba(168,85,247,0.6)",
+    image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30"
+  }
+];
+
+export default function Home() {
+  const [enter, setEnter] = useState(false);
 
   useEffect(() => {
-    loadEvents();
+    setTimeout(() => setEnter(true), 1200);
   }, []);
 
-  async function loadEvents() {
-    const { data, error } = await supabase
-      .from("events")
-      .select("id, name, slug");
-
-    console.log("EVENTS:", data);
-    console.log("ERROR:", error);
-
-    setEvents(data || []);
-  }
-
-  const filtered = events.filter((e) =>
-    e.name.toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
-    <div style={styles.page}>
+    <main style={styles.page}>
 
-      {/* HEADER */}
-      <div style={styles.header}>
-        <h1 style={styles.title}>Find Your Moment</h1>
+      {/* 🎬 CINEMATIC ENTRY */}
+      {!enter && (
+        <div style={styles.intro}>
+          <div style={styles.introGlow}></div>
+          <h1 style={styles.introLogo}>NOOISE</h1>
+        </div>
+      )}
 
-        {/* SEARCH */}
-        <input
-          placeholder="Search event..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={styles.search}
-        />
-      </div>
+      {/* MAIN CONTENT */}
+      {enter && (
+        <>
+          <div style={styles.hero}>
+            <h1 style={styles.logo}>NOOISE</h1>
+            <p style={styles.tagline}>
+              Select your moment
+            </p>
+          </div>
 
-      {/* EVENT CARDS */}
-      <div style={styles.grid}>
-        {filtered.map((event) => (
-          <Link key={event.id} href={`/photos/${event.slug}`}>
-            <div style={styles.card}>
+          <div style={styles.container}>
+            {EVENTS.map((event) => (
+              <Link key={event.id} href={`/photos/${event.id}`} style={{ textDecoration: "none" }}>
+                <div style={styles.card}>
 
-              <div style={styles.cardOverlay} />
+                  <div
+                    style={{
+                      ...styles.image,
+                      backgroundImage: `url(${event.image})`
+                    }}
+                  />
 
-              <h2 style={styles.cardTitle}>{event.name}</h2>
+                  <div
+                    style={{
+                      ...styles.glow,
+                      background: `radial-gradient(circle, ${event.glow}, transparent)`
+                    }}
+                  />
 
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+                  <div style={styles.content}>
+                    <h2 style={styles.title}>{event.title}</h2>
+                    <p style={styles.subtitle}>{event.subtitle}</p>
+                  </div>
+
+                </div>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
+    </main>
   );
 }
 
 const styles = {
-
   page: {
     background: "#05050a",
     minHeight: "100vh",
-    color: "white"
-  },
-
-  header: {
-    padding: "20px 16px"
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: 600,
-    marginBottom: 12
-  },
-
-  search: {
-    width: "100%",
-    padding: 12,
-    borderRadius: 12,
-    border: "none",
-    background: "rgba(255,255,255,0.08)",
     color: "white",
-    outline: "none"
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
 
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 12,
-    padding: 16
+  /* 🎬 INTRO */
+  intro: {
+    position: "fixed",
+    inset: 0,
+    background: "#05050a",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 999
+  },
+
+  introLogo: {
+    fontSize: 40,
+    letterSpacing: 8,
+    fontWeight: 600,
+    animation: "fadeIn 1.2s ease"
+  },
+
+  introGlow: {
+    position: "absolute",
+    width: 300,
+    height: 300,
+    background: "radial-gradient(circle, rgba(168,85,247,0.5), transparent)",
+    filter: "blur(80px)"
+  },
+
+  /* HERO */
+  hero: {
+    padding: "40px 20px 10px"
+  },
+
+  logo: {
+    fontSize: 30,
+    letterSpacing: 6,
+    fontWeight: 600
+  },
+
+  tagline: {
+    opacity: 0.5,
+    marginTop: 8,
+    fontSize: 14,
+    letterSpacing: 1
+  },
+
+  container: {
+    padding: 16,
+    display: "flex",
+    flexDirection: "column",
+    gap: 18
   },
 
   card: {
     position: "relative",
-    height: 120,
-    borderRadius: 16,
+    height: 190,
+    borderRadius: 24,
     overflow: "hidden",
-    display: "flex",
-    alignItems: "flex-end",
-    padding: 12,
-    background: "linear-gradient(135deg, #111, #222)",
-    cursor: "pointer",
-    transition: "transform 0.2s ease"
+    transition: "transform 0.4s ease"
   },
 
-  cardOverlay: {
+  image: {
     position: "absolute",
     inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    filter: "brightness(0.65)"
   },
 
-  cardTitle: {
-    position: "relative",
-    zIndex: 2,
-    color: "white", // ✅ FIXED (always white)
-    fontSize: 16,
-    fontWeight: 600
+  glow: {
+    position: "absolute",
+    width: 320,
+    height: 320,
+    filter: "blur(100px)",
+    top: -80,
+    left: -40
+  },
+
+  content: {
+    position: "absolute",
+    bottom: 20,
+    left: 20
+  },
+
+  title: {
+    fontSize: 22,
+    fontWeight: 600,
+    letterSpacing: 1
+  },
+
+  subtitle: {
+    fontSize: 13,
+    opacity: 0.7,
+    marginTop: 6
   }
 };
