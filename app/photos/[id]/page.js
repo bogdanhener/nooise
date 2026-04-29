@@ -1,16 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
 export default function EventGallery() {
   const params = useParams();
+
   const [images, setImages] = useState([]);
+  const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // fullscreen state
-  const [activeIndex, setActiveIndex] = useState(null);
+  // touch tracking
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   useEffect(() => {
     if (params?.id) loadImages();
@@ -19,11 +22,9 @@ export default function EventGallery() {
   async function loadImages() {
     setLoading(true);
 
-    const folder = params.id;
-
     const { data, error } = await supabase.storage
       .from("nooise-photos")
-      .list(folder, {
+      .list(params.id, {
         limit: 200,
         sortBy: { column: "name", order: "asc" }
       });
@@ -37,7 +38,7 @@ export default function EventGallery() {
     const urls = data.map((file) => {
       const { data: urlData } = supabase.storage
         .from("nooise-photos")
-        .getPublicUrl(`${folder}/${file.name}`);
+        .getPublicUrl(`${params.id}/${file.name}`);
 
       return urlData.publicUrl;
     });
@@ -46,28 +47,12 @@ export default function EventGallery() {
     setLoading(false);
   }
 
-  function downloadImage(url, index) {
-    fetch(url)
-      .then((res) => res.blob())
-      .then((blob) => {
-        const blobUrl = window.URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = blobUrl;
-        a.download = `nooise-${params.id}-${index + 1}.jpg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
-        window.URL.revokeObjectURL(blobUrl);
-      });
-  }
-
-  function openFullscreen(index) {
+  function open(index) {
     setActiveIndex(index);
   }
 
-  function closeFullscreen() {
+  function close(e) {
+    e.stopPropagation();
     setActiveIndex(null);
   }
 
@@ -79,57 +64,89 @@ export default function EventGallery() {
     setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
   }
 
+  // 📱 REAL SWIPE DETECTION
+  function handleTouchStart(e) {
+    touchStartX.current = e.touches[0].clientX;
+  }
+
+  function handleTouchEnd() {
+    const distance = touchStartX.current - touchEndX.current;
+
+    if (distance > 50) next();       // swipe left
+    if (distance < -50) prev();     // swipe right
+  }
+
+  function handleTouchMove(e) {
+    touchEndX.current = e.touches[0].clientX;
+  }
+
+  function download(url, index) {
+    fetch(url)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = `nooise-${params.id}-${index + 1}.jpg`;
+        a.click();
+
+        URL.revokeObjectURL(blobUrl);
+      });
+  }
+
   return (
     <div style={styles.page}>
 
       {/* HEADER */}
       <div style={styles.header}>
         <h1 style={styles.title}>{params?.id}</h1>
-        <p style={styles.subtitle}>Swipe. Feel. Relive.</p>
+        <p style={styles.subtitle}>Swipe. Tap. Relive.</p>
       </div>
 
       {/* GRID */}
       {!loading && (
-        <div style={styles.grid} className="grid">
-
+        <div className="grid">
           {images.map((url, i) => (
             <div key={i} style={styles.card}>
 
-              {/* IMAGE */}
               <img
                 src={url}
                 style={styles.image}
-                onClick={() => openFullscreen(i)}
+                onClick={() => open(i)}
               />
 
-              {/* DOWNLOAD ICON (FIXED VISIBILITY) */}
               <button
-                onClick={() => downloadImage(url, i)}
                 style={styles.download}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  download(url, i);
+                }}
               >
                 ⬇
               </button>
 
             </div>
           ))}
-
         </div>
       )}
 
-      {/* LOADING */}
-      {loading && (
-        <div style={styles.loading}>Loading memories...</div>
-      )}
-
-      {/* FULLSCREEN VIEWER */}
+      {/* FULLSCREEN */}
       {activeIndex !== null && (
-        <div style={styles.fullscreen}>
+        <div
+          style={styles.fullscreen}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
 
-          {/* CLOSE */}
-          <div style={styles.close} onClick={closeFullscreen}>✕</div>
-
-          {/* LEFT */}
-          <div style={styles.left} onClick={prev} />
+          {/* CLOSE (FIXED STOP PROPAGATION) */}
+          <button
+            style={styles.close}
+            onClick={close}
+          >
+            ✕
+          </button>
 
           {/* IMAGE */}
           <img
@@ -137,13 +154,13 @@ export default function EventGallery() {
             style={styles.fullImage}
           />
 
-          {/* RIGHT */}
-          <div style={styles.right} onClick={next} />
-
           {/* DOWNLOAD */}
           <button
             style={styles.fullDownload}
-            onClick={() => downloadImage(images[activeIndex], activeIndex)}
+            onClick={(e) => {
+              e.stopPropagation();
+              download(images[activeIndex], activeIndex);
+            }}
           >
             ⬇ Download
           </button>
@@ -155,19 +172,13 @@ export default function EventGallery() {
       <style jsx>{`
         .grid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
         }
 
-        @media (min-width: 768px) {
+        @media (max-width: 768px) {
           .grid {
             grid-template-columns: repeat(3, 1fr);
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .grid {
-            grid-template-columns: repeat(4, 1fr);
           }
         }
       `}</style>
@@ -178,62 +189,50 @@ export default function EventGallery() {
 /* 💎 STYLES */
 const styles = {
   page: {
-    minHeight: "100vh",
     background: "#07070c",
+    minHeight: "100vh",
     color: "white",
-    padding: 14
+    padding: 12
   },
 
   header: {
-    marginBottom: 15
+    marginBottom: 10
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 18,
     textTransform: "capitalize"
   },
 
   subtitle: {
     opacity: 0.5,
-    fontSize: 13
+    fontSize: 12
   },
-
-  loading: {
-    opacity: 0.6,
-    paddingTop: 20
-  },
-
-  grid: {},
 
   card: {
     position: "relative",
-    borderRadius: 16,
+    borderRadius: 14,
     overflow: "hidden"
   },
 
   image: {
     width: "100%",
-    aspectRatio: "1 / 1",
+    aspectRatio: "1/1",
     objectFit: "cover",
-    cursor: "pointer",
     display: "block"
   },
 
   download: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 38,
-    height: 38,
+    top: 6,
+    right: 6,
+    width: 34,
+    height: 34,
     borderRadius: "50%",
-    background: "rgba(0,0,0,0.75)",
-    border: "1px solid rgba(255,255,255,0.15)",
+    background: "rgba(0,0,0,0.7)",
+    border: "1px solid rgba(255,255,255,0.2)",
     color: "white",
-    fontSize: 16,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 5
+    zIndex: 10
   },
 
   fullscreen: {
@@ -247,8 +246,8 @@ const styles = {
   },
 
   fullImage: {
-    maxWidth: "90%",
-    maxHeight: "90%",
+    maxWidth: "92%",
+    maxHeight: "92%",
     objectFit: "contain"
   },
 
@@ -256,22 +255,11 @@ const styles = {
     position: "absolute",
     top: 20,
     right: 20,
-    fontSize: 26,
-    cursor: "pointer"
-  },
-
-  left: {
-    position: "absolute",
-    left: 0,
-    width: "50%",
-    height: "100%"
-  },
-
-  right: {
-    position: "absolute",
-    right: 0,
-    width: "50%",
-    height: "100%"
+    fontSize: 24,
+    background: "transparent",
+    border: "none",
+    color: "white",
+    zIndex: 1000
   },
 
   fullDownload: {
