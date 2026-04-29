@@ -1,107 +1,125 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-
-const EVENTS = [
-  {
-    id: "mall-takeover",
-    title: "Mall Takeover",
-    glow: "rgba(0,200,255,0.6)"
-  },
-  {
-    id: "matchaty",
-    title: "MatchaTy",
-    glow: "rgba(120,255,160,0.6)"
-  },
-  {
-    id: "sudplazza",
-    title: "SudPlazza",
-    glow: "rgba(168,85,247,0.6)"
-  }
-];
+import { supabase } from "../../lib/supabase";
 
 export default function PhotosPage() {
+  const [events, setEvents] = useState([]);
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    loadEvents();
+  }, []);
+
+  async function loadEvents() {
+    const { data, error } = await supabase
+      .from("events")
+      .select("id, name, slug");
+
+    console.log("EVENTS:", data);
+    console.log("ERROR:", error);
+
+    setEvents(data || []);
+  }
+
+  const filtered = events.filter((e) =>
+    e.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div style={styles.page}>
 
+      {/* HEADER */}
       <div style={styles.header}>
         <h1 style={styles.title}>Find Your Moment</h1>
-        <p style={styles.subtitle}>
-          Select the event you were part of
-        </p>
+
+        {/* SEARCH */}
+        <input
+          placeholder="Search event..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={styles.search}
+        />
       </div>
 
-      <div style={styles.list}>
-        {EVENTS.map((event) => (
-          <Link key={event.id} href={`/photos/${event.id}`} style={{ textDecoration: "none" }}>
-            <div style={styles.item}>
+      {/* EVENT CARDS */}
+      <div style={styles.grid}>
+        {filtered.map((event) => (
+          <Link key={event.id} href={`/photos/${event.slug}`}>
+            <div style={styles.card}>
 
-              <div
-                style={{
-                  ...styles.glow,
-                  background: `radial-gradient(circle, ${event.glow}, transparent)`
-                }}
-              />
+              <div style={styles.cardOverlay} />
 
-              <span style={styles.text}>{event.title}</span>
+              <h2 style={styles.cardTitle}>{event.name}</h2>
 
             </div>
           </Link>
         ))}
       </div>
-
     </div>
   );
 }
 
 const styles = {
+
   page: {
     background: "#05050a",
     minHeight: "100vh",
-    color: "white",
-    padding: 20
+    color: "white"
   },
 
   header: {
-    marginBottom: 30
+    padding: "20px 16px"
   },
 
   title: {
     fontSize: 24,
-    fontWeight: 600
+    fontWeight: 600,
+    marginBottom: 12
   },
 
-  subtitle: {
-    opacity: 0.6,
-    marginTop: 6,
-    fontSize: 13
+  search: {
+    width: "100%",
+    padding: 12,
+    borderRadius: 12,
+    border: "none",
+    background: "rgba(255,255,255,0.08)",
+    color: "white",
+    outline: "none"
   },
 
-  list: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 14
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(2, 1fr)",
+    gap: 12,
+    padding: 16
   },
 
-  item: {
+  card: {
     position: "relative",
-    padding: "18px 20px",
+    height: 120,
     borderRadius: 16,
-    background: "rgba(255,255,255,0.05)",
-    overflow: "hidden"
+    overflow: "hidden",
+    display: "flex",
+    alignItems: "flex-end",
+    padding: 12,
+    background: "linear-gradient(135deg, #111, #222)",
+    cursor: "pointer",
+    transition: "transform 0.2s ease"
   },
 
-  glow: {
+  cardOverlay: {
     position: "absolute",
-    width: 200,
-    height: 200,
-    filter: "blur(80px)",
-    top: -60,
-    left: -40
+    inset: 0,
+    background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
   },
 
-  text: {
+  cardTitle: {
+    position: "relative",
+    zIndex: 2,
+    color: "white", // ✅ FIXED (always white)
     fontSize: 16,
-    fontWeight: 500
+    fontWeight: 600
   }
 };
