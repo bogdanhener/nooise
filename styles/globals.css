@@ -86,3 +86,55 @@ body {
   }
 }
 
+@keyframes cinematicLogo {
+  0% {
+    transform: scale(0.8);
+    color: white;
+    text-shadow: none;
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+    color: #fff3d6;
+    transform: scale(1);
+  }
+
+  70% {
+    color: #ffd98a;
+    text-shadow: 0 0 20px rgba(255, 215, 120, 0.4);
+  }
+
+  100% {
+    color: #ffcf6a;
+    text-shadow:
+      0 0 25px rgba(255, 215, 120, 0.9),
+      0 0 60px rgba(255, 180, 60, 0.5);
+  }
+}
+
+@keyframes glowBurst {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(6);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(10);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInMain {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
