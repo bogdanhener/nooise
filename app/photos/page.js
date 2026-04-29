@@ -6,7 +6,6 @@ import { supabase } from "../../lib/supabase";
 
 export default function PhotosPage() {
   const [events, setEvents] = useState([]);
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,37 +24,23 @@ export default function PhotosPage() {
     setLoading(false);
   }
 
-  const filtered = events.filter((e) =>
-    (e.title || "").toLowerCase().includes(search.toLowerCase())
-  );
-
   return (
     <div style={styles.page}>
 
       {/* HEADER */}
       <div style={styles.header}>
         <h1 style={styles.title}>Find Your Photos</h1>
-        <p style={styles.subtitle}>
-          Select an event and relive the moment
-        </p>
+        <p style={styles.subtitle}>Select an event</p>
       </div>
-
-      {/* SEARCH */}
-      <input
-        placeholder="Search events..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        style={styles.search}
-      />
 
       {/* LOADING */}
       {loading && (
         <p style={{ opacity: 0.6 }}>Loading events...</p>
       )}
 
-      {/* GRID */}
+      {/* EVENTS GRID */}
       <div style={styles.grid}>
-        {filtered.map((event) => (
+        {events.map((event) => (
           <Link
             key={event.id}
             href={`/photos/${event.id}`}
@@ -63,6 +48,7 @@ export default function PhotosPage() {
           >
             <div style={styles.card}>
 
+              {/* BACKGROUND IMAGE */}
               <div
                 style={{
                   ...styles.image,
@@ -70,26 +56,23 @@ export default function PhotosPage() {
                 }}
               />
 
+              {/* DARK OVERLAY */}
               <div style={styles.overlay} />
 
+              {/* TEXT CONTENT */}
               <div style={styles.content}>
-                <h2 style={styles.titleText}>{event.title}</h2>
 
-                <div style={styles.meta}>
-                  <span>
-                    {event.event_date
-                      ? new Date(event.event_date).toLocaleDateString()
-                      : ""}
-                  </span>
+                {/* EVENT NAME */}
+                <h2 style={styles.titleText}>
+                  {event.name || event.title}
+                </h2>
 
-                  <div style={styles.vibe}>
-                    {event.vibe?.map((v, i) => (
-                      <span key={i} style={styles.vibeTag}>
-                        {v}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                {/* EVENT DATE */}
+                <p style={styles.dateText}>
+                  {event.event_date
+                    ? new Date(event.event_date).toLocaleDateString()
+                    : ""}
+                </p>
 
               </div>
 
@@ -97,9 +80,12 @@ export default function PhotosPage() {
           </Link>
         ))}
       </div>
+
     </div>
   );
 }
+
+/* ================= STYLES ================= */
 
 const styles = {
   page: {
@@ -110,29 +96,19 @@ const styles = {
   },
 
   header: {
-    marginBottom: 10
+    marginBottom: 14
   },
 
   title: {
     fontSize: 24,
-    fontWeight: 700
+    fontWeight: 700,
+    color: "white"
   },
 
   subtitle: {
     opacity: 0.6,
     fontSize: 13,
     marginTop: 4
-  },
-
-  search: {
-    width: "100%",
-    padding: "12px",
-    borderRadius: 12,
-    border: "1px solid rgba(255,255,255,0.1)",
-    background: "rgba(255,255,255,0.05)",
-    color: "white",
-    marginBottom: 14,
-    outline: "none"
   },
 
   grid: {
@@ -143,7 +119,7 @@ const styles = {
 
   card: {
     position: "relative",
-    height: 170,
+    height: 180,
     borderRadius: 18,
     overflow: "hidden"
   },
@@ -164,33 +140,21 @@ const styles = {
 
   content: {
     position: "absolute",
-    bottom: 12,
-    left: 12,
-    right: 12
+    bottom: 14,
+    left: 14,
+    right: 14
   },
 
   titleText: {
     fontSize: 18,
-    fontWeight: 700
+    fontWeight: 700,
+    color: "white"
   },
 
-  meta: {
-    marginTop: 6,
-    display: "flex",
-    justifyContent: "space-between",
-    fontSize: 11,
-    opacity: 0.8
-  },
-
-  vibe: {
-    display: "flex",
-    gap: 6
-  },
-
-  vibeTag: {
-    fontSize: 10,
-    padding: "3px 8px",
-    borderRadius: 20,
-    background: "rgba(255,255,255,0.12)"
+  dateText: {
+    fontSize: 12,
+    marginTop: 4,
+    opacity: 0.75,
+    color: "white"
   }
 };
