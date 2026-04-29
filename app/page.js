@@ -7,14 +7,14 @@ export default function Home() {
   const [enter, setEnter] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setEnter(true), 2600);
+    const t = setTimeout(() => setEnter(true), 2400);
     return () => clearTimeout(t);
   }, []);
 
   return (
     <div style={styles.page}>
 
-      {/* CINEMATIC INTRO */}
+      {/* INTRO */}
       {!enter && (
         <div style={styles.intro}>
           <h1 style={styles.logoIntro}>NOOISE</h1>
@@ -22,36 +22,36 @@ export default function Home() {
         </div>
       )}
 
-      {/* MAIN CONTENT */}
-      {enter && (
-        <div style={styles.main}>
+      {/* MAIN CONTENT (FORCED VISIBILITY) */}
+      <div style={{
+        ...styles.main,
+        display: enter ? "block" : "none"
+      }}>
 
-          <div style={styles.hero}>
-            <h1 style={styles.logo}>NOOISE</h1>
-            <p style={styles.tagline}>
-              Events. Energy. Moments.
-            </p>
-          </div>
+        <div style={styles.hero}>
+          <h1 style={styles.logo}>NOOISE</h1>
+          <p style={styles.tagline}>
+            Events. Energy. Moments.
+          </p>
+        </div>
 
-          <div style={styles.container}>
+        <div style={styles.container}>
 
-            <Link href="/photos" style={{ textDecoration: "none" }}>
-              <div style={styles.cardPrimary}>
-                <h2 style={styles.cardTitle}>Find Your Photos</h2>
-                <p style={styles.cardText}>Relive your event moments</p>
-              </div>
-            </Link>
-
-            <div style={styles.cardSecondary}>
-              <h2 style={styles.cardTitle}>Next Event</h2>
-              <p style={styles.cardText}>Coming soon</p>
+          <Link href="/photos" style={{ textDecoration: "none" }}>
+            <div style={styles.cardPrimary}>
+              <h2 style={styles.cardTitle}>Find Your Photos</h2>
+              <p style={styles.cardText}>Relive your event moments</p>
             </div>
+          </Link>
 
+          <div style={styles.cardSecondary}>
+            <h2 style={styles.cardTitle}>Next Event</h2>
+            <p style={styles.cardText}>Coming soon</p>
           </div>
 
         </div>
-      )}
 
+      </div>
     </div>
   );
 }
@@ -66,7 +66,7 @@ const styles = {
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
 
-  /* ===== INTRO ===== */
+  /* INTRO */
   intro: {
     position: "fixed",
     inset: 0,
@@ -83,7 +83,7 @@ const styles = {
     fontWeight: 800,
     letterSpacing: 8,
     color: "white",
-    animation: "cinematicLogo 2.6s ease-in-out forwards",
+    animation: "cinematicLogo 2.2s ease-in-out forwards",
     zIndex: 2
   },
 
@@ -94,13 +94,13 @@ const styles = {
     borderRadius: "50%",
     background: "rgba(255, 210, 120, 0.9)",
     filter: "blur(40px)",
-    animation: "glowBurst 2.6s ease-in-out forwards"
+    animation: "glowBurst 2.2s ease-in-out forwards"
   },
 
-  /* ===== MAIN ===== */
+  /* MAIN */
   main: {
-    opacity: 0,
-    animation: "fadeInMain 0.6s ease forwards"
+    width: "100%",
+    minHeight: "100vh"
   },
 
   hero: {
