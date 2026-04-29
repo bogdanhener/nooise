@@ -1,45 +1,56 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
-import { supabase } from "../../lib/supabase";
+
+const EVENTS = [
+  {
+    id: "mall-takeover",
+    title: "Mall Takeover",
+    type: "day",
+    date: "2026-04-10",
+    cover: "/covers/mall.jpg" // optional later
+  },
+  {
+    id: "matchaty",
+    title: "MatchaTy",
+    type: "day",
+    date: "2026-03-22",
+    cover: "/covers/matcha.jpg"
+  },
+  {
+    id: "sudplazza",
+    title: "SudPlazza",
+    type: "night",
+    date: "2026-02-14",
+    cover: "/covers/sud.jpg"
+  }
+];
 
 export default function PhotosPage() {
-  const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    loadEvents();
-  }, []);
-
-  async function loadEvents() {
-    const { data, error } = await supabase
-      .from("events")
-      .select("id, name, slug, cover_image_url, vibe, event_date")
-      .order("event_date", { ascending: false });
-
-    console.log("EVENTS:", data);
-    console.log("ERROR:", error);
-
-    setEvents(data || []);
-  }
-
-  const filtered = events
+  const filtered = EVENTS
     .filter((e) =>
-      e.name.toLowerCase().includes(search.toLowerCase())
+      e.title.toLowerCase().includes(search.toLowerCase())
     )
-    .filter((e) =>
-      filter === "all" ? true : e.vibe?.includes(filter)
-    );
+    .filter((e) => (filter === "all" ? true : e.type === filter))
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
 
   return (
     <div style={styles.page}>
-
+      
       {/* HEADER */}
       <div style={styles.header}>
         <h1 style={styles.title}>Find Your Moment</h1>
+        <p style={styles.subtitle}>
+          Every event. Every memory. All in one place.
+        </p>
+      </div>
 
+      {/* SEARCH */}
+      <div style={styles.controls}>
         <input
           placeholder="Search event..."
           value={search}
@@ -48,114 +59,97 @@ export default function PhotosPage() {
         />
 
         <div style={styles.filters}>
-          {["all", "day", "night"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              style={{
-                ...styles.filterBtn,
-                background:
-                  filter === f ? "white" : "rgba(255,255,255,0.1)",
-                color: filter === f ? "black" : "white"
-              }}
-            >
-              {f}
-            </button>
-          ))}
+          <button onClick={() => setFilter("all")} style={btn(filter === "all")}>All</button>
+          <button onClick={() => setFilter("day")} style={btn(filter === "day")}>Day</button>
+          <button onClick={() => setFilter("night")} style={btn(filter === "night")}>Night</button>
         </div>
       </div>
 
-      {/* GRID */}
+      {/* EVENTS GRID */}
       <div style={styles.grid}>
-        {filtered.map((event) => {
+        {filtered.map((event) => (
+          <Link key={event.id} href={`/photos/${event.id}`} style={{ textDecoration: "none" }}>
+            <div style={styles.card}>
 
-          const image =
-            event.cover_image_url ||
-            "https://images.unsplash.com/photo-1506157786151-b8491531f063?q=80&w=1200";
+              {/* COVER */}
+              <div
+                style={{
+                  ...styles.cover,
+                  backgroundImage: `url(${event.cover || ""})`
+                }}
+              />
 
-          return (
-            <Link key={event.id} href={`/photos/${event.slug}`}>
-              <div style={styles.card}>
+              {/* OVERLAY */}
+              <div style={styles.overlay} />
 
-                {/* IMAGE */}
-                <img
-                  src={image}
-                  style={styles.cover}
-                />
+              {/* CONTENT */}
+              <div style={styles.cardContent}>
+                <h2 style={styles.cardTitle}>{event.title}</h2>
 
-                {/* OVERLAY */}
-                <div style={styles.overlay} />
-
-                {/* CONTENT */}
-                <div style={styles.content}>
-                  <h2 style={styles.cardTitle}>
-                    {event.name}
-                  </h2>
-
-                  <div style={styles.tags}>
-                    {event.vibe?.map((v, i) => (
-                      <span key={i} style={styles.tag}>
-                        {v}
-                      </span>
-                    ))}
-                  </div>
+                <div style={styles.meta}>
+                  <span style={styles.tag}>{event.type}</span>
+                  <span style={styles.date}>
+                    {new Date(event.date).toLocaleDateString()}
+                  </span>
                 </div>
-
               </div>
-            </Link>
-          );
-        })}
+
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );
 }
 
 const styles = {
-
   page: {
     background: "#05050a",
+    color: "white",
     minHeight: "100vh",
-    color: "white"
-  },
-
-  header: {
     padding: "20px 16px"
   },
 
+  header: {
+    marginBottom: 20
+  },
+
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 600,
-    marginBottom: 12,
     color: "white"
+  },
+
+  subtitle: {
+    fontSize: 13,
+    opacity: 0.6,
+    marginTop: 4,
+    color: "white"
+  },
+
+  controls: {
+    marginBottom: 20
   },
 
   search: {
     width: "100%",
-    padding: 12,
-    borderRadius: 12,
+    padding: "12px",
+    borderRadius: 10,
     border: "none",
+    marginBottom: 10,
     background: "rgba(255,255,255,0.08)",
-    color: "white",
-    marginBottom: 12
+    color: "white"
   },
 
   filters: {
     display: "flex",
-    gap: 8
-  },
-
-  filterBtn: {
-    padding: "6px 12px",
-    borderRadius: 20,
-    border: "none",
-    cursor: "pointer"
+    gap: 10
   },
 
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 12,
-    padding: 16
+    gridTemplateColumns: "1fr",
+    gap: 14
   },
 
   card: {
@@ -168,44 +162,60 @@ const styles = {
 
   cover: {
     position: "absolute",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover"
+    inset: 0,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    filter: "brightness(0.7)"
   },
 
   overlay: {
     position: "absolute",
     inset: 0,
-    background:
-      "linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0.2))"
+    background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)"
   },
 
-  content: {
+  cardContent: {
     position: "absolute",
-    bottom: 10,
-    left: 10,
-    right: 10,
-    zIndex: 2
+    bottom: 12,
+    left: 12,
+    right: 12
   },
 
   cardTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 600,
-    color: "white" // ✅ FORCE WHITE
+    color: "white"
   },
 
-  tags: {
+  meta: {
     display: "flex",
-    gap: 6,
-    marginTop: 4,
-    flexWrap: "wrap"
+    justifyContent: "space-between",
+    marginTop: 6
   },
 
   tag: {
-    fontSize: 10,
-    padding: "2px 6px",
-    borderRadius: 6,
-    background: "rgba(255,255,255,0.2)",
+    fontSize: 11,
+    padding: "4px 8px",
+    borderRadius: 20,
+    background: "rgba(255,255,255,0.1)",
+    textTransform: "uppercase",
+    color: "white"
+  },
+
+  date: {
+    fontSize: 11,
+    opacity: 0.7,
     color: "white"
   }
 };
+
+function btn(active) {
+  return {
+    padding: "8px 12px",
+    borderRadius: 20,
+    border: "none",
+    background: active ? "white" : "rgba(255,255,255,0.1)",
+    color: active ? "black" : "white",
+    cursor: "pointer"
+  };
+}
