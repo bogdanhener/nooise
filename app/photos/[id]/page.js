@@ -5,18 +5,9 @@ import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
 const EVENT_CONFIG = {
-  "mall-takeover": {
-    title: "Mall Takeover",
-    glow: "rgba(0,200,255,0.4)"
-  },
-  "matchaty": {
-    title: "MatchaTy",
-    glow: "rgba(120,255,160,0.4)"
-  },
-  "sudplazza": {
-    title: "SudPlazza",
-    glow: "rgba(168,85,247,0.4)"
-  }
+  "mall-takeover": { title: "Mall Takeover" },
+  "matchaty": { title: "MatchaTy" },
+  "sudplazza": { title: "SudPlazza" }
 };
 
 export default function EventGallery() {
@@ -112,10 +103,10 @@ export default function EventGallery() {
               onClick={() => open(i)}
             />
 
-            {/* GLASS OVERLAY */}
+            {/* FIXED OVERLAY */}
             <div style={styles.overlay} />
 
-            {/* DOWNLOAD */}
+            {/* DOWNLOAD BUTTON */}
             <button
               style={styles.download}
               onClick={(e) => {
@@ -138,7 +129,6 @@ export default function EventGallery() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-
           <div
             style={{
               ...styles.bgGlow,
@@ -149,7 +139,6 @@ export default function EventGallery() {
           <button style={styles.close} onClick={close}>✕</button>
 
           <img src={images[index]} style={styles.fullImage} />
-
         </div>
       )}
     </div>
@@ -183,23 +172,22 @@ const styles = {
   card: {
     position: "relative",
     borderRadius: 16,
-    overflow: "hidden",
-    backdropFilter: "blur(10px)",
-    background: "rgba(255,255,255,0.05)"
+    overflow: "hidden"
   },
 
   image: {
     width: "100%",
     aspectRatio: "1/1",
     objectFit: "cover",
-    cursor: "pointer",
-    transition: "transform 0.3s ease"
+    cursor: "pointer"
   },
 
+  /* ✅ THIS IS THE FIX */
   overlay: {
     position: "absolute",
     inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent)"
+    background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
+    pointerEvents: "none" // 👈 CRITICAL FIX
   },
 
   download: {
@@ -212,7 +200,8 @@ const styles = {
     background: "rgba(0,0,0,0.6)",
     border: "none",
     color: "white",
-    fontSize: 14
+    fontSize: 14,
+    zIndex: 2
   },
 
   modal: {
