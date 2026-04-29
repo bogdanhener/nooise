@@ -5,18 +5,37 @@ import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
 const EVENT_CONFIG = {
-  "mall-takeover": { title: "Mall Takeover" },
-  "matchaty": { title: "MatchaTy" },
-  "sudplazza": { title: "SudPlazza" }
+  "mall-takeover": {
+    title: "Mall Takeover",
+    story: "Energy takes over the space. Movement, sound, and crowd in sync.",
+    glow: "rgba(0, 200, 255, 0.5)"
+  },
+
+  "matchaty": {
+    title: "MatchaTy",
+    story: "A curated moment of rhythm, aesthetic and connection.",
+    glow: "rgba(120, 255, 160, 0.5)"
+  },
+
+  "sudplazza": {
+    title: "SudPlazza",
+    story: "Deeper sounds. Late energy. A different side of Nooise.",
+    glow: "rgba(168, 85, 247, 0.5)"
+  }
 };
 
 export default function EventGallery() {
   const params = useParams();
-  const config = EVENT_CONFIG[params?.id] || {};
+  const config = EVENT_CONFIG[params?.id] || {
+    title: params?.id,
+    story: "Nooise experience.",
+    glow: "rgba(255,255,255,0.3)"
+  };
 
   const [images, setImages] = useState([]);
-  const [active, setActive] = useState(false);
   const [index, setIndex] = useState(0);
+  const [active, setActive] = useState(false);
+  const [fade, setFade] = useState(true);
 
   const startY = useRef(0);
   const endY = useRef(0);
@@ -28,7 +47,7 @@ export default function EventGallery() {
   async function load() {
     const { data } = await supabase.storage
       .from("nooise-photos")
-      .list(params.id);
+      .list(params.id, { limit: 200 });
 
     const urls = data.map((file) => {
       const { data: urlData } = supabase.storage
@@ -50,12 +69,20 @@ export default function EventGallery() {
     setActive(false);
   }
 
+  function changeImage(i) {
+    setFade(false);
+    setTimeout(() => {
+      setIndex(i);
+      setFade(true);
+    }, 180);
+  }
+
   function next() {
-    setIndex((prev) => (prev + 1) % images.length);
+    changeImage((index + 1) % images.length);
   }
 
   function prev() {
-    setIndex((prev) => (prev - 1 + images.length) % images.length);
+    changeImage((index - 1 + images.length) % images.length);
   }
 
   function onTouchStart(e) {
@@ -81,34 +108,36 @@ export default function EventGallery() {
         a.href = blobUrl;
         a.download = `nooise-${params.id}-${i}.jpg`;
         a.click();
+        URL.revokeObjectURL(blobUrl);
       });
   }
 
   return (
     <div style={styles.page}>
 
-      {/* HEADER */}
-      <div style={styles.header}>
+      {/* HERO */}
+      <div style={styles.hero}>
+        <div
+          style={{
+            ...styles.glow,
+            background: `radial-gradient(circle, ${config.glow}, transparent)`
+          }}
+        />
+
         <h1 style={styles.title}>{config.title}</h1>
+
+        <p style={styles.story}>{config.story}</p>
       </div>
 
       {/* GRID */}
       <div style={styles.grid}>
         {images.map((url, i) => (
           <div key={i} style={styles.card}>
+            <img src={url} style={styles.image} onClick={() => open(i)} />
 
-            <img
-              src={url}
-              style={styles.image}
-              onClick={() => open(i)}
-            />
-
-            {/* FIXED OVERLAY */}
-            <div style={styles.overlay} />
-
-            {/* DOWNLOAD BUTTON */}
+            {/* DOWNLOAD ICON ON GRID */}
             <button
-              style={styles.download}
+              style={styles.gridDownload}
               onClick={(e) => {
                 e.stopPropagation();
                 download(url, i);
@@ -116,12 +145,11 @@ export default function EventGallery() {
             >
               ⬇
             </button>
-
           </div>
         ))}
       </div>
 
-      {/* FULLSCREEN */}
+      {/* MODAL */}
       {active && (
         <div
           style={styles.modal}
@@ -138,7 +166,20 @@ export default function EventGallery() {
 
           <button style={styles.close} onClick={close}>✕</button>
 
-          <img src={images[index]} style={styles.fullImage} />
+          <img
+            src={images[index]}
+            style={{
+              ...styles.fullImage,
+              opacity: fade ? 1 : 0
+            }}
+          />
+
+          <button
+            style={styles.download}
+            onClick={() => download(images[index], index)}
+          >
+            ⬇
+          </button>
         </div>
       )}
     </div>
@@ -146,68 +187,73 @@ export default function EventGallery() {
 }
 
 const styles = {
-
   page: {
     background: "#05050a",
-    minHeight: "100vh",
-    color: "white"
+    color: "white",
+    minHeight: "100vh"
   },
 
-  header: {
-    padding: "20px 16px"
+  hero: {
+    padding: "20px 16px",
+    position: "relative"
+  },
+
+  glow: {
+    position: "absolute",
+    width: 220,
+    height: 220,
+    filter: "blur(50px)",
+    top: 0,
+    left: 20
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: 600
+  },
+
+  story: {
+    fontSize: 13,
+    opacity: 0.65,
+    marginTop: 6
   },
 
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 8,
+    gap: 6,
     padding: 10
   },
 
   card: {
     position: "relative",
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: "hidden"
   },
 
   image: {
     width: "100%",
     aspectRatio: "1/1",
-    objectFit: "cover",
-    cursor: "pointer"
+    objectFit: "cover"
   },
 
-  /* ✅ THIS IS THE FIX */
-  overlay: {
+  gridDownload: {
     position: "absolute",
-    inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.4), transparent)",
-    pointerEvents: "none" // 👈 CRITICAL FIX
-  },
-
-  download: {
-    position: "absolute",
-    bottom: 8,
-    right: 8,
-    width: 32,
-    height: 32,
+    bottom: 6,
+    right: 6,
+    width: 28,
+    height: 28,
     borderRadius: "50%",
     background: "rgba(0,0,0,0.6)",
     border: "none",
     color: "white",
-    fontSize: 14,
-    zIndex: 2
+    fontSize: 12
   },
 
   modal: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.95)",
+    background: "rgba(0,0,0,0.92)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center"
@@ -225,7 +271,8 @@ const styles = {
     maxWidth: "90%",
     maxHeight: "90%",
     borderRadius: 16,
-    zIndex: 2
+    zIndex: 2,
+    transition: "opacity 0.2s ease"
   },
 
   close: {
@@ -234,6 +281,18 @@ const styles = {
     right: 20,
     fontSize: 22,
     background: "transparent",
+    border: "none",
+    color: "white"
+  },
+
+  download: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    width: 40,
+    height: 40,
+    borderRadius: "50%",
+    background: "rgba(255,255,255,0.1)",
     border: "none",
     color: "white"
   }
