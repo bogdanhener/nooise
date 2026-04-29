@@ -7,20 +7,27 @@ import { supabase } from "../../lib/supabase";
 export default function PhotosPage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadEvents();
   }, []);
 
   async function loadEvents() {
+    setLoading(true);
+    setError(null);
+
     const { data, error } = await supabase
       .from("events")
-      .select("*")
+      .select("id, name, event_date, cover_image_url")
       .order("event_date", { ascending: false });
 
-    console.log("EVENTS:", data, error);
+    if (error) {
+      setError("Could not load events. Please try again.");
+    } else {
+      setEvents(data || []);
+    }
 
-    setEvents(data || []);
     setLoading(false);
   }
 
@@ -36,6 +43,19 @@ export default function PhotosPage() {
       {/* LOADING */}
       {loading && (
         <p style={{ opacity: 0.6 }}>Loading events...</p>
+      )}
+
+      {/* ERROR */}
+      {error && (
+        <div style={styles.errorBox}>
+          <p style={styles.errorText}>{error}</p>
+          <button style={styles.retryBtn} onClick={loadEvents}>Try again</button>
+        </div>
+      )}
+
+      {/* EMPTY */}
+      {!loading && !error && events.length === 0 && (
+        <p style={{ opacity: 0.6 }}>No events yet. Check back soon.</p>
       )}
 
       {/* GRID */}
@@ -56,18 +76,22 @@ export default function PhotosPage() {
                 }}
               />
 
-              {/* LIGHTER OVERLAY (FIX DARK ISSUE) */}
+              {/* OVERLAY */}
               <div style={styles.overlay} />
 
               {/* CONTENT */}
               <div style={styles.content}>
                 <h2 style={styles.titleText}>
-                  {event.name || event.title}
+                  {event.name}
                 </h2>
 
                 <p style={styles.dateText}>
                   {event.event_date
-                    ? new Date(event.event_date).toLocaleDateString()
+                    ? new Date(event.event_date).toLocaleDateString("ro-RO", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric"
+                      })
                     : ""}
                 </p>
               </div>
@@ -81,8 +105,6 @@ export default function PhotosPage() {
   );
 }
 
-/* ================= STYLES ================= */
-
 const styles = {
   page: {
     background: "#05050a",
@@ -90,69 +112,76 @@ const styles = {
     color: "white",
     padding: "20px"
   },
-
   header: {
     marginBottom: 14
   },
-
   title: {
     fontSize: 24,
     fontWeight: 700
   },
-
   subtitle: {
     opacity: 0.6,
     fontSize: 13,
     marginTop: 4
   },
-
+  errorBox: {
+    background: "rgba(255,60,60,0.1)",
+    border: "1px solid rgba(255,60,60,0.3)",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 14
+  },
+  errorText: {
+    color: "#ff6b6b",
+    fontSize: 14,
+    margin: 0
+  },
+  retryBtn: {
+    marginTop: 10,
+    background: "transparent",
+    border: "1px solid rgba(255,100,100,0.4)",
+    color: "#ff6b6b",
+    borderRadius: 8,
+    padding: "6px 14px",
+    fontSize: 13,
+    cursor: "pointer"
+  },
   grid: {
     display: "flex",
     flexDirection: "column",
     gap: 14
   },
-
-  /* ✨ PREMIUM CARD WITH GLOW */
   card: {
     position: "relative",
     height: 180,
     borderRadius: 18,
     overflow: "hidden",
-
-    /* GOLD / NEON BORDER */
     border: "1px solid rgba(255, 215, 120, 0.35)",
     boxShadow: "0 0 18px rgba(255, 200, 100, 0.15)"
   },
-
   image: {
     position: "absolute",
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "brightness(0.9)" // 👈 lighter than before
+    filter: "brightness(0.9)"
   },
-
-  /* 🔥 MUCH LIGHTER OVERLAY */
   overlay: {
     position: "absolute",
     inset: 0,
-    background:
-      "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.05))"
+    background: "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.05))"
   },
-
   content: {
     position: "absolute",
     bottom: 14,
     left: 14,
     right: 14
   },
-
   titleText: {
     fontSize: 18,
     fontWeight: 700,
     color: "white"
   },
-
   dateText: {
     fontSize: 12,
     marginTop: 4,

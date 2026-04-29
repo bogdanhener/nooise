@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
@@ -10,13 +11,11 @@ const EVENT_CONFIG = {
     story: "Energy takes over the space. Movement, sound, and crowd in sync.",
     glow: "rgba(0, 200, 255, 0.5)"
   },
-
   "matchaty": {
     title: "MatchaTy",
     story: "A curated moment of rhythm, aesthetic and connection.",
     glow: "rgba(120, 255, 160, 0.5)"
   },
-
   "sudplazza": {
     title: "SudPlazza",
     story: "Deeper sounds. Late energy. A different side of Nooise.",
@@ -33,6 +32,8 @@ export default function EventGallery() {
   };
 
   const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [index, setIndex] = useState(0);
   const [active, setActive] = useState(false);
   const [fade, setFade] = useState(true);
@@ -45,19 +46,30 @@ export default function EventGallery() {
   }, [params]);
 
   async function load() {
-    const { data } = await supabase.storage
+    setLoading(true);
+    setError(null);
+
+    const { data, error } = await supabase.storage
       .from("nooise-photos")
       .list(params.id, { limit: 200 });
 
-    const urls = data.map((file) => {
-      const { data: urlData } = supabase.storage
-        .from("nooise-photos")
-        .getPublicUrl(`${params.id}/${file.name}`);
+    if (error || !data) {
+      setError("Could not load photos. Please try again.");
+      setLoading(false);
+      return;
+    }
 
-      return urlData.publicUrl;
-    });
+    const urls = data
+      .filter((file) => file.name && !file.name.startsWith("."))
+      .map((file) => {
+        const { data: urlData } = supabase.storage
+          .from("nooise-photos")
+          .getPublicUrl(`${params.id}/${file.name}`);
+        return urlData.publicUrl;
+      });
 
     setImages(urls);
+    setLoading(false);
   }
 
   function open(i) {
@@ -106,7 +118,7 @@ export default function EventGallery() {
         const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = blobUrl;
-        a.download = `nooise-${params.id}-${i}.jpg`;
+        a.download = `nooise-${params.id}-${i + 1}.jpg`;
         a.click();
         URL.revokeObjectURL(blobUrl);
       });
@@ -114,6 +126,9 @@ export default function EventGallery() {
 
   return (
     <div style={styles.page}>
+
+      {/* BACK */}
+      <Link href="/photos" style={styles.backLink}>← All Events</Link>
 
       {/* HERO */}
       <div style={styles.hero}>
@@ -123,31 +138,52 @@ export default function EventGallery() {
             background: `radial-gradient(circle, ${config.glow}, transparent)`
           }}
         />
-
         <h1 style={styles.title}>{config.title}</h1>
-
         <p style={styles.story}>{config.story}</p>
       </div>
 
-      {/* GRID */}
-      <div style={styles.grid}>
-        {images.map((url, i) => (
-          <div key={i} style={styles.card}>
-            <img src={url} style={styles.image} onClick={() => open(i)} />
+      {/* LOADING */}
+      {loading && (
+        <p style={styles.message}>Loading photos...</p>
+      )}
 
-            {/* DOWNLOAD ICON ON GRID */}
-            <button
-              style={styles.gridDownload}
-              onClick={(e) => {
-                e.stopPropagation();
-                download(url, i);
-              }}
-            >
-              ⬇
-            </button>
-          </div>
-        ))}
-      </div>
+      {/* ERROR */}
+      {error && (
+        <div style={styles.errorBox}>
+          <p style={styles.errorText}>{error}</p>
+          <button style={styles.retryBtn} onClick={load}>Try again</button>
+        </div>
+      )}
+
+      {/* EMPTY */}
+      {!loading && !error && images.length === 0 && (
+        <p style={styles.message}>No photos uploaded yet for this event.</p>
+      )}
+
+      {/* GRID */}
+      {!loading && !error && images.length > 0 && (
+        <div style={styles.grid}>
+          {images.map((url, i) => (
+            <div key={i} style={styles.card}>
+              <img
+                src={url}
+                style={styles.image}
+                loading="lazy"
+                onClick={() => open(i)}
+              />
+              <button
+                style={styles.gridDownload}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  download(url, i);
+                }}
+              >
+                ⬇
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* MODAL */}
       {active && (
@@ -175,13 +211,14 @@ export default function EventGallery() {
           />
 
           <button
-            style={styles.download}
+            style={styles.downloadBtn}
             onClick={() => download(images[index], index)}
           >
             ⬇
           </button>
         </div>
       )}
+
     </div>
   );
 }
@@ -190,14 +227,21 @@ const styles = {
   page: {
     background: "#05050a",
     color: "white",
-    minHeight: "100vh"
+    minHeight: "100vh",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
-
+  backLink: {
+    color: "#ffcf6a",
+    textDecoration: "none",
+    fontSize: 13,
+    opacity: 0.8,
+    display: "inline-block",
+    padding: "16px 16px 0"
+  },
   hero: {
     padding: "20px 16px",
     position: "relative"
   },
-
   glow: {
     position: "absolute",
     width: 220,
@@ -206,37 +250,61 @@ const styles = {
     top: 0,
     left: 20
   },
-
   title: {
     fontSize: 22,
-    fontWeight: 600
+    fontWeight: 600,
+    margin: 0
   },
-
   story: {
     fontSize: 13,
     opacity: 0.65,
     marginTop: 6
   },
-
+  message: {
+    opacity: 0.6,
+    fontSize: 14,
+    padding: "0 16px"
+  },
+  errorBox: {
+    margin: "0 16px",
+    background: "rgba(255,60,60,0.1)",
+    border: "1px solid rgba(255,60,60,0.3)",
+    borderRadius: 12,
+    padding: 16
+  },
+  errorText: {
+    color: "#ff6b6b",
+    fontSize: 14,
+    margin: 0
+  },
+  retryBtn: {
+    marginTop: 10,
+    background: "transparent",
+    border: "1px solid rgba(255,100,100,0.4)",
+    color: "#ff6b6b",
+    borderRadius: 8,
+    padding: "6px 14px",
+    fontSize: 13,
+    cursor: "pointer"
+  },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
     gap: 6,
     padding: 10
   },
-
   card: {
     position: "relative",
     borderRadius: 12,
     overflow: "hidden"
   },
-
   image: {
     width: "100%",
     aspectRatio: "1/1",
-    objectFit: "cover"
+    objectFit: "cover",
+    cursor: "pointer",
+    display: "block"
   },
-
   gridDownload: {
     position: "absolute",
     bottom: 6,
@@ -247,9 +315,9 @@ const styles = {
     background: "rgba(0,0,0,0.6)",
     border: "none",
     color: "white",
-    fontSize: 12
+    fontSize: 12,
+    cursor: "pointer"
   },
-
   modal: {
     position: "fixed",
     inset: 0,
@@ -258,7 +326,6 @@ const styles = {
     justifyContent: "center",
     alignItems: "center"
   },
-
   bgGlow: {
     position: "absolute",
     inset: 0,
@@ -266,7 +333,6 @@ const styles = {
     backgroundPosition: "center",
     filter: "blur(60px) brightness(0.4)"
   },
-
   fullImage: {
     maxWidth: "90%",
     maxHeight: "90%",
@@ -274,7 +340,6 @@ const styles = {
     zIndex: 2,
     transition: "opacity 0.2s ease"
   },
-
   close: {
     position: "absolute",
     top: 20,
@@ -282,10 +347,11 @@ const styles = {
     fontSize: 22,
     background: "transparent",
     border: "none",
-    color: "white"
+    color: "white",
+    cursor: "pointer",
+    zIndex: 3
   },
-
-  download: {
+  downloadBtn: {
     position: "absolute",
     top: 20,
     left: 20,
@@ -294,6 +360,8 @@ const styles = {
     borderRadius: "50%",
     background: "rgba(255,255,255,0.1)",
     border: "none",
-    color: "white"
+    color: "white",
+    cursor: "pointer",
+    zIndex: 3
   }
 };
