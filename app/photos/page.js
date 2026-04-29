@@ -7,28 +7,25 @@ import { supabase } from "../../lib/supabase";
 export default function PhotosPage() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     loadEvents();
   }, []);
 
   async function loadEvents() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("events")
-      .select("id, name, slug, cover_image_url, vibe, event_date")
-      .order("event_date", { ascending: false });
+      .select("id, name, slug");
+
+    console.log("EVENTS:", data);
+    console.log("ERROR:", error);
 
     setEvents(data || []);
   }
 
-  const filtered = events
-    .filter((e) =>
-      e.name.toLowerCase().includes(search.toLowerCase())
-    )
-    .filter((e) =>
-      filter === "all" ? true : e.vibe?.includes(filter)
-    );
+  const filtered = events.filter((e) =>
+    e.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div style={styles.page}>
@@ -44,53 +41,17 @@ export default function PhotosPage() {
           onChange={(e) => setSearch(e.target.value)}
           style={styles.search}
         />
-
-        {/* FILTER */}
-        <div style={styles.filters}>
-          {["all", "day", "night"].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              style={{
-                ...styles.filterBtn,
-                background:
-                  filter === f ? "white" : "rgba(255,255,255,0.1)",
-                color: filter === f ? "black" : "white"
-              }}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* GRID */}
+      {/* EVENT CARDS */}
       <div style={styles.grid}>
         {filtered.map((event) => (
           <Link key={event.id} href={`/photos/${event.slug}`}>
             <div style={styles.card}>
 
-              {/* IMAGE */}
-              <img
-                src={event.cover_image_url}
-                style={styles.cover}
-              />
+              <div style={styles.cardOverlay} />
 
-              {/* OVERLAY */}
-              <div style={styles.overlay} />
-
-              {/* CONTENT */}
-              <div style={styles.content}>
-                <h2 style={styles.cardTitle}>{event.name}</h2>
-
-                <div style={styles.tags}>
-                  {event.vibe?.map((v, i) => (
-                    <span key={i} style={styles.tag}>
-                      {v}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              <h2 style={styles.cardTitle}>{event.name}</h2>
 
             </div>
           </Link>
@@ -125,19 +86,7 @@ const styles = {
     border: "none",
     background: "rgba(255,255,255,0.08)",
     color: "white",
-    marginBottom: 12
-  },
-
-  filters: {
-    display: "flex",
-    gap: 8
-  },
-
-  filterBtn: {
-    padding: "6px 12px",
-    borderRadius: 20,
-    border: "none",
-    cursor: "pointer"
+    outline: "none"
   },
 
   grid: {
@@ -149,47 +98,28 @@ const styles = {
 
   card: {
     position: "relative",
-    height: 160,
+    height: 120,
     borderRadius: 16,
-    overflow: "hidden"
+    overflow: "hidden",
+    display: "flex",
+    alignItems: "flex-end",
+    padding: 12,
+    background: "linear-gradient(135deg, #111, #222)",
+    cursor: "pointer",
+    transition: "transform 0.2s ease"
   },
 
-  cover: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover"
-  },
-
-  overlay: {
+  cardOverlay: {
     position: "absolute",
     inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.8), transparent)"
-  },
-
-  content: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    zIndex: 2
+    background: "linear-gradient(to top, rgba(0,0,0,0.7), transparent)"
   },
 
   cardTitle: {
+    position: "relative",
+    zIndex: 2,
+    color: "white", // ✅ FIXED (always white)
     fontSize: 16,
-    fontWeight: 600,
-    color: "white"
-  },
-
-  tags: {
-    display: "flex",
-    gap: 6,
-    marginTop: 4
-  },
-
-  tag: {
-    fontSize: 10,
-    padding: "2px 6px",
-    borderRadius: 6,
-    background: "rgba(255,255,255,0.2)"
+    fontWeight: 600
   }
 };
