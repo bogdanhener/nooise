@@ -10,7 +10,9 @@ export default function EventGallery() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (params?.id) loadImages();
+    if (params?.id) {
+      loadImages();
+    }
   }, [params]);
 
   async function loadImages() {
@@ -43,13 +45,29 @@ export default function EventGallery() {
     setLoading(false);
   }
 
-  function forceDownload(url) {
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "nooise-photo.jpg";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+  // ✅ FULL DOWNLOAD FUNCTION (THIS WAS MISSING BEFORE)
+  function downloadImage(url, index) {
+    const fileName = `nooise-photo-${index + 1}.jpg`;
+
+    fetch(url)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const blobUrl = window.URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(blobUrl);
+      })
+      .catch((err) => {
+        console.log("Download failed:", err);
+        // fallback
+        window.open(url, "_blank");
+      });
   }
 
   return (
@@ -95,9 +113,9 @@ export default function EventGallery() {
                 }}
               />
 
-              {/* OVERLAY DOWNLOAD BUTTON */}
+              {/* DOWNLOAD BUTTON */}
               <button
-                onClick={() => forceDownload(url)}
+                onClick={() => downloadImage(url, i)}
                 style={{
                   position: "absolute",
                   top: 8,
