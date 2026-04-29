@@ -58,7 +58,7 @@ export default function PhotosPage() {
         {filtered.map((event) => (
           <Link
             key={event.id}
-            href={`/photos/${event.slug}`}
+            href={`/photos/${event.id}`}
             style={{ textDecoration: "none" }}
           >
             <div style={styles.card}>
