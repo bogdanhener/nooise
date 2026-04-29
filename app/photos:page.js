@@ -11,22 +11,21 @@ export default function Photos() {
   }, []);
 
   async function load() {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from("event_photos")
       .select("*");
+
+    console.log("DATA:", data);
+    console.log("ERROR:", error);
 
     setPhotos(data || []);
   }
 
   return (
     <div style={{ padding: 20 }}>
+      <h1>Photos</h1>
 
-      <h1>Find Your Moment</h1>
-
-      <div style={{
-        columnCount: 2,
-        columnGap: 10
-      }}>
+      <div style={{ columnCount: 2, columnGap: 10 }}>
         {photos.map((p, i) => (
           <img
             key={i}
@@ -34,13 +33,11 @@ export default function Photos() {
             style={{
               width: "100%",
               marginBottom: 10,
-              borderRadius: 15,
-              transition: "0.3s"
+              borderRadius: 12
             }}
           />
         ))}
       </div>
-
     </div>
   );
 }
