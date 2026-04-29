@@ -26,7 +26,7 @@ export default function EventGallery() {
       });
 
     if (error) {
-      console.log("STORAGE ERROR:", error);
+      console.log(error);
       setLoading(false);
       return;
     }
@@ -43,10 +43,7 @@ export default function EventGallery() {
     setLoading(false);
   }
 
-  // ✅ REAL DOWNLOAD FUNCTION (forced + fallback)
   function downloadImage(url, index) {
-    const fileName = `nooise-${params.id}-${index + 1}.jpg`;
-
     fetch(url)
       .then((res) => res.blob())
       .then((blob) => {
@@ -54,50 +51,49 @@ export default function EventGallery() {
 
         const a = document.createElement("a");
         a.href = blobUrl;
-        a.download = fileName;
+        a.download = `nooise-${params.id}-${index + 1}.jpg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
 
         window.URL.revokeObjectURL(blobUrl);
-      })
-      .catch(() => {
-        window.open(url, "_blank");
       });
   }
 
   return (
     <div style={styles.page}>
-      
-      {/* TITLE */}
-      <h2 style={styles.title}>
-        {params?.id}
-      </h2>
+
+      {/* BACKGROUND GLOW */}
+      <div style={styles.bgGlow}></div>
+
+      {/* HEADER */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>{params?.id}</h1>
+        <p style={styles.subtitle}>Find your moment</p>
+      </div>
 
       {/* LOADING */}
       {loading ? (
-        <p style={styles.loading}>Loading photos...</p>
+        <div style={styles.loading}>Loading memories...</div>
       ) : (
 
-        /* RESPONSIVE GRID */
-        <div style={styles.grid} className="gallery-grid">
+        <div style={styles.grid} className="grid">
 
           {images.map((url, i) => (
             <div key={i} style={styles.card}>
 
               {/* IMAGE */}
-              <img
-                src={url}
-                style={styles.image}
-              />
+              <img src={url} style={styles.image} />
 
-              {/* DOWNLOAD BUTTON */}
-              <button
-                onClick={() => downloadImage(url, i)}
-                style={styles.downloadBtn}
-              >
-                ⬇
-              </button>
+              {/* HOVER OVERLAY */}
+              <div style={styles.overlay}>
+                <button
+                  onClick={() => downloadImage(url, i)}
+                  style={styles.download}
+                >
+                  ⬇
+                </button>
+              </div>
 
             </div>
           ))}
@@ -105,20 +101,20 @@ export default function EventGallery() {
         </div>
       )}
 
-      {/* RESPONSIVE CSS */}
+      {/* RESPONSIVE GRID */}
       <style jsx>{`
-        .gallery-grid {
+        .grid {
           grid-template-columns: repeat(2, 1fr);
         }
 
         @media (min-width: 768px) {
-          .gallery-grid {
+          .grid {
             grid-template-columns: repeat(3, 1fr);
           }
         }
 
         @media (min-width: 1024px) {
-          .gallery-grid {
+          .grid {
             grid-template-columns: repeat(4, 1fr);
           }
         }
@@ -127,23 +123,46 @@ export default function EventGallery() {
   );
 }
 
-/* INLINE STYLES (clean + portable for Vercel) */
+/* 💎 PREMIUM STYLES */
 const styles = {
   page: {
-    padding: 12,
-    background: "#0b0b0f",
     minHeight: "100vh",
-    color: "white"
+    background: "#07070c",
+    color: "white",
+    padding: 16,
+    position: "relative",
+    overflow: "hidden"
+  },
+
+  bgGlow: {
+    position: "absolute",
+    top: "-200px",
+    left: "-200px",
+    width: "500px",
+    height: "500px",
+    background: "radial-gradient(circle, rgba(255,0,128,0.25), transparent 60%)",
+    filter: "blur(80px)"
+  },
+
+  header: {
+    marginBottom: 18
   },
 
   title: {
-    marginBottom: 16,
-    fontSize: 18,
-    textTransform: "capitalize"
+    fontSize: 20,
+    letterSpacing: 1,
+    textTransform: "capitalize",
+    marginBottom: 4
+  },
+
+  subtitle: {
+    opacity: 0.5,
+    fontSize: 13
   },
 
   loading: {
-    opacity: 0.6
+    opacity: 0.6,
+    paddingTop: 20
   },
 
   grid: {
@@ -153,34 +172,41 @@ const styles = {
 
   card: {
     position: "relative",
-    borderRadius: 14,
+    borderRadius: 16,
     overflow: "hidden",
-    background: "#111"
+    background: "#111",
+    transform: "translateZ(0)",
+    transition: "0.3s ease"
   },
 
   image: {
     width: "100%",
-    height: "auto",
     aspectRatio: "1 / 1",
     objectFit: "cover",
-    display: "block"
+    display: "block",
+    transition: "0.3s ease"
   },
 
-  downloadBtn: {
+  overlay: {
     position: "absolute",
-    top: 8,
-    right: 8,
-    width: 34,
-    height: 34,
+    inset: 0,
+    background: "linear-gradient(to top, rgba(0,0,0,0.5), transparent)",
+    opacity: 0,
+    transition: "0.3s ease",
+    display: "flex",
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+    padding: 10
+  },
+
+  download: {
+    width: 36,
+    height: 36,
     borderRadius: "50%",
     background: "rgba(0,0,0,0.6)",
-    border: "none",
+    border: "1px solid rgba(255,255,255,0.1)",
     color: "white",
-    fontSize: 14,
     cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "blur(6px)"
+    backdropFilter: "blur(10px)"
   }
 };
