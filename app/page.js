@@ -7,6 +7,9 @@ export default function Home() {
   const [enter, setEnter] = useState(false);
 
   useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#05050a";
     const t = setTimeout(() => setEnter(true), 2400);
     return () => clearTimeout(t);
   }, []);
@@ -17,7 +20,7 @@ export default function Home() {
       {/* INTRO */}
       {!enter && (
         <div style={styles.intro}>
-          <h1 style={styles.logoIntro}>NOOISE</h1>
+          <h1 style={styles.logoIntro}>nooise</h1>
           <div style={styles.introGlow} />
         </div>
       )}
@@ -28,10 +31,8 @@ export default function Home() {
 
           {/* HERO */}
           <div style={styles.hero}>
-            <h1 style={styles.logo}>NOOISE</h1>
-            <p style={styles.tagline}>
-              Events. Energy. Moments.
-            </p>
+            <h1 style={styles.logo}>nooise</h1>
+            <p style={styles.tagline}>Events. Energy. Moments.</p>
           </div>
 
           {/* ACTIONS */}
@@ -40,8 +41,13 @@ export default function Home() {
             {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
               <div style={styles.cardPrimary}>
-                <h2 style={styles.cardTitle}>Find Your Photos</h2>
-                <p style={styles.cardText}>Relive your event moments</p>
+                <div style={styles.cardRow}>
+                  <div>
+                    <h2 style={styles.cardTitle}>Find Your Photos</h2>
+                    <p style={styles.cardText}>Relive your event moments</p>
+                  </div>
+                  <span style={styles.cardArrow}>→</span>
+                </div>
               </div>
             </Link>
 
@@ -53,30 +59,20 @@ export default function Home() {
               style={styles.linkFix}
             >
               <div style={styles.eventCard}>
-
                 <div style={styles.eventGlow} />
 
-                {/* ⭐ FIXED TITLE */}
-                <h2 style={styles.eventTitle}>
-                  Next Event
-                </h2>
+                <div style={styles.eventTopRow}>
+                  <span style={styles.eventBadge}>Next Event</span>
+                  <span style={styles.ticket}>Tickets →</span>
+                </div>
 
-                <h3 style={styles.cardTitle}>
-                  NOOISE x Crama Thesaurus
-                </h3>
+                <h3 style={styles.eventName}>NOOISE x Crama Thesaurus</h3>
+                <p style={styles.eventSubtitle}>Winery Session</p>
 
-                <p style={styles.eventSubtitle}>
-                  Winery Session
-                </p>
-
-                <p style={styles.eventDate}>
-                  sâmbătă, 9 mai 2026 · 16:00 – 23:00
-                </p>
-
-                <p style={styles.ticket}>
-                  Tickets → livetickets.ro
-                </p>
-
+                <div style={styles.eventMeta}>
+                  <span style={styles.eventMetaItem}>📅 9 mai 2026</span>
+                  <span style={styles.eventMetaItem}>🕓 16:00 – 23:00</span>
+                </div>
               </div>
             </a>
 
@@ -104,21 +100,24 @@ export default function Home() {
   );
 }
 
-/* ================= STYLES ================= */
-
 const styles = {
   page: {
-    minHeight: "100vh",
+    minHeight: "100dvh",
     background: "#05050a",
     color: "white",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-    overflowX: "hidden"
+    overflowX: "hidden",
+    margin: 0,
+    padding: 0
   },
 
   /* INTRO */
   intro: {
     position: "fixed",
-    inset: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     background: "#05050a",
     display: "flex",
     justifyContent: "center",
@@ -132,8 +131,8 @@ const styles = {
     fontWeight: 800,
     letterSpacing: 8,
     color: "#ffcf6a",
-    textShadow:
-      "0 0 15px rgba(255, 215, 120, 0.8), 0 0 40px rgba(255, 180, 60, 0.5)"
+    margin: 0,
+    textShadow: "0 0 15px rgba(255,215,120,0.8), 0 0 40px rgba(255,180,60,0.5)"
   },
 
   introGlow: {
@@ -141,20 +140,21 @@ const styles = {
     width: 140,
     height: 140,
     borderRadius: "50%",
-    background: "rgba(255, 210, 120, 0.7)",
-    filter: "blur(60px)"
+    background: "rgba(255,210,120,0.7)",
+    filter: "blur(60px)",
+    zIndex: -1
   },
 
   /* MAIN */
   main: {
     width: "100%",
-    minHeight: "100vh"
+    minHeight: "100dvh"
   },
 
   hero: {
     textAlign: "center",
     paddingTop: 80,
-    marginBottom: 50
+    marginBottom: 40
   },
 
   logo: {
@@ -162,15 +162,16 @@ const styles = {
     fontWeight: 800,
     letterSpacing: 6,
     color: "#ffcf6a",
-    textShadow:
-      "0 0 15px rgba(255, 215, 120, 0.8), 0 0 45px rgba(255, 180, 60, 0.4)"
+    margin: 0,
+    textShadow: "0 0 15px rgba(255,215,120,0.8), 0 0 45px rgba(255,180,60,0.4)"
   },
 
   tagline: {
-    marginTop: 14,
-    opacity: 0.7,
-    fontSize: 14,
-    color: "#f3e2b3"
+    marginTop: 12,
+    opacity: 0.6,
+    fontSize: 13,
+    color: "#f3e2b3",
+    letterSpacing: 1
   },
 
   container: {
@@ -190,94 +191,134 @@ const styles = {
     color: "inherit"
   },
 
-  /* PRIMARY CARD */
+  /* PHOTOS CARD */
   cardPrimary: {
-    padding: 18,
-    borderRadius: 16,
+    padding: "18px 20px",
+    borderRadius: 18,
     background: "linear-gradient(135deg, #7c3aed, #ec4899, #f97316)",
     color: "white",
-    boxShadow: "0 0 25px rgba(255, 200, 100, 0.15)"
+    boxShadow: "0 8px 32px rgba(236,72,153,0.25)"
+  },
+
+  cardRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+
+  cardTitle: {
+    fontSize: 17,
+    fontWeight: 700,
+    margin: 0,
+    color: "white"
+  },
+
+  cardText: {
+    fontSize: 13,
+    opacity: 0.85,
+    marginTop: 3,
+    color: "white"
+  },
+
+  cardArrow: {
+    fontSize: 20,
+    opacity: 0.8
   },
 
   /* EVENT CARD */
   eventCard: {
-    padding: 18,
-    borderRadius: 16,
+    padding: "18px 20px",
+    borderRadius: 18,
     background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255, 215, 120, 0.25)",
+    border: "1px solid rgba(255,215,120,0.2)",
     position: "relative",
     overflow: "hidden",
-    boxShadow: "0 0 30px rgba(255, 200, 80, 0.08)",
-    color: "white"
+    boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
   },
 
   eventGlow: {
     position: "absolute",
-    width: 160,
-    height: 160,
-    top: -40,
-    right: -40,
-    background: "rgba(255, 200, 100, 0.25)",
-    filter: "blur(50px)"
+    width: 180,
+    height: 180,
+    top: -60,
+    right: -60,
+    background: "rgba(255,200,100,0.2)",
+    filter: "blur(50px)",
+    pointerEvents: "none"
   },
 
-  /* ⭐ FIXED MISSING TITLE */
-  eventTitle: {
-    fontSize: 12,
-    letterSpacing: 2,
-    textTransform: "uppercase",
-    opacity: 0.7,
-    marginBottom: 10,
-    color: "#ffcf6a",
+  eventTopRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
     position: "relative"
   },
 
-  cardTitle: {
-    fontSize: 16,
+  eventBadge: {
+    fontSize: 11,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    color: "#ffcf6a",
+    fontWeight: 600,
+    background: "rgba(255,207,106,0.12)",
+    padding: "3px 8px",
+    borderRadius: 6,
+    border: "1px solid rgba(255,207,106,0.25)"
+  },
+
+  ticket: {
+    fontSize: 12,
+    color: "#ffcf6a",
+    fontWeight: 600,
+    position: "relative"
+  },
+
+  eventName: {
+    fontSize: 17,
     fontWeight: 700,
-    position: "relative",
-    color: "white"
+    color: "white",
+    margin: 0,
+    position: "relative"
   },
 
   eventSubtitle: {
     fontSize: 13,
     marginTop: 4,
-    opacity: 0.85,
-    position: "relative",
-    color: "white"
-  },
-
-  eventDate: {
-    fontSize: 12,
-    marginTop: 8,
     opacity: 0.7,
-    position: "relative",
-    color: "white"
+    color: "white",
+    position: "relative"
   },
 
-  ticket: {
-    fontSize: 12,
-    marginTop: 10,
-    color: "#ffcf6a",
-    fontWeight: 600,
+  eventMeta: {
+    display: "flex",
+    gap: 14,
+    marginTop: 12,
     position: "relative"
+  },
+
+  eventMetaItem: {
+    fontSize: 12,
+    opacity: 0.6,
+    color: "white"
   },
 
   /* FOOTER */
   footer: {
     marginTop: 50,
     textAlign: "center",
-    paddingBottom: 30
+    paddingBottom: 40
   },
 
   footerText: {
     fontSize: 12,
-    opacity: 0.6
+    opacity: 0.4
   },
 
   footerLink: {
     color: "#ffcf6a",
     textDecoration: "none",
-    fontWeight: 600
+    fontWeight: 600,
+    opacity: 1
   }
 };
