@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+:root {
+  --orange: #FF7A18;
+  --pink: #FF3D8D;
+  --purple: #3A0CA3;
+  --dark: #0B1026;
+  --white: #F5F5F5;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  overflow-x: hidden;
+}
+
+/* SUNSET BACKGROUND SYSTEM */
+.sunset-bg {
+  background: radial-gradient(circle at top, #FF7A18, #FF3D8D, #3A0CA3);
+}
+
+/* GLASS CARD */
+.glass {
+  background: rgba(255,255,255,0.08);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* BUTTON */
+.btn {
+  padding: 12px 20px;
+  border-radius: 30px;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: white;
+  color: black;
+}
+
+.btn-outline {
+  border: 1px solid white;
+  color: white;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+/* HERO GLOW */
+.glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: var(--pink);
+  filter: blur(150px);
+  opacity: 0.3;
+  border-radius: 50%;
+}

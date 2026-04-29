@@ -20,10 +20,11 @@ export default function Photos() {
 
   return (
     <div style={{ padding: 20 }}>
+
       <h1>Find Your Moment</h1>
 
       <div style={{
-        columnCount: 3,
+        columnCount: 2,
         columnGap: 10
       }}>
         {photos.map((p, i) => (
@@ -33,11 +34,13 @@ export default function Photos() {
             style={{
               width: "100%",
               marginBottom: 10,
-              borderRadius: 10
+              borderRadius: 15,
+              transition: "0.3s"
             }}
           />
         ))}
       </div>
+
     </div>
   );
 }
