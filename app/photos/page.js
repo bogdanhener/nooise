@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function PhotosPage() {
   const events = [
-    "mall-takeover",
-    "matchaty",
-    "sudplazza"
+    { id: "mall-takeover", name: "Mall Takeover" },
+    { id: "matchaty", name: "MatchaTy" },
+    { id: "sudplazza", name: "SudPlazza" }
   ];
 
   return (
@@ -12,19 +12,19 @@ export default function PhotosPage() {
       <h1>Find Your Photos</h1>
 
       <div style={{ display: "grid", gap: 12 }}>
-        {events.map((e) => (
+        {events.map((event) => (
           <Link
-            key={e}
-            href={`/photos/${e}`}
+            key={event.id}
+            href={`/photos/${event.id}`}
             style={{
-              padding: 20,
+              padding: 18,
+              borderRadius: 12,
               background: "#111",
               color: "white",
-              borderRadius: 12,
               textDecoration: "none"
             }}
           >
-            {e}
+            {event.name}
           </Link>
         ))}
       </div>
