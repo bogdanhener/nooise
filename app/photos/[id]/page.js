@@ -8,8 +8,10 @@ export default function EventGallery() {
   const params = useParams();
 
   const [images, setImages] = useState([]);
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [index, setIndex] = useState(0);
+  const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [fade, setFade] = useState(true);
 
   const startY = useRef(0);
   const endY = useRef(0);
@@ -40,22 +42,34 @@ export default function EventGallery() {
     setLoading(false);
   }
 
-  function open(index) {
-    setActiveIndex(index);
+  function open(i) {
+    setIndex(i);
+    setActive(true);
   }
 
   function close() {
-    setActiveIndex(null);
+    setActive(false);
+  }
+
+  // 🌀 SMOOTH TRANSITION ENGINE
+  function changeImage(nextIndex) {
+    setFade(false);
+
+    setTimeout(() => {
+      setIndex(nextIndex);
+      setFade(true);
+    }, 180);
   }
 
   function next() {
-    setActiveIndex((prev) => (prev + 1) % images.length);
+    changeImage((index + 1) % images.length);
   }
 
   function prev() {
-    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
+    changeImage((index - 1 + images.length) % images.length);
   }
 
+  // 📱 SWIPE (with inertia feel)
   function onTouchStart(e) {
     startY.current = e.touches[0].clientY;
   }
@@ -67,8 +81,10 @@ export default function EventGallery() {
   function onTouchEnd() {
     const diff = startY.current - endY.current;
 
-    if (diff > 60) next();
-    if (diff < -60) prev();
+    if (Math.abs(diff) < 40) return;
+
+    if (diff > 0) next();
+    else prev();
   }
 
   function download(url, i) {
@@ -76,12 +92,10 @@ export default function EventGallery() {
       .then((r) => r.blob())
       .then((blob) => {
         const blobUrl = URL.createObjectURL(blob);
-
         const a = document.createElement("a");
         a.href = blobUrl;
         a.download = `nooise-${params.id}-${i}.jpg`;
         a.click();
-
         URL.revokeObjectURL(blobUrl);
       });
   }
@@ -89,14 +103,16 @@ export default function EventGallery() {
   return (
     <div style={styles.page}>
 
-      {/* HEADER (RESTORED) */}
-      <div style={styles.header}>
-        <h1 style={styles.title}>
-          {params?.id}
-        </h1>
+      {/* 🌟 HERO STORY (EVENT IDENTITY LAYER) */}
+      <div style={styles.hero}>
+        <div style={styles.glow}></div>
 
-        <p style={styles.subtitle}>
-          Swipe. Tap. Relive.
+        <h1 style={styles.title}>{params?.id}</h1>
+
+        <p style={styles.story}>
+          Swipe through memories from <b>Nooise daytime experience</b>.
+          <br />
+          Feel the sound, the sun, the crowd.
         </p>
       </div>
 
@@ -105,25 +121,11 @@ export default function EventGallery() {
         <div style={styles.grid}>
           {images.map((url, i) => (
             <div key={i} style={styles.card}>
-
-              {/* IMAGE */}
               <img
                 src={url}
                 style={styles.image}
                 onClick={() => open(i)}
               />
-
-              {/* DOWNLOAD (NOW BACK IN GRID ✔) */}
-              <button
-                style={styles.download}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  download(url, i);
-                }}
-              >
-                ⬇
-              </button>
-
             </div>
           ))}
         </div>
@@ -131,13 +133,11 @@ export default function EventGallery() {
 
       {/* LOADING */}
       {loading && (
-        <div style={styles.loading}>
-          Loading memories...
-        </div>
+        <div style={styles.loading}>Loading experience...</div>
       )}
 
-      {/* MODAL */}
-      {activeIndex !== null && (
+      {/* MODAL VIEWER */}
+      {active && (
         <div
           style={styles.modal}
           onTouchStart={onTouchStart}
@@ -145,74 +145,80 @@ export default function EventGallery() {
           onTouchEnd={onTouchEnd}
         >
 
-          {/* CLOSE */}
-          <button style={styles.close} onClick={close}>
-            ✕
-          </button>
+          {/* BACK GLOW LAYER */}
+          <div
+            style={{
+              ...styles.bgGlow,
+              backgroundImage: `url(${images[index]})`
+            }}
+          />
 
-          {/* IMAGE */}
+          {/* CLOSE */}
+          <button style={styles.close} onClick={close}>✕</button>
+
+          {/* IMAGE (FADE ANIMATION) */}
           <img
-            src={images[activeIndex]}
-            style={styles.fullImage}
+            src={images[index]}
+            style={{
+              ...styles.fullImage,
+              opacity: fade ? 1 : 0,
+              transform: fade ? "scale(1)" : "scale(1.02)"
+            }}
           />
 
           {/* DOWNLOAD */}
           <button
-            style={styles.modalDownload}
-            onClick={(e) => {
-              e.stopPropagation();
-              download(images[activeIndex], activeIndex);
-            }}
+            style={styles.download}
+            onClick={() => download(images[index], index)}
           >
             ⬇
           </button>
 
         </div>
       )}
-
-      {/* GRID RESPONSIVE */}
-      <style jsx>{`
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 6px;
-          padding: 10px;
-        }
-
-        @media (min-width: 768px) {
-          .grid {
-            grid-template-columns: repeat(4, 1fr);
-          }
-        }
-      `}</style>
     </div>
   );
 }
 
-/* 💎 STYLES */
+/* 💎 CINEMATIC DESIGN SYSTEM */
 const styles = {
+
   page: {
-    background: "#07070c",
+    background: "#05050a",
     minHeight: "100vh",
     color: "white"
   },
 
-  header: {
-    padding: 12,
-    paddingBottom: 6
+  /* HERO STORY */
+  hero: {
+    padding: "20px 16px 10px",
+    position: "relative"
+  },
+
+  glow: {
+    position: "absolute",
+    width: 200,
+    height: 200,
+    background: "radial-gradient(circle, rgba(168,85,247,0.5), transparent)",
+    filter: "blur(40px)",
+    top: 0,
+    left: 20
   },
 
   title: {
-    fontSize: 20,
-    textTransform: "capitalize",
-    marginBottom: 4
+    fontSize: 22,
+    fontWeight: 600,
+    letterSpacing: 1
   },
 
-  subtitle: {
-    opacity: 0.6,
-    fontSize: 13
+  story: {
+    fontSize: 13,
+    opacity: 0.65,
+    marginTop: 6,
+    lineHeight: 1.4
   },
 
+  /* GRID */
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
@@ -221,46 +227,46 @@ const styles = {
   },
 
   card: {
-    position: "relative",
     borderRadius: 12,
-    overflow: "hidden"
+    overflow: "hidden",
+    position: "relative"
   },
 
   image: {
     width: "100%",
-    aspectRatio: "1 / 1",
+    aspectRatio: "1/1",
     objectFit: "cover",
-    display: "block",
-    cursor: "pointer"
+    cursor: "pointer",
+    transition: "transform 0.3s ease"
   },
 
-  download: {
-    position: "absolute",
-    top: 6,
-    right: 6,
-    width: 34,
-    height: 34,
-    borderRadius: "50%",
-    background: "rgba(0,0,0,0.6)",
-    border: "1px solid rgba(255,255,255,0.2)",
-    color: "white",
-    zIndex: 10
-  },
-
+  /* MODAL */
   modal: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.95)",
+    background: "rgba(0,0,0,0.92)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     zIndex: 999
   },
 
+  bgGlow: {
+    position: "absolute",
+    inset: 0,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    filter: "blur(60px) brightness(0.4)",
+    transform: "scale(1.2)"
+  },
+
   fullImage: {
-    maxWidth: "92%",
-    maxHeight: "92%",
-    objectFit: "contain"
+    maxWidth: "90%",
+    maxHeight: "90%",
+    objectFit: "contain",
+    borderRadius: 18,
+    transition: "all 0.25s ease",
+    zIndex: 2
   },
 
   close: {
@@ -271,19 +277,20 @@ const styles = {
     background: "transparent",
     border: "none",
     color: "white",
-    zIndex: 1000
+    zIndex: 3
   },
 
-  modalDownload: {
+  download: {
     position: "absolute",
     top: 20,
     left: 20,
     width: 44,
     height: 44,
     borderRadius: "50%",
-    background: "rgba(255,255,255,0.15)",
-    border: "none",
-    color: "white"
+    background: "rgba(255,255,255,0.12)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    color: "white",
+    zIndex: 3
   },
 
   loading: {
