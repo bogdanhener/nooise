@@ -56,7 +56,6 @@ export default function EventGallery() {
     setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
   }
 
-  // 📱 REAL SWIPE (only inside modal)
   function onTouchStart(e) {
     startY.current = e.touches[0].clientY;
   }
@@ -68,8 +67,8 @@ export default function EventGallery() {
   function onTouchEnd() {
     const diff = startY.current - endY.current;
 
-    if (diff > 60) next();   // swipe up
-    if (diff < -60) prev();  // swipe down
+    if (diff > 60) next();
+    if (diff < -60) prev();
   }
 
   function download(url, i) {
@@ -77,10 +76,12 @@ export default function EventGallery() {
       .then((r) => r.blob())
       .then((blob) => {
         const blobUrl = URL.createObjectURL(blob);
+
         const a = document.createElement("a");
         a.href = blobUrl;
         a.download = `nooise-${params.id}-${i}.jpg`;
         a.click();
+
         URL.revokeObjectURL(blobUrl);
       });
   }
@@ -88,16 +89,41 @@ export default function EventGallery() {
   return (
     <div style={styles.page}>
 
-      {/* GRID VIEW */}
+      {/* HEADER (RESTORED) */}
+      <div style={styles.header}>
+        <h1 style={styles.title}>
+          {params?.id}
+        </h1>
+
+        <p style={styles.subtitle}>
+          Swipe. Tap. Relive.
+        </p>
+      </div>
+
+      {/* GRID */}
       {!loading && (
         <div style={styles.grid}>
           {images.map((url, i) => (
             <div key={i} style={styles.card}>
+
+              {/* IMAGE */}
               <img
                 src={url}
                 style={styles.image}
                 onClick={() => open(i)}
               />
+
+              {/* DOWNLOAD (NOW BACK IN GRID ✔) */}
+              <button
+                style={styles.download}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  download(url, i);
+                }}
+              >
+                ⬇
+              </button>
+
             </div>
           ))}
         </div>
@@ -105,10 +131,12 @@ export default function EventGallery() {
 
       {/* LOADING */}
       {loading && (
-        <div style={styles.loading}>Loading...</div>
+        <div style={styles.loading}>
+          Loading memories...
+        </div>
       )}
 
-      {/* FULLSCREEN MODAL */}
+      {/* MODAL */}
       {activeIndex !== null && (
         <div
           style={styles.modal}
@@ -130,7 +158,7 @@ export default function EventGallery() {
 
           {/* DOWNLOAD */}
           <button
-            style={styles.download}
+            style={styles.modalDownload}
             onClick={(e) => {
               e.stopPropagation();
               download(images[activeIndex], activeIndex);
@@ -142,13 +170,8 @@ export default function EventGallery() {
         </div>
       )}
 
-      {/* RESPONSIVE GRID */}
+      {/* GRID RESPONSIVE */}
       <style jsx>{`
-        div {
-          box-sizing: border-box;
-        }
-
-        ${"" /* mobile-first 3 columns */}
         .grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -170,7 +193,24 @@ export default function EventGallery() {
 const styles = {
   page: {
     background: "#07070c",
-    minHeight: "100vh"
+    minHeight: "100vh",
+    color: "white"
+  },
+
+  header: {
+    padding: 12,
+    paddingBottom: 6
+  },
+
+  title: {
+    fontSize: 20,
+    textTransform: "capitalize",
+    marginBottom: 4
+  },
+
+  subtitle: {
+    opacity: 0.6,
+    fontSize: 13
   },
 
   grid: {
@@ -181,6 +221,7 @@ const styles = {
   },
 
   card: {
+    position: "relative",
     borderRadius: 12,
     overflow: "hidden"
   },
@@ -191,6 +232,19 @@ const styles = {
     objectFit: "cover",
     display: "block",
     cursor: "pointer"
+  },
+
+  download: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    width: 34,
+    height: 34,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.6)",
+    border: "1px solid rgba(255,255,255,0.2)",
+    color: "white",
+    zIndex: 10
   },
 
   modal: {
@@ -214,13 +268,13 @@ const styles = {
     top: 20,
     right: 20,
     fontSize: 24,
-    color: "white",
     background: "transparent",
     border: "none",
+    color: "white",
     zIndex: 1000
   },
 
-  download: {
+  modalDownload: {
     position: "absolute",
     top: 20,
     left: 20,
@@ -228,12 +282,12 @@ const styles = {
     height: 44,
     borderRadius: "50%",
     background: "rgba(255,255,255,0.15)",
-    color: "white",
-    border: "none"
+    border: "none",
+    color: "white"
   },
 
   loading: {
-    color: "white",
-    padding: 20
+    padding: 20,
+    opacity: 0.6
   }
 };
