@@ -36,7 +36,6 @@ export default function Home() {
 
           <div style={styles.container}>
 
-            {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
               <div style={styles.cardPrimary}>
                 <h2 style={styles.cardTitle}>Find Your Photos</h2>
@@ -44,15 +43,11 @@ export default function Home() {
               </div>
             </Link>
 
-            {/* NEXT EVENT CARD */}
             <div style={styles.eventCard}>
 
-              {/* CLICKABLE EVENT TITLE */}
-              <Link href="/event/nooise-crama-thesaurus" style={styles.linkFix}>
-                <h2 style={styles.eventTitle}>
-                  NOOISE x Crama Thesaurus
-                </h2>
-              </Link>
+              <h2 style={styles.eventTitle}>
+                NOOISE x Crama Thesaurus
+              </h2>
 
               <p style={styles.eventSubtitle}>
                 Winery Session
@@ -62,7 +57,6 @@ export default function Home() {
                 sâmbătă, 9 mai 2026 · 16:00 – 23:00
               </p>
 
-              {/* TICKET BUTTON */}
               <a
                 href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
                 target="_blank"
@@ -91,14 +85,13 @@ const styles = {
     width: "100vw",
     background: "#05050a",
     color: "white",
-    fontFamily: "cursive, system-ui",
-
-    /* FIX MOBILE WHITE MARGINS */
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+    overflowX: "hidden",
     margin: 0,
-    padding: 0,
-    overflowX: "hidden"
+    padding: 0
   },
 
+  /* INTRO */
   intro: {
     position: "fixed",
     inset: 0,
@@ -110,14 +103,13 @@ const styles = {
     zIndex: 999
   },
 
-  /* HANDWRITING + SMALL CAPS FEEL */
+  /* ⭐ ONLY LOGO IS HANDWRITING */
   logoIntro: {
-    fontSize: 50,
+    fontSize: 52,
     fontWeight: 600,
     letterSpacing: 4,
     color: "#ffcf6a",
     fontFamily: "cursive",
-    textTransform: "lowercase",
     textShadow:
       "0 0 15px rgba(255, 215, 120, 0.8), 0 0 40px rgba(255, 180, 60, 0.5)"
   },
@@ -142,22 +134,24 @@ const styles = {
     marginBottom: 50
   },
 
+  /* ⭐ ONLY LOGO IS HANDWRITING */
   logo: {
     fontSize: 40,
     fontWeight: 600,
     letterSpacing: 5,
     color: "#ffcf6a",
     fontFamily: "cursive",
-    textTransform: "lowercase",
     textShadow:
       "0 0 15px rgba(255, 215, 120, 0.8), 0 0 45px rgba(255, 180, 60, 0.4)"
   },
 
+  /* NORMAL TEXT */
   tagline: {
     marginTop: 14,
     opacity: 0.7,
     fontSize: 14,
-    color: "#f3e2b3"
+    color: "#f3e2b3",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
 
   container: {
@@ -194,8 +188,7 @@ const styles = {
     fontSize: 16,
     fontWeight: 700,
     color: "#ffcf6a",
-    marginBottom: 6,
-    cursor: "pointer"
+    marginBottom: 6
   },
 
   eventSubtitle: {
