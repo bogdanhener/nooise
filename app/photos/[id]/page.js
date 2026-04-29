@@ -8,9 +8,8 @@ export default function EventGallery() {
   const params = useParams();
 
   const [images, setImages] = useState([]);
-  const [index, setIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [animating, setAnimating] = useState(false);
 
   const startY = useRef(0);
   const endY = useRef(0);
@@ -41,21 +40,23 @@ export default function EventGallery() {
     setLoading(false);
   }
 
+  function open(index) {
+    setActiveIndex(index);
+  }
+
+  function close() {
+    setActiveIndex(null);
+  }
+
   function next() {
-    if (animating) return;
-    setAnimating(true);
-    setIndex((prev) => (prev + 1) % images.length);
-    setTimeout(() => setAnimating(false), 250);
+    setActiveIndex((prev) => (prev + 1) % images.length);
   }
 
   function prev() {
-    if (animating) return;
-    setAnimating(true);
-    setIndex((prev) => (prev - 1 + images.length) % images.length);
-    setTimeout(() => setAnimating(false), 250);
+    setActiveIndex((prev) => (prev - 1 + images.length) % images.length);
   }
 
-  // 📱 SWIPE ENGINE (TikTok style)
+  // 📱 REAL SWIPE (only inside modal)
   function onTouchStart(e) {
     startY.current = e.touches[0].clientY;
   }
@@ -67,8 +68,8 @@ export default function EventGallery() {
   function onTouchEnd() {
     const diff = startY.current - endY.current;
 
-    if (diff > 60) next();   // swipe up → next
-    if (diff < -60) prev();  // swipe down → prev
+    if (diff > 60) next();   // swipe up
+    if (diff < -60) prev();  // swipe down
   }
 
   function download(url, i) {
@@ -84,129 +85,155 @@ export default function EventGallery() {
       });
   }
 
-  if (loading) {
-    return (
-      <div style={styles.loading}>Loading experience...</div>
-    );
-  }
-
-  const current = images[index];
-
   return (
-    <div
-      style={styles.wrapper}
-      onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
-      onTouchEnd={onTouchEnd}
-    >
+    <div style={styles.page}>
 
-      {/* 🌫 BACKGROUND BLUR LAYER */}
-      <div
-        style={{
-          ...styles.bg,
-          backgroundImage: `url(${current})`
-        }}
-      />
+      {/* GRID VIEW */}
+      {!loading && (
+        <div style={styles.grid}>
+          {images.map((url, i) => (
+            <div key={i} style={styles.card}>
+              <img
+                src={url}
+                style={styles.image}
+                onClick={() => open(i)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* 💎 MAIN IMAGE */}
-      <div
-        style={{
-          ...styles.imageWrap,
-          opacity: animating ? 0.6 : 1,
-          transform: animating ? "scale(0.98)" : "scale(1)"
-        }}
-      >
-        <img src={current} style={styles.image} />
-      </div>
+      {/* LOADING */}
+      {loading && (
+        <div style={styles.loading}>Loading...</div>
+      )}
 
-      {/* ⬇ DOWNLOAD */}
-      <button
-        style={styles.download}
-        onClick={(e) => {
-          e.stopPropagation();
-          download(current, index);
-        }}
-      >
-        ⬇
-      </button>
+      {/* FULLSCREEN MODAL */}
+      {activeIndex !== null && (
+        <div
+          style={styles.modal}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+        >
 
-      {/* 📊 COUNTER */}
-      <div style={styles.counter}>
-        {index + 1} / {images.length}
-      </div>
+          {/* CLOSE */}
+          <button style={styles.close} onClick={close}>
+            ✕
+          </button>
 
+          {/* IMAGE */}
+          <img
+            src={images[activeIndex]}
+            style={styles.fullImage}
+          />
+
+          {/* DOWNLOAD */}
+          <button
+            style={styles.download}
+            onClick={(e) => {
+              e.stopPropagation();
+              download(images[activeIndex], activeIndex);
+            }}
+          >
+            ⬇
+          </button>
+
+        </div>
+      )}
+
+      {/* RESPONSIVE GRID */}
+      <style jsx>{`
+        div {
+          box-sizing: border-box;
+        }
+
+        ${"" /* mobile-first 3 columns */}
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 6px;
+          padding: 10px;
+        }
+
+        @media (min-width: 768px) {
+          .grid {
+            grid-template-columns: repeat(4, 1fr);
+          }
+        }
+      `}</style>
     </div>
   );
 }
 
 /* 💎 STYLES */
 const styles = {
-  wrapper: {
-    height: "100vh",
-    width: "100%",
-    overflow: "hidden",
-    position: "relative",
-    background: "#000"
+  page: {
+    background: "#07070c",
+    minHeight: "100vh"
   },
 
-  bg: {
-    position: "absolute",
-    inset: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    filter: "blur(40px) brightness(0.5)",
-    transform: "scale(1.2)"
+  grid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 6,
+    padding: 10
   },
 
-  imageWrap: {
-    position: "relative",
-    height: "100%",
-    width: "100%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "all 0.25s ease"
+  card: {
+    borderRadius: 12,
+    overflow: "hidden"
   },
 
   image: {
-    maxHeight: "85%",
+    width: "100%",
+    aspectRatio: "1 / 1",
+    objectFit: "cover",
+    display: "block",
+    cursor: "pointer"
+  },
+
+  modal: {
+    position: "fixed",
+    inset: 0,
+    background: "rgba(0,0,0,0.95)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 999
+  },
+
+  fullImage: {
     maxWidth: "92%",
-    objectFit: "contain",
-    borderRadius: 20,
-    boxShadow: "0 20px 80px rgba(0,0,0,0.6)"
+    maxHeight: "92%",
+    objectFit: "contain"
+  },
+
+  close: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    fontSize: 24,
+    color: "white",
+    background: "transparent",
+    border: "none",
+    zIndex: 1000
   },
 
   download: {
     position: "absolute",
     top: 20,
-    right: 20,
-    zIndex: 10,
+    left: 20,
     width: 44,
     height: 44,
     borderRadius: "50%",
-    border: "none",
     background: "rgba(255,255,255,0.15)",
     color: "white",
-    fontSize: 18,
-    backdropFilter: "blur(10px)"
-  },
-
-  counter: {
-    position: "absolute",
-    bottom: 20,
-    left: "50%",
-    transform: "translateX(-50%)",
-    color: "white",
-    fontSize: 13,
-    opacity: 0.7
+    border: "none"
   },
 
   loading: {
-    height: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
     color: "white",
-    background: "#000"
+    padding: 20
   }
 };
