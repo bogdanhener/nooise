@@ -13,7 +13,7 @@ export default function Photos() {
   async function load() {
     const { data, error } = await supabase
       .from("event_photos")
-      .select("*");
+      .select("image_url");
 
     console.log("DATA:", data);
     console.log("ERROR:", error);
