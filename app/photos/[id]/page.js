@@ -4,13 +4,37 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
+const EVENT_CONFIG = {
+  "mall-takeover": {
+    title: "Mall Takeover",
+    story: "Energy takes over the space. Movement, sound, and crowd in sync.",
+    glow: "rgba(0, 200, 255, 0.5)"
+  },
+
+  "matchaty": {
+    title: "MatchaTy",
+    story: "A curated moment of rhythm, aesthetic and connection.",
+    glow: "rgba(120, 255, 160, 0.5)"
+  },
+
+  "sudplazza": {
+    title: "SudPlazza",
+    story: "Deeper sounds. Late energy. A different side of Nooise.",
+    glow: "rgba(168, 85, 247, 0.5)"
+  }
+};
+
 export default function EventGallery() {
   const params = useParams();
+  const config = EVENT_CONFIG[params?.id] || {
+    title: params?.id,
+    story: "Nooise experience.",
+    glow: "rgba(255,255,255,0.3)"
+  };
 
   const [images, setImages] = useState([]);
   const [index, setIndex] = useState(0);
   const [active, setActive] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [fade, setFade] = useState(true);
 
   const startY = useRef(0);
@@ -21,14 +45,9 @@ export default function EventGallery() {
   }, [params]);
 
   async function load() {
-    setLoading(true);
-
     const { data } = await supabase.storage
       .from("nooise-photos")
-      .list(params.id, {
-        limit: 200,
-        sortBy: { column: "name", order: "asc" }
-      });
+      .list(params.id, { limit: 200 });
 
     const urls = data.map((file) => {
       const { data: urlData } = supabase.storage
@@ -39,7 +58,6 @@ export default function EventGallery() {
     });
 
     setImages(urls);
-    setLoading(false);
   }
 
   function open(i) {
@@ -51,12 +69,10 @@ export default function EventGallery() {
     setActive(false);
   }
 
-  // 🌀 SMOOTH TRANSITION ENGINE
-  function changeImage(nextIndex) {
+  function changeImage(i) {
     setFade(false);
-
     setTimeout(() => {
-      setIndex(nextIndex);
+      setIndex(i);
       setFade(true);
     }, 180);
   }
@@ -69,7 +85,6 @@ export default function EventGallery() {
     changeImage((index - 1 + images.length) % images.length);
   }
 
-  // 📱 SWIPE (with inertia feel)
   function onTouchStart(e) {
     startY.current = e.touches[0].clientY;
   }
@@ -80,11 +95,8 @@ export default function EventGallery() {
 
   function onTouchEnd() {
     const diff = startY.current - endY.current;
-
     if (Math.abs(diff) < 40) return;
-
-    if (diff > 0) next();
-    else prev();
+    diff > 0 ? next() : prev();
   }
 
   function download(url, i) {
@@ -103,41 +115,41 @@ export default function EventGallery() {
   return (
     <div style={styles.page}>
 
-      {/* 🌟 HERO STORY (EVENT IDENTITY LAYER) */}
+      {/* HERO */}
       <div style={styles.hero}>
-        <div style={styles.glow}></div>
+        <div
+          style={{
+            ...styles.glow,
+            background: `radial-gradient(circle, ${config.glow}, transparent)`
+          }}
+        />
 
-        <h1 style={styles.title}>{params?.id}</h1>
+        <h1 style={styles.title}>{config.title}</h1>
 
-        <p style={styles.story}>
-          Step into the Nooise experience</b>.
-          <br />
-          Music. Energy. People.<br />
-	  Find your moment.	
-        </p>
+        <p style={styles.story}>{config.story}</p>
       </div>
 
       {/* GRID */}
-      {!loading && (
-        <div style={styles.grid}>
-          {images.map((url, i) => (
-            <div key={i} style={styles.card}>
-              <img
-                src={url}
-                style={styles.image}
-                onClick={() => open(i)}
-              />
-            </div>
-          ))}
-        </div>
-      )}
+      <div style={styles.grid}>
+        {images.map((url, i) => (
+          <div key={i} style={styles.card}>
+            <img src={url} style={styles.image} onClick={() => open(i)} />
 
-      {/* LOADING */}
-      {loading && (
-        <div style={styles.loading}>Loading experience...</div>
-      )}
+            {/* DOWNLOAD ICON ON GRID */}
+            <button
+              style={styles.gridDownload}
+              onClick={(e) => {
+                e.stopPropagation();
+                download(url, i);
+              }}
+            >
+              ⬇
+            </button>
+          </div>
+        ))}
+      </div>
 
-      {/* MODAL VIEWER */}
+      {/* MODAL */}
       {active && (
         <div
           style={styles.modal}
@@ -145,8 +157,6 @@ export default function EventGallery() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-
-          {/* BACK GLOW LAYER */}
           <div
             style={{
               ...styles.bgGlow,
@@ -154,72 +164,60 @@ export default function EventGallery() {
             }}
           />
 
-          {/* CLOSE */}
           <button style={styles.close} onClick={close}>✕</button>
 
-          {/* IMAGE (FADE ANIMATION) */}
           <img
             src={images[index]}
             style={{
               ...styles.fullImage,
-              opacity: fade ? 1 : 0,
-              transform: fade ? "scale(1)" : "scale(1.02)"
+              opacity: fade ? 1 : 0
             }}
           />
 
-          {/* DOWNLOAD */}
           <button
             style={styles.download}
             onClick={() => download(images[index], index)}
           >
             ⬇
           </button>
-
         </div>
       )}
     </div>
   );
 }
 
-/* 💎 CINEMATIC DESIGN SYSTEM */
 const styles = {
-
   page: {
     background: "#05050a",
-    minHeight: "100vh",
-    color: "white"
+    color: "white",
+    minHeight: "100vh"
   },
 
-  /* HERO STORY */
   hero: {
-    padding: "20px 16px 10px",
+    padding: "20px 16px",
     position: "relative"
   },
 
   glow: {
     position: "absolute",
-    width: 200,
-    height: 200,
-    background: "radial-gradient(circle, rgba(168,85,247,0.5), transparent)",
-    filter: "blur(40px)",
+    width: 220,
+    height: 220,
+    filter: "blur(50px)",
     top: 0,
     left: 20
   },
 
   title: {
     fontSize: 22,
-    fontWeight: 600,
-    letterSpacing: 1
+    fontWeight: 600
   },
 
   story: {
     fontSize: 13,
     opacity: 0.65,
-    marginTop: 6,
-    lineHeight: 1.4
+    marginTop: 6
   },
 
-  /* GRID */
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
@@ -228,28 +226,37 @@ const styles = {
   },
 
   card: {
+    position: "relative",
     borderRadius: 12,
-    overflow: "hidden",
-    position: "relative"
+    overflow: "hidden"
   },
 
   image: {
     width: "100%",
     aspectRatio: "1/1",
-    objectFit: "cover",
-    cursor: "pointer",
-    transition: "transform 0.3s ease"
+    objectFit: "cover"
   },
 
-  /* MODAL */
+  gridDownload: {
+    position: "absolute",
+    bottom: 6,
+    right: 6,
+    width: 28,
+    height: 28,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.6)",
+    border: "none",
+    color: "white",
+    fontSize: 12
+  },
+
   modal: {
     position: "fixed",
     inset: 0,
     background: "rgba(0,0,0,0.92)",
     display: "flex",
-    alignItems: "center",
     justifyContent: "center",
-    zIndex: 999
+    alignItems: "center"
   },
 
   bgGlow: {
@@ -257,45 +264,36 @@ const styles = {
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "blur(60px) brightness(0.4)",
-    transform: "scale(1.2)"
+    filter: "blur(60px) brightness(0.4)"
   },
 
   fullImage: {
     maxWidth: "90%",
     maxHeight: "90%",
-    objectFit: "contain",
-    borderRadius: 18,
-    transition: "all 0.25s ease",
-    zIndex: 2
+    borderRadius: 16,
+    zIndex: 2,
+    transition: "opacity 0.2s ease"
   },
 
   close: {
     position: "absolute",
     top: 20,
     right: 20,
-    fontSize: 24,
+    fontSize: 22,
     background: "transparent",
     border: "none",
-    color: "white",
-    zIndex: 3
+    color: "white"
   },
 
   download: {
     position: "absolute",
     top: 20,
     left: 20,
-    width: 44,
-    height: 44,
+    width: 40,
+    height: 40,
     borderRadius: "50%",
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.2)",
-    color: "white",
-    zIndex: 3
-  },
-
-  loading: {
-    padding: 20,
-    opacity: 0.6
+    background: "rgba(255,255,255,0.1)",
+    border: "none",
+    color: "white"
   }
 };
