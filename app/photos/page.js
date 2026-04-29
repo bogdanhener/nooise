@@ -1,41 +1,30 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
 import Link from "next/link";
 
 export default function PhotosPage() {
-  const [events, setEvents] = useState([]);
-
-  useEffect(() => {
-    loadEvents();
-  }, []);
-
-  async function loadEvents() {
-    const { data } = await supabase.from("events").select("*");
-    setEvents(data || []);
-  }
+  const events = [
+    "mall-takeover",
+    "matchaty",
+    "sudplazza"
+  ];
 
   return (
     <div style={{ padding: 20 }}>
-      <h1 style={{ fontSize: 28, marginBottom: 20 }}>
-        Find Your Photos
-      </h1>
+      <h1>Find Your Photos</h1>
 
-      <div style={{ display: "grid", gap: 15 }}>
-        {events.map((event) => (
+      <div style={{ display: "grid", gap: 12 }}>
+        {events.map((e) => (
           <Link
-            key={event.id}
-            href={`/photos/${event.id}`}
+            key={e}
+            href={`/photos/${e}`}
             style={{
               padding: 20,
-              borderRadius: 12,
               background: "#111",
               color: "white",
+              borderRadius: 12,
               textDecoration: "none"
             }}
           >
-            {event.name}
+            {e}
           </Link>
         ))}
       </div>

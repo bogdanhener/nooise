@@ -4,56 +4,63 @@ import { useEffect, useState } from "react";
 import { supabase } from "../../../lib/supabase";
 
 export default function EventGallery({ params }) {
-  const [photos, setPhotos] = useState([]);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
-    load();
+    loadImages();
   }, []);
 
-  async function load() {
-    const { data } = await supabase
-      .from("event_photos")
-      .select("*")
-      .eq("event_id", params.id);
+  async function loadImages() {
+    const folder = params.id;
 
-    setPhotos(data || []);
+    const { data, error } = await supabase.storage
+      .from("nooise-photos")
+      .list(folder);
+
+    if (error) {
+      console.log("ERROR:", error);
+      return;
+    }
+
+    const urls = data.map(
+      (file) =>
+        `https://cntbmodmvknudjdapxyz.supabase.co/storage/v1/object/public/nooise-photos/${folder}/${file.name}`
+    );
+
+    setImages(urls);
   }
 
   return (
     <div style={{ padding: 15 }}>
-      <h2 style={{ marginBottom: 15 }}>
-        {params.id}
-      </h2>
+      <h2 style={{ marginBottom: 15 }}>{params.id}</h2>
 
-      {/* GRID */}
+      {/* 3 COLUMN GRID */}
       <div
         style={{
           columnCount: 3,
           columnGap: 10
         }}
       >
-        {photos.map((p) => (
-          <div key={p.id} style={{ marginBottom: 10 }}>
-            
+        {images.map((url, i) => (
+          <div key={i} style={{ marginBottom: 10 }}>
+
             <img
-              src={p.image_url}
+              src={url}
               style={{
                 width: "100%",
-                borderRadius: 12,
-                display: "block"
+                borderRadius: 12
               }}
             />
 
-            {/* DOWNLOAD BUTTON */}
             <a
-              href={p.image_url}
+              href={url}
               download
               target="_blank"
               style={{
                 display: "block",
                 textAlign: "center",
-                marginTop: 5,
                 fontSize: 12,
+                marginTop: 5,
                 color: "#666"
               }}
             >
