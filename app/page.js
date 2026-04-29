@@ -34,8 +34,10 @@ export default function Home() {
             </p>
           </div>
 
+          {/* ACTIONS */}
           <div style={styles.container}>
 
+            {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
               <div style={styles.cardPrimary}>
                 <h2 style={styles.cardTitle}>Find Your Photos</h2>
@@ -43,31 +45,56 @@ export default function Home() {
               </div>
             </Link>
 
-            <div style={styles.eventCard}>
+            {/* NEXT EVENT */}
+            <a
+              href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.linkFix}
+            >
+              <div style={styles.eventCard}>
 
-              <h2 style={styles.eventTitle}>
-                NOOISE x Crama Thesaurus
-              </h2>
+                <div style={styles.eventGlow} />
 
-              <p style={styles.eventSubtitle}>
-                Winery Session
-              </p>
+                {/* ⭐ FIXED TITLE */}
+                <h2 style={styles.eventTitle}>
+                  Next Event
+                </h2>
 
-              <p style={styles.eventDate}>
-                sâmbătă, 9 mai 2026 · 16:00 – 23:00
-              </p>
+                <h3 style={styles.cardTitle}>
+                  NOOISE x Crama Thesaurus
+                </h3>
 
+                <p style={styles.eventSubtitle}>
+                  Winery Session
+                </p>
+
+                <p style={styles.eventDate}>
+                  sâmbătă, 9 mai 2026 · 16:00 – 23:00
+                </p>
+
+                <p style={styles.ticket}>
+                  Tickets → livetickets.ro
+                </p>
+
+              </div>
+            </a>
+
+          </div>
+
+          {/* FOOTER */}
+          <div style={styles.footer}>
+            <p style={styles.footerText}>
+              2026 © Nooise ·{" "}
               <a
-                href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
+                href="https://www.instagram.com/bogdanhener/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={styles.ticketBtn}
+                style={styles.footerLink}
               >
-                🎟 Tickets
+                designed by bogdanhener
               </a>
-
-            </div>
-
+            </p>
           </div>
 
         </div>
@@ -82,13 +109,10 @@ export default function Home() {
 const styles = {
   page: {
     minHeight: "100vh",
-    width: "100vw",
     background: "#05050a",
     color: "white",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-    overflowX: "hidden",
-    margin: 0,
-    padding: 0
+    overflowX: "hidden"
   },
 
   /* INTRO */
@@ -103,13 +127,11 @@ const styles = {
     zIndex: 999
   },
 
-  /* ⭐ ONLY LOGO IS HANDWRITING */
   logoIntro: {
-    fontSize: 52,
-    fontWeight: 600,
-    letterSpacing: 4,
+    fontSize: 50,
+    fontWeight: 800,
+    letterSpacing: 8,
     color: "#ffcf6a",
-    fontFamily: "cursive",
     textShadow:
       "0 0 15px rgba(255, 215, 120, 0.8), 0 0 40px rgba(255, 180, 60, 0.5)"
   },
@@ -123,6 +145,7 @@ const styles = {
     filter: "blur(60px)"
   },
 
+  /* MAIN */
   main: {
     width: "100%",
     minHeight: "100vh"
@@ -134,24 +157,20 @@ const styles = {
     marginBottom: 50
   },
 
-  /* ⭐ ONLY LOGO IS HANDWRITING */
   logo: {
-    fontSize: 40,
-    fontWeight: 600,
-    letterSpacing: 5,
+    fontSize: 44,
+    fontWeight: 800,
+    letterSpacing: 6,
     color: "#ffcf6a",
-    fontFamily: "cursive",
     textShadow:
       "0 0 15px rgba(255, 215, 120, 0.8), 0 0 45px rgba(255, 180, 60, 0.4)"
   },
 
-  /* NORMAL TEXT */
   tagline: {
     marginTop: 14,
     opacity: 0.7,
     fontSize: 14,
-    color: "#f3e2b3",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
+    color: "#f3e2b3"
   },
 
   container: {
@@ -167,47 +186,98 @@ const styles = {
 
   linkFix: {
     textDecoration: "none",
+    width: "100%",
     color: "inherit"
   },
 
+  /* PRIMARY CARD */
   cardPrimary: {
     padding: 18,
     borderRadius: 16,
     background: "linear-gradient(135deg, #7c3aed, #ec4899, #f97316)",
-    color: "white"
+    color: "white",
+    boxShadow: "0 0 25px rgba(255, 200, 100, 0.15)"
   },
 
+  /* EVENT CARD */
   eventCard: {
     padding: 18,
     borderRadius: 16,
     background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255, 215, 120, 0.25)"
+    border: "1px solid rgba(255, 215, 120, 0.25)",
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "0 0 30px rgba(255, 200, 80, 0.08)",
+    color: "white"
   },
 
+  eventGlow: {
+    position: "absolute",
+    width: 160,
+    height: 160,
+    top: -40,
+    right: -40,
+    background: "rgba(255, 200, 100, 0.25)",
+    filter: "blur(50px)"
+  },
+
+  /* ⭐ FIXED MISSING TITLE */
   eventTitle: {
+    fontSize: 12,
+    letterSpacing: 2,
+    textTransform: "uppercase",
+    opacity: 0.7,
+    marginBottom: 10,
+    color: "#ffcf6a",
+    position: "relative"
+  },
+
+  cardTitle: {
     fontSize: 16,
     fontWeight: 700,
-    color: "#ffcf6a",
-    marginBottom: 6
+    position: "relative",
+    color: "white"
   },
 
   eventSubtitle: {
     fontSize: 13,
-    opacity: 0.85
+    marginTop: 4,
+    opacity: 0.85,
+    position: "relative",
+    color: "white"
   },
 
   eventDate: {
     fontSize: 12,
+    marginTop: 8,
     opacity: 0.7,
-    marginTop: 6
+    position: "relative",
+    color: "white"
   },
 
-  ticketBtn: {
-    display: "inline-block",
-    marginTop: 10,
+  ticket: {
     fontSize: 12,
+    marginTop: 10,
     color: "#ffcf6a",
     fontWeight: 600,
-    textDecoration: "none"
+    position: "relative"
+  },
+
+  /* FOOTER */
+  footer: {
+    marginTop: 50,
+    textAlign: "center",
+    paddingBottom: 30
+  },
+
+  footerText: {
+    fontSize: 12,
+    opacity: 0.6
+  },
+
+  footerLink: {
+    color: "#ffcf6a",
+    textDecoration: "none",
+    fontWeight: 600
   }
 };
