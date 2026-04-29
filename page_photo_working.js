@@ -38,7 +38,7 @@ export default function PhotosPage() {
         <p style={{ opacity: 0.6 }}>Loading events...</p>
       )}
 
-      {/* GRID */}
+      {/* EVENTS GRID */}
       <div style={styles.grid}>
         {events.map((event) => (
           <Link
@@ -48,7 +48,7 @@ export default function PhotosPage() {
           >
             <div style={styles.card}>
 
-              {/* IMAGE */}
+              {/* BACKGROUND IMAGE */}
               <div
                 style={{
                   ...styles.image,
@@ -56,20 +56,24 @@ export default function PhotosPage() {
                 }}
               />
 
-              {/* LIGHTER OVERLAY (FIX DARK ISSUE) */}
+              {/* DARK OVERLAY */}
               <div style={styles.overlay} />
 
-              {/* CONTENT */}
+              {/* TEXT CONTENT */}
               <div style={styles.content}>
+
+                {/* EVENT NAME */}
                 <h2 style={styles.titleText}>
                   {event.name || event.title}
                 </h2>
 
+                {/* EVENT DATE */}
                 <p style={styles.dateText}>
                   {event.event_date
                     ? new Date(event.event_date).toLocaleDateString()
                     : ""}
                 </p>
+
               </div>
 
             </div>
@@ -97,7 +101,8 @@ const styles = {
 
   title: {
     fontSize: 24,
-    fontWeight: 700
+    fontWeight: 700,
+    color: "white"
   },
 
   subtitle: {
@@ -112,16 +117,11 @@ const styles = {
     gap: 14
   },
 
-  /* ✨ PREMIUM CARD WITH GLOW */
   card: {
     position: "relative",
     height: 180,
     borderRadius: 18,
-    overflow: "hidden",
-
-    /* GOLD / NEON BORDER */
-    border: "1px solid rgba(255, 215, 120, 0.35)",
-    boxShadow: "0 0 18px rgba(255, 200, 100, 0.15)"
+    overflow: "hidden"
   },
 
   image: {
@@ -129,15 +129,13 @@ const styles = {
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "brightness(0.9)" // 👈 lighter than before
+    filter: "brightness(0.75)"
   },
 
-  /* 🔥 MUCH LIGHTER OVERLAY */
   overlay: {
     position: "absolute",
     inset: 0,
-    background:
-      "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.05))"
+    background: "linear-gradient(to top, rgba(0,0,0,0.85), transparent)"
   },
 
   content: {
@@ -156,7 +154,7 @@ const styles = {
   dateText: {
     fontSize: 12,
     marginTop: 4,
-    opacity: 0.85,
+    opacity: 0.75,
     color: "white"
   }
 };
