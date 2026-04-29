@@ -2,64 +2,43 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
+import Link from "next/link";
 
-export default function Photos() {
-  const [photos, setPhotos] = useState([]);
+export default function PhotosPage() {
+  const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    load();
+    loadEvents();
   }, []);
 
-  async function load() {
-    const { data, error } = await supabase
-      .from("event_photos")
-      .select("image_url");
-
-    if (!error) {
-      setPhotos(data || []);
-    } else {
-      console.error(error);
-    }
+  async function loadEvents() {
+    const { data } = await supabase.from("events").select("*");
+    setEvents(data || []);
   }
 
   return (
-    <div style={{
-      padding: 20,
-      background: "#0b0b0f",
-      minHeight: "100vh",
-      color: "white"
-    }}>
-      
-      {/* HEADER */}
-      <h1 style={{
-        textAlign: "center",
-        marginBottom: 30,
-        fontSize: 28,
-        letterSpacing: 2
-      }}>
-        NOOISE — Photos
+    <div style={{ padding: 20 }}>
+      <h1 style={{ fontSize: 28, marginBottom: 20 }}>
+        Find Your Photos
       </h1>
 
-      {/* GALLERY */}
-      <div style={{
-        columnCount: 2,
-        columnGap: 10
-      }}>
-        {photos.map((p, i) => (
-          <img
-            key={i}
-            src={p.image_url}
-            alt=""
+      <div style={{ display: "grid", gap: 15 }}>
+        {events.map((event) => (
+          <Link
+            key={event.id}
+            href={`/photos/${event.id}`}
             style={{
-              width: "100%",
-              marginBottom: 10,
-              borderRadius: 14,
-              breakInside: "avoid"
+              padding: 20,
+              borderRadius: 12,
+              background: "#111",
+              color: "white",
+              textDecoration: "none"
             }}
-          />
+          >
+            {event.name}
+          </Link>
         ))}
       </div>
-
     </div>
   );
 }
