@@ -18,7 +18,7 @@ export default function Photos() {
     console.log("FULL RESPONSE:", res);
 
     setPhotos(res.data || []);
-}
+  }
 
     console.log("DATA:", data);
     console.log("ERROR:", error);
