@@ -5,6 +5,8 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
+const PAGE_SIZE = 30;
+
 const EVENT_CONFIG = {
   "mall-takeover": {
     title: "Mall Takeover",
@@ -32,6 +34,7 @@ export default function EventGallery() {
   };
 
   const [images, setImages] = useState([]);
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [index, setIndex] = useState(0);
@@ -40,18 +43,36 @@ export default function EventGallery() {
 
   const startY = useRef(0);
   const endY = useRef(0);
+  const sentinelRef = useRef(null);
 
   useEffect(() => {
     if (params?.id) load();
   }, [params]);
 
+  // watch sentinel div — when it enters viewport, render 30 more
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisible((v) => Math.min(v + PAGE_SIZE, images.length));
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [images]);
+
   async function load() {
     setLoading(true);
     setError(null);
+    setImages([]);
+    setVisible(PAGE_SIZE);
 
     const { data, error } = await supabase.storage
       .from("nooise-photos")
-      .list(params.id, { limit: 200 });
+      .list(params.id, { limit: 1000, sortBy: { column: "name", order: "asc" } });
 
     if (error || !data) {
       setError("Could not load photos. Please try again.");
@@ -72,39 +93,19 @@ export default function EventGallery() {
     setLoading(false);
   }
 
-  function open(i) {
-    setIndex(i);
-    setActive(true);
-  }
-
-  function close() {
-    setActive(false);
-  }
+  function open(i) { setIndex(i); setActive(true); }
+  function close() { setActive(false); }
 
   function changeImage(i) {
     setFade(false);
-    setTimeout(() => {
-      setIndex(i);
-      setFade(true);
-    }, 180);
+    setTimeout(() => { setIndex(i); setFade(true); }, 180);
   }
 
-  function next() {
-    changeImage((index + 1) % images.length);
-  }
+  function next() { changeImage((index + 1) % images.length); }
+  function prev() { changeImage((index - 1 + images.length) % images.length); }
 
-  function prev() {
-    changeImage((index - 1 + images.length) % images.length);
-  }
-
-  function onTouchStart(e) {
-    startY.current = e.touches[0].clientY;
-  }
-
-  function onTouchMove(e) {
-    endY.current = e.touches[0].clientY;
-  }
-
+  function onTouchStart(e) { startY.current = e.touches[0].clientY; }
+  function onTouchMove(e) { endY.current = e.touches[0].clientY; }
   function onTouchEnd() {
     const diff = startY.current - endY.current;
     if (Math.abs(diff) < 40) return;
@@ -124,27 +125,30 @@ export default function EventGallery() {
       });
   }
 
+  const displayedImages = images.slice(0, visible);
+  const hasMore = visible < images.length;
+
   return (
     <div style={styles.page}>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       {/* BACK */}
       <Link href="/photos" style={styles.backLink}>← All Events</Link>
 
       {/* HERO */}
       <div style={styles.hero}>
-        <div
-          style={{
-            ...styles.glow,
-            background: `radial-gradient(circle, ${config.glow}, transparent)`
-          }}
-        />
+        <div style={{ ...styles.glow, background: `radial-gradient(circle, ${config.glow}, transparent)` }} />
         <h1 style={styles.title}>{config.title}</h1>
         <p style={styles.story}>{config.story}</p>
       </div>
 
       {/* LOADING */}
       {loading && (
-        <p style={styles.message}>Loading photos...</p>
+        <div style={styles.loadingWrap}>
+          <div style={styles.spinner} />
+          <p style={styles.message}>Loading photos...</p>
+        </div>
       )}
 
       {/* ERROR */}
@@ -160,29 +164,44 @@ export default function EventGallery() {
         <p style={styles.message}>No photos uploaded yet for this event.</p>
       )}
 
-      {/* GRID */}
+      {/* COUNT */}
       {!loading && !error && images.length > 0 && (
+        <p style={styles.count}>{images.length} photos</p>
+      )}
+
+      {/* GRID — only renders visible slice, not all at once */}
+      {!loading && !error && displayedImages.length > 0 && (
         <div style={styles.grid}>
-          {images.map((url, i) => (
+          {displayedImages.map((url, i) => (
             <div key={i} style={styles.card}>
               <img
                 src={url}
                 style={styles.image}
                 loading="lazy"
+                decoding="async"
                 onClick={() => open(i)}
               />
               <button
                 style={styles.gridDownload}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  download(url, i);
-                }}
+                onClick={(e) => { e.stopPropagation(); download(url, i); }}
               >
                 ⬇
               </button>
             </div>
           ))}
         </div>
+      )}
+
+      {/* SENTINEL — invisible, triggers more photos when scrolled into view */}
+      {!loading && hasMore && (
+        <div ref={sentinelRef} style={styles.sentinel}>
+          <div style={styles.spinner} />
+        </div>
+      )}
+
+      {/* END */}
+      {!loading && !error && !hasMore && images.length > 0 && (
+        <p style={styles.endMessage}>All {images.length} photos loaded</p>
       )}
 
       {/* MODAL */}
@@ -193,29 +212,14 @@ export default function EventGallery() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div
-            style={{
-              ...styles.bgGlow,
-              backgroundImage: `url(${images[index]})`
-            }}
-          />
-
+          <div style={{ ...styles.bgGlow, backgroundImage: `url(${images[index]})` }} />
           <button style={styles.close} onClick={close}>✕</button>
-
           <img
             src={images[index]}
-            style={{
-              ...styles.fullImage,
-              opacity: fade ? 1 : 0
-            }}
+            style={{ ...styles.fullImage, opacity: fade ? 1 : 0 }}
           />
-
-          <button
-            style={styles.downloadBtn}
-            onClick={() => download(images[index], index)}
-          >
-            ⬇
-          </button>
+          <p style={styles.modalCounter}>{index + 1} / {images.length}</p>
+          <button style={styles.downloadBtn} onClick={() => download(images[index], index)}>⬇</button>
         </div>
       )}
 
@@ -227,7 +231,7 @@ const styles = {
   page: {
     background: "#05050a",
     color: "white",
-    minHeight: "100vh",
+    minHeight: "100dvh",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
   backLink: {
@@ -259,6 +263,27 @@ const styles = {
     fontSize: 13,
     opacity: 0.65,
     marginTop: 6
+  },
+  count: {
+    fontSize: 12,
+    opacity: 0.4,
+    padding: "0 16px 4px",
+    margin: 0
+  },
+  loadingWrap: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 12,
+    padding: "40px 16px"
+  },
+  spinner: {
+    width: 24,
+    height: 24,
+    border: "2px solid rgba(255,207,106,0.2)",
+    borderTop: "2px solid #ffcf6a",
+    borderRadius: "50%",
+    animation: "spin 0.8s linear infinite"
   },
   message: {
     opacity: 0.6,
@@ -318,6 +343,18 @@ const styles = {
     fontSize: 12,
     cursor: "pointer"
   },
+  sentinel: {
+    display: "flex",
+    justifyContent: "center",
+    padding: "20px 0 10px"
+  },
+  endMessage: {
+    textAlign: "center",
+    fontSize: 12,
+    opacity: 0.3,
+    padding: "16px 0 40px",
+    margin: 0
+  },
   modal: {
     position: "fixed",
     inset: 0,
@@ -339,6 +376,17 @@ const styles = {
     borderRadius: 16,
     zIndex: 2,
     transition: "opacity 0.2s ease"
+  },
+  modalCounter: {
+    position: "absolute",
+    bottom: 24,
+    left: "50%",
+    transform: "translateX(-50%)",
+    fontSize: 12,
+    opacity: 0.5,
+    color: "white",
+    zIndex: 3,
+    margin: 0
   },
   close: {
     position: "absolute",
