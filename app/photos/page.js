@@ -34,6 +34,9 @@ export default function PhotosPage() {
   return (
     <div style={styles.page}>
 
+      {/* BACK */}
+      <Link href="/" style={styles.backLink}>← nooise</Link>
+
       {/* HEADER */}
       <div style={styles.header}>
         <h1 style={styles.title}>Find Your Photos</h1>
@@ -111,6 +114,14 @@ const styles = {
     minHeight: "100vh",
     color: "white",
     padding: "20px"
+  },
+  backLink: {
+    color: "#ffcf6a",
+    textDecoration: "none",
+    fontSize: 13,
+    opacity: 0.8,
+    display: "inline-block",
+    marginBottom: 16
   },
   header: {
     marginBottom: 14
