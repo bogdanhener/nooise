@@ -21,9 +21,7 @@ export default function CramaThesaurusPage() {
 
       {/* POSTER */}
       <div style={styles.posterWrap}>
-        <div style={styles.posterPlaceholder}>
-          <p style={styles.posterLabel}>Event Poster</p>
-        </div>
+        <img src="/img/nooise_crama.jpg" alt="NOOISE x Crama Thesaurus" style={styles.poster} />
         <div style={styles.posterGlow} />
       </div>
 
@@ -129,19 +127,10 @@ const styles = {
     borderRadius: 20,
     overflow: "hidden"
   },
-  posterPlaceholder: {
+  poster: {
     width: "100%",
-    aspectRatio: "3/4",
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,215,120,0.2)",
-    borderRadius: 20,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  posterLabel: {
-    opacity: 0.2,
-    fontSize: 13
+    display: "block",
+    borderRadius: 20
   },
   posterGlow: {
     position: "absolute",
