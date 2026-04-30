@@ -59,18 +59,21 @@ export default function Home() {
             </Link>
 
             {/* NEXT EVENT */}
-            <a
-              href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.linkFix}
-            >
+            <Link href="/events/crama-thesaurus" style={styles.linkFix}>
               <div style={styles.eventCard}>
                 <div style={styles.eventGlow} />
 
                 <div style={styles.eventTopRow}>
                   <span style={styles.eventBadge}>Next Event</span>
-                  <span style={styles.ticket}>Tickets →</span>
+                  <a
+                    href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.ticketLink}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    Tickets →
+                  </a>
                 </div>
 
                 <h3 style={styles.eventName}>NOOISE x Crama Thesaurus</h3>
@@ -81,7 +84,7 @@ export default function Home() {
                   <span style={styles.eventMetaItem}>🕓 16:00 – 23:00</span>
                 </div>
               </div>
-            </a>
+            </Link>
 
           </div>
 
@@ -259,11 +262,13 @@ const styles = {
     borderRadius: 6,
     border: "1px solid rgba(255,207,106,0.25)"
   },
-  ticket: {
+  ticketLink: {
     fontSize: 12,
     color: "#ffcf6a",
     fontWeight: 600,
-    position: "relative"
+    textDecoration: "none",
+    position: "relative",
+    zIndex: 10
   },
   eventName: {
     fontSize: 17,
