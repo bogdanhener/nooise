@@ -10,6 +10,9 @@ export default function PhotosPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#05050a";
     loadEvents();
   }, []);
 
@@ -71,7 +74,6 @@ export default function PhotosPage() {
           >
             <div style={styles.card}>
 
-              {/* IMAGE */}
               <div
                 style={{
                   ...styles.image,
@@ -79,15 +81,10 @@ export default function PhotosPage() {
                 }}
               />
 
-              {/* OVERLAY */}
               <div style={styles.overlay} />
 
-              {/* CONTENT */}
               <div style={styles.content}>
-                <h2 style={styles.titleText}>
-                  {event.name}
-                </h2>
-
+                <h2 style={styles.titleText}>{event.name}</h2>
                 <p style={styles.dateText}>
                   {event.event_date
                     ? new Date(event.event_date).toLocaleDateString("ro-RO", {
@@ -111,9 +108,11 @@ export default function PhotosPage() {
 const styles = {
   page: {
     background: "#05050a",
-    minHeight: "100vh",
+    minHeight: "100dvh",
     color: "white",
-    padding: "20px"
+    padding: "20px",
+    margin: 0,
+    boxSizing: "border-box"
   },
   backLink: {
     color: "#ffcf6a",
@@ -128,7 +127,8 @@ const styles = {
   },
   title: {
     fontSize: 24,
-    fontWeight: 700
+    fontWeight: 700,
+    margin: 0
   },
   subtitle: {
     opacity: 0.6,
