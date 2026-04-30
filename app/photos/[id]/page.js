@@ -46,6 +46,9 @@ export default function EventGallery() {
   const sentinelRef = useRef(null);
 
   useEffect(() => {
+    document.body.style.margin = "0";
+    document.body.style.padding = "0";
+    document.body.style.background = "#05050a";
     if (params?.id) load();
   }, [params]);
 
@@ -232,6 +235,7 @@ const styles = {
     background: "#05050a",
     color: "white",
     minHeight: "100dvh",
+    margin: 0,
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
   backLink: {
