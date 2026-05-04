@@ -432,25 +432,37 @@ const styles = {
   },
   modal: {
     position: "fixed",
-    inset: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100vw",
+    height: "100vh",
     background: "rgba(0,0,0,0.95)",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    zIndex: 1000
   },
   bgGlow: {
     position: "absolute",
-    inset: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "blur(60px) brightness(0.3)"
+    filter: "blur(60px) brightness(0.3)",
+    zIndex: 0
   },
   fullImage: {
-    maxWidth: "90%",
-    maxHeight: "90%",
+    maxWidth: "90vw",
+    maxHeight: "80vh",
     borderRadius: 16,
     zIndex: 2,
-    transition: "opacity 0.2s ease"
+    transition: "opacity 0.2s ease",
+    display: "block",
+    margin: "auto"
   },
   modalCounter: {
     position: "absolute",
@@ -460,7 +472,7 @@ const styles = {
     fontSize: 12,
     opacity: 0.5,
     color: "white",
-    zIndex: 3,
+    zIndex: 1001,
     margin: 0
   },
   close: {
@@ -472,7 +484,7 @@ const styles = {
     border: "none",
     color: "white",
     cursor: "pointer",
-    zIndex: 3
+    zIndex: 1001
   },
   downloadBtn: {
     position: "absolute",
@@ -485,6 +497,6 @@ const styles = {
     border: "none",
     color: "white",
     cursor: "pointer",
-    zIndex: 3
+    zIndex: 1001
   }
 };
