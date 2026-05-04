@@ -153,16 +153,32 @@ export default function CramaThesaurusPage() {
           <div style={styles.transportPoints}>
             <div style={styles.transportPoint}>
               <span style={styles.transportPointDot} />
-              <div>
+              <div style={styles.transportPointBody}>
                 <span style={styles.transportPointLabel}>Departure</span>
                 <p style={styles.transportPointValue}>Punctele Cardinale</p>
+                <a
+                  href="https://maps.google.com/?q=Punctele+Cardinale+Timisoara"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.transportMapLink}
+                >
+                  Open in Maps ↗
+                </a>
               </div>
             </div>
             <div style={styles.transportPoint}>
               <span style={styles.transportPointDot} />
-              <div>
+              <div style={styles.transportPointBody}>
                 <span style={styles.transportPointLabel}>Departure</span>
                 <p style={styles.transportPointValue}>AEM Roundabout</p>
+                <a
+                  href="https://maps.google.com/?q=Sens+giratoriu+AEM+Timisoara"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.transportMapLink}
+                >
+                  Open in Maps ↗
+                </a>
               </div>
             </div>
           </div>
@@ -171,6 +187,19 @@ export default function CramaThesaurusPage() {
             <span style={styles.transportFooterLabel}>Ticketing window</span>
             <span style={styles.transportFooterValue}>04.05 — 07.05</span>
           </div>
+
+          <a
+            href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.transportBtn}
+            className="press"
+          >
+            <span>Buy transport ticket</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
         </section>
 
         {/* ENTRY */}
@@ -564,6 +593,11 @@ const styles = {
     marginTop: 8,
     flexShrink: 0
   },
+  transportPointBody: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start"
+  },
   transportPointLabel: {
     fontSize: 9,
     fontWeight: 500,
@@ -575,8 +609,17 @@ const styles = {
     fontSize: 14,
     fontWeight: 500,
     color: "var(--ink)",
-    margin: "3px 0 0",
+    margin: "3px 0 4px",
     letterSpacing: "-0.01em"
+  },
+  transportMapLink: {
+    fontSize: 11,
+    color: "var(--ink-mute)",
+    textDecoration: "none",
+    letterSpacing: "0.04em",
+    fontWeight: 500,
+    borderBottom: "1px solid var(--line-strong)",
+    paddingBottom: 1
   },
   transportFooter: {
     display: "flex",
@@ -597,6 +640,20 @@ const styles = {
     color: "var(--ink)",
     fontFamily: "var(--serif)",
     fontStyle: "italic"
+  },
+  transportBtn: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "13px 16px",
+    borderRadius: 10,
+    background: "var(--soft-dark)",
+    color: "var(--soft-dark-text)",
+    fontWeight: 500,
+    fontSize: 13,
+    textDecoration: "none",
+    letterSpacing: "0.02em",
+    marginTop: 16
   },
 
   /* ENTRY */
