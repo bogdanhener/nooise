@@ -38,7 +38,7 @@ export default function Home() {
           {/* HERO */}
           <div style={styles.hero}>
             <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
-            <p style={styles.tagline}>Events. Energy. Moments.</p>
+            
           </div>
 
           {/* CARDS */}

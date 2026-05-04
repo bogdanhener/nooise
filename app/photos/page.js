@@ -12,7 +12,7 @@ export default function PhotosPage() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#05050a";
+    document.body.style.background = "#ffffff";
     loadEvents();
   }, []);
 
@@ -48,7 +48,7 @@ export default function PhotosPage() {
 
       {/* LOADING */}
       {loading && (
-        <p style={{ opacity: 0.6 }}>Loading events...</p>
+        <p style={styles.message}>Loading events...</p>
       )}
 
       {/* ERROR */}
@@ -61,7 +61,7 @@ export default function PhotosPage() {
 
       {/* EMPTY */}
       {!loading && !error && events.length === 0 && (
-        <p style={{ opacity: 0.6 }}>No events yet. Check back soon.</p>
+        <p style={styles.message}>No events yet. Check back soon.</p>
       )}
 
       {/* GRID */}
@@ -107,51 +107,58 @@ export default function PhotosPage() {
 
 const styles = {
   page: {
-    background: "#05050a",
+    background: "#ffffff",
     minHeight: "100dvh",
-    color: "white",
+    color: "#111",
     padding: "20px",
     margin: 0,
-    boxSizing: "border-box"
+    boxSizing: "border-box",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
   backLink: {
-    color: "#ffcf6a",
+    color: "#111",
     textDecoration: "none",
     fontSize: 13,
-    opacity: 0.8,
+    fontWeight: 600,
+    opacity: 0.5,
     display: "inline-block",
     marginBottom: 16
   },
   header: {
-    marginBottom: 14
+    marginBottom: 20
   },
   title: {
     fontSize: 24,
     fontWeight: 700,
-    margin: 0
+    margin: 0,
+    color: "#111"
   },
   subtitle: {
-    opacity: 0.6,
+    color: "#888",
     fontSize: 13,
     marginTop: 4
   },
+  message: {
+    color: "#aaa",
+    fontSize: 14
+  },
   errorBox: {
-    background: "rgba(255,60,60,0.1)",
-    border: "1px solid rgba(255,60,60,0.3)",
+    background: "rgba(255,60,60,0.06)",
+    border: "1px solid rgba(255,60,60,0.2)",
     borderRadius: 12,
     padding: 16,
     marginBottom: 14
   },
   errorText: {
-    color: "#ff6b6b",
+    color: "#e05555",
     fontSize: 14,
     margin: 0
   },
   retryBtn: {
     marginTop: 10,
     background: "transparent",
-    border: "1px solid rgba(255,100,100,0.4)",
-    color: "#ff6b6b",
+    border: "1px solid rgba(200,60,60,0.3)",
+    color: "#e05555",
     borderRadius: 8,
     padding: "6px 14px",
     fontSize: 13,
@@ -167,8 +174,8 @@ const styles = {
     height: 180,
     borderRadius: 18,
     overflow: "hidden",
-    border: "1px solid rgba(255, 215, 120, 0.35)",
-    boxShadow: "0 0 18px rgba(255, 200, 100, 0.15)"
+    border: "1px solid rgba(0,0,0,0.08)",
+    boxShadow: "0 2px 16px rgba(0,0,0,0.08)"
   },
   image: {
     position: "absolute",
@@ -180,7 +187,7 @@ const styles = {
   overlay: {
     position: "absolute",
     inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.05))"
+    background: "linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.05))"
   },
   content: {
     position: "absolute",
@@ -191,12 +198,12 @@ const styles = {
   titleText: {
     fontSize: 18,
     fontWeight: 700,
-    color: "white"
+    color: "white",
+    margin: 0
   },
   dateText: {
     fontSize: 12,
     marginTop: 4,
-    opacity: 0.85,
-    color: "white"
+    color: "rgba(255,255,255,0.8)"
   }
 };
