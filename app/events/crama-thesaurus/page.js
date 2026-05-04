@@ -8,18 +8,18 @@ export default function CramaThesaurusPage() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#05050a";
+    document.body.style.background = "#ffffff";
   }, []);
 
   return (
     <div style={styles.page}>
 
-      <style>{`@keyframes pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }`}</style>
+      <style>{`@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }`}</style>
 
       {/* BACK */}
       <Link href="/" style={styles.backLink}>← nooise</Link>
 
-      {/* POSTER — capped height so content peeks below */}
+      {/* POSTER */}
       <div style={styles.posterWrap}>
         <img
           src="/img/nooise_crama.jpg"
@@ -27,7 +27,6 @@ export default function CramaThesaurusPage() {
           style={styles.poster}
         />
         <div style={styles.posterFade} />
-        <div style={styles.posterGlow} />
       </div>
 
       {/* CONTENT */}
@@ -85,7 +84,7 @@ export default function CramaThesaurusPage() {
         {/* DIVIDER */}
         <div style={styles.divider} />
 
-        {/* TICKETS INFO */}
+        {/* INFO BOXES */}
         <div style={styles.infoBox}>
           <p style={styles.infoTitle}>🎟 First 50 tickets — FREE</p>
           <p style={styles.infoText}>
@@ -93,13 +92,11 @@ export default function CramaThesaurusPage() {
           </p>
         </div>
 
-        {/* TRANSPORT */}
         <div style={styles.infoBox}>
           <p style={styles.infoTitle}>🚌 Transport available</p>
           <p style={styles.infoText}>Timișoara → Buziaș → return · Details soon</p>
         </div>
 
-        {/* AGE */}
         <div style={styles.infoBox}>
           <p style={styles.infoTitle}>🔞 18+ event</p>
           <p style={styles.infoText}>The door reserves the right to select guests.</p>
@@ -147,18 +144,19 @@ export default function CramaThesaurusPage() {
 
 const styles = {
   page: {
-    background: "#05050a",
+    background: "#ffffff",
     minHeight: "100dvh",
-    color: "white",
+    color: "#111",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
     margin: 0,
     paddingBottom: 60
   },
   backLink: {
-    color: "#ffcf6a",
+    color: "#111",
     textDecoration: "none",
     fontSize: 13,
-    opacity: 0.8,
+    fontWeight: 600,
+    opacity: 0.5,
     display: "inline-block",
     padding: "16px 16px 0"
   },
@@ -167,7 +165,8 @@ const styles = {
     margin: "16px 16px 0",
     borderRadius: 20,
     overflow: "hidden",
-    maxHeight: "62vh"
+    maxHeight: "62vh",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.1)"
   },
   poster: {
     width: "100%",
@@ -176,24 +175,13 @@ const styles = {
     objectFit: "cover",
     objectPosition: "top"
   },
-  /* fade at the bottom of the poster so content below feels connected */
   posterFade: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     height: 80,
-    background: "linear-gradient(to bottom, transparent, #05050a)"
-  },
-  posterGlow: {
-    position: "absolute",
-    width: 200,
-    height: 200,
-    bottom: -60,
-    right: -40,
-    background: "rgba(255,200,100,0.15)",
-    filter: "blur(60px)",
-    pointerEvents: "none"
+    background: "linear-gradient(to bottom, transparent, #ffffff)"
   },
   content: {
     padding: "20px 16px 0"
@@ -202,12 +190,12 @@ const styles = {
     fontSize: 11,
     letterSpacing: 2,
     textTransform: "uppercase",
-    color: "#ffcf6a",
+    color: "#111",
     fontWeight: 600,
-    background: "rgba(255,207,106,0.12)",
+    background: "rgba(0,0,0,0.05)",
     padding: "3px 10px",
     borderRadius: 6,
-    border: "1px solid rgba(255,207,106,0.25)",
+    border: "1px solid rgba(0,0,0,0.1)",
     display: "inline-block",
     marginBottom: 14,
     animation: "pulse 2.5s ease-in-out infinite"
@@ -215,20 +203,19 @@ const styles = {
   title: {
     fontSize: 24,
     fontWeight: 800,
-    color: "white",
+    color: "#111",
     margin: 0,
     lineHeight: 1.3
   },
   divider: {
     height: 1,
-    background: "rgba(255,215,120,0.1)",
+    background: "rgba(0,0,0,0.07)",
     margin: "20px 0"
   },
   description: {
     fontSize: 14,
     lineHeight: 1.75,
-    opacity: 0.75,
-    color: "white",
+    color: "#555",
     margin: "0 0 10px"
   },
   details: {
@@ -248,43 +235,43 @@ const styles = {
   detailText: {
     fontSize: 14,
     fontWeight: 600,
-    color: "white",
+    color: "#111",
     margin: 0
   },
   infoBox: {
     marginBottom: 12,
     padding: "12px 14px",
-    background: "rgba(255,255,255,0.03)",
+    background: "#f9f9f9",
     borderRadius: 12,
-    border: "1px solid rgba(255,215,120,0.08)"
+    border: "1px solid rgba(0,0,0,0.06)"
   },
   infoTitle: {
     fontSize: 14,
     fontWeight: 700,
-    color: "white",
+    color: "#111",
     margin: "0 0 4px"
   },
   infoText: {
     fontSize: 13,
-    opacity: 0.6,
+    color: "#888",
     margin: 0,
     lineHeight: 1.5
   },
   tablesBox: {
     padding: "14px 16px",
-    background: "rgba(255,207,106,0.05)",
+    background: "#f9f9f9",
     borderRadius: 14,
-    border: "1px solid rgba(255,207,106,0.15)"
+    border: "1px solid rgba(0,0,0,0.06)"
   },
   tablesTitle: {
     fontSize: 14,
     fontWeight: 700,
-    color: "#ffcf6a",
+    color: "#111",
     margin: "0 0 6px"
   },
   tablesText: {
     fontSize: 13,
-    opacity: 0.7,
+    color: "#888",
     margin: "0 0 10px"
   },
   tableTypes: {
@@ -295,21 +282,21 @@ const styles = {
   tableTag: {
     fontSize: 12,
     fontWeight: 600,
-    color: "#ffcf6a",
-    background: "rgba(255,207,106,0.1)",
-    border: "1px solid rgba(255,207,106,0.25)",
+    color: "#111",
+    background: "rgba(0,0,0,0.05)",
+    border: "1px solid rgba(0,0,0,0.1)",
     borderRadius: 8,
     padding: "4px 10px"
   },
   tablesNote: {
     fontSize: 12,
-    opacity: 0.5,
+    color: "#aaa",
     margin: 0
   },
   cta: {
     fontSize: 15,
     fontWeight: 700,
-    color: "white",
+    color: "#111",
     textAlign: "center",
     marginBottom: 20,
     lineHeight: 1.5
@@ -319,18 +306,17 @@ const styles = {
     textAlign: "center",
     padding: "16px 20px",
     borderRadius: 16,
-    background: "rgba(255,207,106,0.12)",
-    border: "1px solid rgba(255,207,106,0.4)",
-    color: "#ffcf6a",
+    background: "#111",
+    color: "#ffffff",
     fontWeight: 700,
     fontSize: 15,
     textDecoration: "none",
-    boxShadow: "0 0 30px rgba(255,200,80,0.1)"
+    boxShadow: "0 4px 20px rgba(0,0,0,0.15)"
   },
   ticketNote: {
     textAlign: "center",
     fontSize: 12,
-    opacity: 0.35,
+    color: "#bbb",
     marginTop: 10
   }
 };
