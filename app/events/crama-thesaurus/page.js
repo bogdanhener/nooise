@@ -137,16 +137,46 @@ export default function CramaThesaurusPage() {
           <p style={styles.ticketNote}>Limited capacity</p>
         </section>
 
-        {/* META GRID */}
-        <section style={styles.metaGrid}>
-          <div style={styles.metaCard}>
-            <span style={styles.metaCardLabel}>Transport</span>
-            <p style={styles.metaCardText}>Timișoara → Buziaș → return. Details soon.</p>
+        {/* TRANSPORT — full width, more prominent */}
+        <section style={styles.transportBlock}>
+          <div style={styles.transportHeader}>
+            <span style={styles.transportEyebrow}>Transport</span>
+            <span style={styles.transportPrice}>
+              <span style={styles.serif}>30</span>
+              <span style={styles.transportCurrency}>RON</span>
+            </span>
           </div>
-          <div style={styles.metaCard}>
-            <span style={styles.metaCardLabel}>Entry</span>
-            <p style={styles.metaCardText}>18+ only. Door reserves the right to select guests.</p>
+          <p style={styles.transportLead}>
+            We've got you covered. Bus to Crama Thesaurus and back.
+          </p>
+
+          <div style={styles.transportPoints}>
+            <div style={styles.transportPoint}>
+              <span style={styles.transportPointDot} />
+              <div>
+                <span style={styles.transportPointLabel}>Departure</span>
+                <p style={styles.transportPointValue}>Punctele Cardinale</p>
+              </div>
+            </div>
+            <div style={styles.transportPoint}>
+              <span style={styles.transportPointDot} />
+              <div>
+                <span style={styles.transportPointLabel}>Departure</span>
+                <p style={styles.transportPointValue}>AEM Roundabout</p>
+              </div>
+            </div>
           </div>
+
+          <div style={styles.transportFooter}>
+            <span style={styles.transportFooterLabel}>Ticketing window</span>
+            <span style={styles.transportFooterValue}>04.05 — 07.05</span>
+          </div>
+        </section>
+
+        {/* ENTRY */}
+        <section style={styles.entryBlock}>
+          <span style={styles.metaCardLabel}>Entry</span>
+          <p style={styles.metaCardText}>18+ only. Door reserves the right to select guests.</p>
         </section>
 
         {/* TABLE RESERVATIONS */}
@@ -470,15 +500,109 @@ const styles = {
     margin: "14px 0 0"
   },
 
-  /* META GRID */
-  metaGrid: {
-    display: "grid",
-    gridTemplateColumns: "1fr 1fr",
-    gap: 12,
-    marginTop: 28
+  /* TRANSPORT BLOCK */
+  transportBlock: {
+    marginTop: 28,
+    padding: "22px 22px 20px",
+    borderRadius: 14,
+    border: "1px solid var(--line)"
   },
-  metaCard: {
-    padding: "16px 16px 18px",
+  transportHeader: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    marginBottom: 14
+  },
+  transportEyebrow: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)"
+  },
+  transportPrice: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 6,
+    fontSize: 28,
+    fontWeight: 500,
+    color: "var(--ink)",
+    letterSpacing: "-0.02em",
+    lineHeight: 1
+  },
+  transportCurrency: {
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    color: "var(--ink-mute)"
+  },
+  transportLead: {
+    fontSize: 13,
+    color: "var(--ink-soft)",
+    lineHeight: 1.6,
+    margin: "0 0 18px"
+  },
+  transportPoints: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 14,
+    paddingTop: 16,
+    paddingBottom: 16,
+    borderTop: "1px solid var(--line)",
+    borderBottom: "1px solid var(--line)"
+  },
+  transportPoint: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 12
+  },
+  transportPointDot: {
+    width: 6,
+    height: 6,
+    borderRadius: "50%",
+    background: "var(--ink)",
+    marginTop: 8,
+    flexShrink: 0
+  },
+  transportPointLabel: {
+    fontSize: 9,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)"
+  },
+  transportPointValue: {
+    fontSize: 14,
+    fontWeight: 500,
+    color: "var(--ink)",
+    margin: "3px 0 0",
+    letterSpacing: "-0.01em"
+  },
+  transportFooter: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 14
+  },
+  transportFooterLabel: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)"
+  },
+  transportFooterValue: {
+    fontSize: 13,
+    fontWeight: 500,
+    color: "var(--ink)",
+    fontFamily: "var(--serif)",
+    fontStyle: "italic"
+  },
+
+  /* ENTRY */
+  entryBlock: {
+    marginTop: 12,
+    padding: "16px 18px 18px",
     borderRadius: 12,
     border: "1px solid var(--line)"
   },
