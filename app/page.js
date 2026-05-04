@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 
 export default function Home() {
-  // phase: 'intro' | 'diving' | 'home'
+  // phase: 'intro' | 'diving' | 'video' | 'home'
   const [phase, setPhase] = useState("intro");
   const [videoFading, setVideoFading] = useState(false);
   const videoRef = useRef(null);
@@ -21,11 +21,9 @@ export default function Home() {
     // Stage 1: hold the logo for a beat
     const t1 = setTimeout(() => {
       setPhase("diving");
-      // Start video playback as the dive begins
+      // Start video playback as the dive begins so it's playing by the time it's revealed
       const v = videoRef.current;
       if (v) {
-        // Force muted property on the actual element — iOS Safari requires this
-        // to be set before play() to allow autoplay
         v.muted = true;
         v.defaultMuted = true;
         v.playsInline = true;
@@ -35,44 +33,50 @@ export default function Home() {
         v.currentTime = 0;
         const playPromise = v.play();
         if (playPromise !== undefined) {
-          playPromise.catch((err) => {
-            console.log("[intro] play rejected, retrying", err?.name);
-            // Retry once after a tick — sometimes mobile needs a moment
-            setTimeout(() => {
-              v.play().catch((e2) => console.log("[intro] retry failed", e2?.name));
-            }, 50);
+          playPromise.catch(() => {
+            setTimeout(() => v.play().catch(() => {}), 50);
           });
         }
       }
     }, 1200);
-    // Stage 2: after the dive completes, switch to home
+
+    // Stage 2: dive completes, video takes over the full screen
     const t2 = setTimeout(() => {
-      setPhase("home");
-      sessionStorage.setItem("nooise_intro_seen", "1");
+      setPhase("video");
     }, 2400);
-    // Stage 3: fade out the video once home has settled
+
+    // Stage 3: start fading the video out
     const t3 = setTimeout(() => {
       setVideoFading(true);
-    }, 3400);
+    }, 6400);
+
+    // Stage 4: switch to home — overlaps with video fade for a crossfade
+    const t4 = setTimeout(() => {
+      setPhase("home");
+      sessionStorage.setItem("nooise_intro_seen", "1");
+    }, 6600);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
+      clearTimeout(t4);
     };
   }, []);
 
-  const showIntro = phase !== "home";
+  const showIntro = phase === "intro" || phase === "diving";
   const isDiving = phase === "diving";
-  // Show home content during diving phase too, so it fades up underneath the zooming logo
-  const showHome = phase === "diving" || phase === "home";
+  // Show home only in the home phase now — video has its own dedicated moment
+  const showHome = phase === "home";
   // Track whether home is arriving via the dive (dramatic) or directly (subtle)
   const [diveArrival] = useState(() => {
     if (typeof window === "undefined") return false;
     return !sessionStorage.getItem("nooise_intro_seen");
   });
-  // Video stays mounted from the start of a fresh-session visit so it can preload during the intro hold
+  // Video stays mounted from the start so it can preload during the intro hold
   const showVideo = diveArrival;
+  // Video should be visible during diving (last portion), video phase, and fading transition out
+  const videoVisible = phase === "diving" || phase === "video";
 
   return (
     <div style={styles.page}>
@@ -100,7 +104,7 @@ export default function Home() {
           100%    { opacity: 0; }
         }
         @keyframes homeArrive {
-          from { opacity: 0; transform: scale(1.06); }
+          from { opacity: 0; transform: scale(1.02); }
           to   { opacity: 1; transform: scale(1); }
         }
         @keyframes lineGrow {
@@ -158,44 +162,28 @@ export default function Home() {
           display: block;
         }
         .intro-video.visible { opacity: 1; }
-        .intro-video.fading { opacity: 0; transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
-        .intro-video-overlay {
-          position: fixed;
-          top: 0; left: 0;
-          width: 100vw;
-          height: 100vh;
-          z-index: 2;
-          pointer-events: none;
-          background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.7) 70%, rgba(255,255,255,0.92) 100%);
-          opacity: 0;
-          transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        .intro-video-overlay.visible { opacity: 1; }
-        .intro-video-overlay.fading { opacity: 0; transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .intro-video.fading { opacity: 0; transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
       `}</style>
 
-      {/* INTRO VIDEO — plays behind everything during the dive→home transition */}
+      {/* INTRO VIDEO — full-screen during the video phase */}
       {showVideo && (
-        <>
-          <video
-            ref={videoRef}
-            className={`intro-video ${isDiving || phase === "home" ? "visible" : ""} ${videoFading ? "fading" : ""}`}
-            src="/intro.mp4"
-            muted
-            defaultMuted
-            playsInline
-            webkit-playsinline=""
-            x5-playsinline=""
-            preload="auto"
-            autoPlay
-            loop
-            disableRemotePlayback
-            onLoadedData={() => console.log("[intro] video loaded")}
-            onPlay={() => console.log("[intro] video playing")}
-            onError={(e) => console.log("[intro] video error", e?.target?.error)}
-          />
-          <div className={`intro-video-overlay ${isDiving || phase === "home" ? "visible" : ""} ${videoFading ? "fading" : ""}`} />
-        </>
+        <video
+          ref={videoRef}
+          className={`intro-video ${videoVisible ? "visible" : ""} ${videoFading ? "fading" : ""}`}
+          src="/intro.mp4"
+          muted
+          defaultMuted
+          playsInline
+          webkit-playsinline=""
+          x5-playsinline=""
+          preload="auto"
+          autoPlay
+          loop
+          disableRemotePlayback
+          onLoadedData={() => console.log("[intro] video loaded")}
+          onPlay={() => console.log("[intro] video playing")}
+          onError={(e) => console.log("[intro] video error", e?.target?.error)}
+        />
       )}
 
       {/* INTRO — dive-through */}
