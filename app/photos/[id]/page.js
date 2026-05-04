@@ -100,8 +100,20 @@ export default function EventGallery() {
     setLoading(false);
   }
 
-  function open(i) { setIndex(i); setActive(true); }
-  function close() { setActive(false); }
+  function open(i) {
+    setIndex(i);
+    setActive(true);
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+  }
+
+  function close() {
+    setActive(false);
+    document.body.style.overflow = "";
+    document.body.style.position = "";
+    document.body.style.width = "";
+  }
 
   function changeImage(i) {
     setFade(false);
