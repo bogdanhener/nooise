@@ -69,26 +69,25 @@ export default function EventGallery() {
     setImages([]);
     setVisible(PAGE_SIZE);
 
-    const [eventRes, photosRes] = await Promise.all([
-      supabase
-        .from("events")
-        .select("id, name, event_date, cover_image_url")
-        .eq("id", params.id)
-        .single(),
-      supabase.storage
-        .from("nooise-photos")
-        .list(params.id, { limit: 1000, sortBy: { column: "name", order: "asc" } })
-    ]);
+    // fetch event info for cover image
+    const { data: evData } = await supabase
+      .from("events")
+      .select("id, name, event_date, cover_image_url")
+      .eq("id", params.id)
+      .single();
+    if (evData) setEventData(evData);
 
-    if (eventRes.data) setEventData(eventRes.data);
+    const { data, error } = await supabase.storage
+      .from("nooise-photos")
+      .list(params.id, { limit: 1000, sortBy: { column: "name", order: "asc" } });
 
-    if (photosRes.error || !photosRes.data) {
+    if (error || !data) {
       setError("Could not load photos. Please try again.");
       setLoading(false);
       return;
     }
 
-    const urls = photosRes.data
+    const urls = data
       .filter((file) => file.name && !file.name.startsWith("."))
       .map((file) => {
         const { data: urlData } = supabase.storage
@@ -133,6 +132,9 @@ export default function EventGallery() {
       });
   }
 
+  const displayedImages = images.slice(0, visible);
+  const hasMore = visible < images.length;
+
   const coverUrl = eventData?.cover_image_url || null;
   const displayName = eventData?.name || config.title;
   const displayDate = eventData?.event_date
@@ -141,30 +143,15 @@ export default function EventGallery() {
       })
     : null;
 
-  const displayedImages = images.slice(0, visible);
-  const hasMore = visible < images.length;
-
   return (
     <div style={styles.page}>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        .img-press { transition: transform 0.1s ease; cursor: pointer; }
-        .img-press:active { transform: scale(0.96); }
-      `}</style>
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
-      {/* TOP BAR */}
-      <div style={styles.topBar}>
-        <Link href="/photos" style={styles.backLink}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 5l-7 7 7 7"/>
-          </svg>
-          <span style={styles.backLabel}>All Events</span>
-        </Link>
-      </div>
+      {/* BACK */}
+      <Link href="/photos" style={styles.backLink}>← All Events</Link>
 
-      {/* HERO COVER */}
+      {/* COVER HERO — only if cover image exists in DB */}
       {coverUrl && (
         <div style={styles.coverWrap}>
           <div style={{ ...styles.coverImg, backgroundImage: `url(${coverUrl})` }} />
@@ -176,10 +163,10 @@ export default function EventGallery() {
         </div>
       )}
 
-      {/* FALLBACK HEADER (no cover image) */}
+      {/* HERO — fallback when no cover image */}
       {!coverUrl && (
-        <div style={styles.header}>
-          <h1 style={styles.title}>{displayName}</h1>
+        <div style={styles.hero}>
+          <h1 style={styles.title}>{config.title}</h1>
           <p style={styles.story}>{config.story}</p>
         </div>
       )}
@@ -188,6 +175,7 @@ export default function EventGallery() {
       {loading && (
         <div style={styles.loadingWrap}>
           <div style={styles.spinner} />
+          <p style={styles.message}>Loading photos...</p>
         </div>
       )}
 
@@ -201,7 +189,7 @@ export default function EventGallery() {
 
       {/* EMPTY */}
       {!loading && !error && images.length === 0 && (
-        <p style={styles.message}>No photos uploaded yet.</p>
+        <p style={styles.message}>No photos uploaded yet for this event.</p>
       )}
 
       {/* COUNT */}
@@ -213,13 +201,20 @@ export default function EventGallery() {
       {!loading && !error && displayedImages.length > 0 && (
         <div style={styles.grid}>
           {displayedImages.map((url, i) => (
-            <div key={i} className="img-press" style={styles.card} onClick={() => open(i)}>
+            <div key={i} style={styles.card}>
               <img
                 src={url}
                 style={styles.image}
                 loading="lazy"
                 decoding="async"
+                onClick={() => open(i)}
               />
+              <button
+                style={styles.gridDownload}
+                onClick={(e) => { e.stopPropagation(); download(url, i); }}
+              >
+                ⬇
+              </button>
             </div>
           ))}
         </div>
@@ -237,7 +232,7 @@ export default function EventGallery() {
         <p style={styles.endMessage}>All {images.length} photos loaded</p>
       )}
 
-      {/* MODAL — stays dark */}
+      {/* MODAL — stays dark for photo viewing */}
       {active && (
         <div
           style={styles.modal}
@@ -266,25 +261,16 @@ const styles = {
     color: "#111",
     minHeight: "100dvh",
     margin: 0,
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-    paddingBottom: 40
-  },
-  topBar: {
-    display: "flex",
-    alignItems: "center",
-    padding: "16px 20px 0"
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
   backLink: {
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
+    color: "#111",
     textDecoration: "none",
-    color: "#111"
-  },
-  backLabel: {
     fontSize: 13,
     fontWeight: 600,
-    opacity: 0.5
+    opacity: 0.5,
+    display: "inline-block",
+    padding: "16px 16px 0"
   },
 
   /* COVER HERO */
@@ -325,36 +311,38 @@ const styles = {
     marginTop: 4
   },
 
-  /* FALLBACK HEADER */
-  header: {
-    padding: "20px 20px 8px"
+  /* FALLBACK HERO */
+  hero: {
+    padding: "20px 16px"
   },
   title: {
-    fontSize: 24,
-    fontWeight: 800,
+    fontSize: 22,
+    fontWeight: 700,
     margin: 0,
     color: "#111"
   },
   story: {
     fontSize: 13,
-    color: "#aaa",
+    color: "#888",
     marginTop: 6
   },
 
   count: {
     fontSize: 12,
     color: "#bbb",
-    padding: "12px 20px 4px",
+    padding: "0 16px 4px",
     margin: 0
   },
   loadingWrap: {
     display: "flex",
-    justifyContent: "center",
-    padding: "60px 0"
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 12,
+    padding: "40px 16px"
   },
   spinner: {
-    width: 22,
-    height: 22,
+    width: 24,
+    height: 24,
     border: "2px solid rgba(0,0,0,0.08)",
     borderTop: "2px solid #111",
     borderRadius: "50%",
@@ -363,12 +351,12 @@ const styles = {
   message: {
     color: "#aaa",
     fontSize: 14,
-    padding: "0 20px"
+    padding: "0 16px"
   },
   errorBox: {
-    margin: "0 20px",
+    margin: "0 16px",
     background: "rgba(255,60,60,0.06)",
-    border: "1px solid rgba(255,60,60,0.15)",
+    border: "1px solid rgba(255,60,60,0.2)",
     borderRadius: 12,
     padding: 16
   },
@@ -390,19 +378,33 @@ const styles = {
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 3,
-    padding: "8px 16px"
+    gap: 4,
+    padding: 10
   },
   card: {
-    borderRadius: 8,
-    overflow: "hidden",
-    background: "#f5f5f5"
+    position: "relative",
+    borderRadius: 10,
+    overflow: "hidden"
   },
   image: {
     width: "100%",
     aspectRatio: "1/1",
     objectFit: "cover",
+    cursor: "pointer",
     display: "block"
+  },
+  gridDownload: {
+    position: "absolute",
+    bottom: 6,
+    right: 6,
+    width: 28,
+    height: 28,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.5)",
+    border: "none",
+    color: "white",
+    fontSize: 12,
+    cursor: "pointer"
   },
   sentinel: {
     display: "flex",
@@ -413,15 +415,13 @@ const styles = {
     textAlign: "center",
     fontSize: 12,
     color: "#ccc",
-    padding: "16px 0 20px",
+    padding: "16px 0 40px",
     margin: 0
   },
-
-  /* MODAL */
   modal: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.92)",
+    background: "rgba(0,0,0,0.95)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center"
@@ -431,7 +431,7 @@ const styles = {
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "blur(60px) brightness(0.4)"
+    filter: "blur(60px) brightness(0.3)"
   },
   fullImage: {
     maxWidth: "90%",
@@ -439,17 +439,6 @@ const styles = {
     borderRadius: 16,
     zIndex: 2,
     transition: "opacity 0.2s ease"
-  },
-  close: {
-    position: "absolute",
-    top: 20,
-    right: 20,
-    fontSize: 22,
-    background: "transparent",
-    border: "none",
-    color: "white",
-    cursor: "pointer",
-    zIndex: 3
   },
   modalCounter: {
     position: "absolute",
@@ -461,6 +450,17 @@ const styles = {
     color: "white",
     zIndex: 3,
     margin: 0
+  },
+  close: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    fontSize: 22,
+    background: "transparent",
+    border: "none",
+    color: "white",
+    cursor: "pointer",
+    zIndex: 3
   },
   downloadBtn: {
     position: "absolute",
