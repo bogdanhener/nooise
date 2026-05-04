@@ -37,18 +37,37 @@ export default function PhotosPage() {
   return (
     <div style={styles.page}>
 
-      {/* BACK */}
-      <Link href="/" style={styles.backLink}>← nooise</Link>
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .card-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
+        .card-press:active { transform: scale(0.98); }
+      `}</style>
+
+      {/* TOP BAR */}
+      <div style={styles.topBar}>
+        <Link href="/" style={styles.backLink}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          <span style={styles.backLabel}>nooise</span>
+        </Link>
+      </div>
 
       {/* HEADER */}
       <div style={styles.header}>
-        <h1 style={styles.title}>Find Your Photos</h1>
-        <p style={styles.subtitle}>Select an event</p>
+        <h1 style={styles.title}>Your Photos</h1>
+        <p style={styles.subtitle}>Select an event to browse</p>
       </div>
 
       {/* LOADING */}
       {loading && (
-        <p style={styles.message}>Loading events...</p>
+        <div style={styles.loadingWrap}>
+          <div style={styles.spinner} />
+        </div>
       )}
 
       {/* ERROR */}
@@ -65,40 +84,72 @@ export default function PhotosPage() {
       )}
 
       {/* GRID */}
-      <div style={styles.grid}>
-        {events.map((event) => (
-          <Link
-            key={event.id}
-            href={`/photos/${event.id}`}
-            style={{ textDecoration: "none" }}
-          >
-            <div style={styles.card}>
+      {!loading && !error && events.length > 0 && (
+        <div style={styles.grid}>
+          {events.map((event, i) => (
+            <Link
+              key={event.id}
+              href={`/photos/${event.id}`}
+              style={{ textDecoration: "none", animation: `fadeIn 0.4s ease ${i * 0.07}s both` }}
+            >
+              <div className="card-press" style={styles.card}>
 
-              <div
-                style={{
-                  ...styles.image,
-                  backgroundImage: `url(${event.cover_image_url || ""})`
-                }}
-              />
+                {/* COVER IMAGE */}
+                <div
+                  style={{
+                    ...styles.image,
+                    backgroundImage: event.cover_image_url
+                      ? `url(${event.cover_image_url})`
+                      : "none",
+                    background: event.cover_image_url ? undefined : "#f0f0f0"
+                  }}
+                />
 
-              <div style={styles.overlay} />
+                {/* GRADIENT OVERLAY */}
+                <div style={styles.overlay} />
 
-              <div style={styles.content}>
-                <h2 style={styles.titleText}>{event.name}</h2>
-                <p style={styles.dateText}>
-                  {event.event_date
-                    ? new Date(event.event_date).toLocaleDateString("ro-RO", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric"
-                      })
-                    : ""}
-                </p>
+                {/* TEXT */}
+                <div style={styles.content}>
+                  <h2 style={styles.titleText}>{event.name}</h2>
+                  <p style={styles.dateText}>
+                    {event.event_date
+                      ? new Date(event.event_date).toLocaleDateString("ro-RO", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric"
+                        })
+                      : ""}
+                  </p>
+                </div>
+
+                {/* ARROW */}
+                <div style={styles.cardArrow}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </div>
+
               </div>
+            </Link>
+          ))}
+        </div>
+      )}
 
-            </div>
-          </Link>
-        ))}
+      {/* FOOTER */}
+      <div style={styles.footer}>
+        <a
+          href="https://www.instagram.com/nooise___/"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={styles.footerInsta}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.8" fill="#bbb" stroke="none"/>
+          </svg>
+          <span>nooise___</span>
+        </a>
       </div>
 
     </div>
@@ -110,44 +161,66 @@ const styles = {
     background: "#ffffff",
     minHeight: "100dvh",
     color: "#111",
-    padding: "20px",
     margin: 0,
     boxSizing: "border-box",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
+  topBar: {
+    display: "flex",
+    alignItems: "center",
+    padding: "16px 20px 0"
+  },
   backLink: {
-    color: "#111",
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
     textDecoration: "none",
-    fontSize: 13,
-    fontWeight: 600,
-    opacity: 0.5,
-    display: "inline-block",
-    marginBottom: 16
-  },
-  header: {
-    marginBottom: 20
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 700,
-    margin: 0,
     color: "#111"
   },
+  backLabel: {
+    fontSize: 13,
+    fontWeight: 600,
+    opacity: 0.5
+  },
+  header: {
+    padding: "20px 20px 8px"
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 800,
+    margin: 0,
+    color: "#111",
+    letterSpacing: -0.5
+  },
   subtitle: {
-    color: "#888",
+    color: "#aaa",
     fontSize: 13,
     marginTop: 4
   },
+  loadingWrap: {
+    display: "flex",
+    justifyContent: "center",
+    padding: "60px 0"
+  },
+  spinner: {
+    width: 22,
+    height: 22,
+    border: "2px solid rgba(0,0,0,0.08)",
+    borderTop: "2px solid #111",
+    borderRadius: "50%",
+    animation: "spin 0.8s linear infinite"
+  },
   message: {
     color: "#aaa",
-    fontSize: 14
+    fontSize: 14,
+    padding: "0 20px"
   },
   errorBox: {
+    margin: "0 20px",
     background: "rgba(255,60,60,0.06)",
-    border: "1px solid rgba(255,60,60,0.2)",
+    border: "1px solid rgba(255,60,60,0.15)",
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 14
+    padding: 16
   },
   errorText: {
     color: "#e05555",
@@ -167,33 +240,32 @@ const styles = {
   grid: {
     display: "flex",
     flexDirection: "column",
-    gap: 14
+    gap: 12,
+    padding: "12px 16px"
   },
   card: {
     position: "relative",
-    height: 180,
-    borderRadius: 18,
+    height: 190,
+    borderRadius: 20,
     overflow: "hidden",
-    border: "1px solid rgba(0,0,0,0.08)",
-    boxShadow: "0 2px 16px rgba(0,0,0,0.08)"
+    boxShadow: "0 2px 20px rgba(0,0,0,0.1)"
   },
   image: {
     position: "absolute",
     inset: 0,
     backgroundSize: "cover",
-    backgroundPosition: "center",
-    filter: "brightness(0.9)"
+    backgroundPosition: "center"
   },
   overlay: {
     position: "absolute",
     inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.6), rgba(0,0,0,0.05))"
+    background: "linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.0) 60%)"
   },
   content: {
     position: "absolute",
     bottom: 14,
-    left: 14,
-    right: 14
+    left: 16,
+    right: 48
   },
   titleText: {
     fontSize: 18,
@@ -203,7 +275,34 @@ const styles = {
   },
   dateText: {
     fontSize: 12,
-    marginTop: 4,
-    color: "rgba(255,255,255,0.8)"
+    marginTop: 3,
+    color: "rgba(255,255,255,0.7)"
+  },
+  cardArrow: {
+    position: "absolute",
+    bottom: 14,
+    right: 14,
+    width: 32,
+    height: 32,
+    borderRadius: "50%",
+    background: "rgba(255,255,255,0.15)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backdropFilter: "blur(4px)"
+  },
+  footer: {
+    marginTop: 16,
+    paddingBottom: 40,
+    display: "flex",
+    justifyContent: "center"
+  },
+  footerInsta: {
+    display: "flex",
+    alignItems: "center",
+    gap: 5,
+    textDecoration: "none",
+    color: "#bbb",
+    fontSize: 12
   }
 };

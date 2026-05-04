@@ -2,27 +2,38 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Comfortaa } from "next/font/google";
-
-const comfortaa = Comfortaa({
-  subsets: ["latin"],
-  weight: ["300"],
-  display: "swap"
-});
 
 export default function Home() {
   const [enter, setEnter] = useState(false);
+  const [pressedCard, setPressedCard] = useState(null);
 
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
     document.body.style.background = "#ffffff";
-    const t = setTimeout(() => setEnter(true), 2400);
+    const t = setTimeout(() => setEnter(true), 2000);
     return () => clearTimeout(t);
   }, []);
 
   return (
     <div style={styles.page}>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes logoIn {
+          from { opacity: 0; transform: scale(0.92); }
+          to   { opacity: 1; transform: scale(1); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.5; }
+          50%       { opacity: 1; }
+        }
+        .card-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
+        .card-press:active { transform: scale(0.97); box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important; }
+      `}</style>
 
       {/* INTRO */}
       {!enter && (
@@ -35,10 +46,27 @@ export default function Home() {
       {enter && (
         <div style={styles.main}>
 
+          {/* TOP BAR */}
+          <div style={styles.topBar}>
+            <a
+              href="https://www.instagram.com/nooise___/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.instaLink}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="0.8" fill="#111" stroke="none"/>
+              </svg>
+              <span style={styles.instaLabel}>@nooise___</span>
+            </a>
+          </div>
+
           {/* HERO */}
           <div style={styles.hero}>
             <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
-            
+            <div style={styles.divider} />
           </div>
 
           {/* CARDS */}
@@ -46,23 +74,30 @@ export default function Home() {
 
             {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
-              <div style={styles.cardPrimary}>
+              <div className="card-press" style={styles.cardPrimary}>
                 <div style={styles.cardRow}>
                   <div>
                     <h2 style={styles.cardTitle}>Find Your Photos</h2>
                     <p style={styles.cardText}>Relive your event moments</p>
                   </div>
-                  <span style={styles.cardArrow}>→</span>
+                  <div style={styles.cardIconWrap}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
             </Link>
 
             {/* NEXT EVENT */}
             <Link href="/events/crama-thesaurus" style={styles.linkFix}>
-              <div style={styles.eventCard}>
+              <div className="card-press" style={styles.eventCard}>
 
                 <div style={styles.eventTopRow}>
-                  <span style={styles.eventBadge}>Next Event</span>
+                  <span style={styles.eventBadge}>
+                    <span style={styles.pulseDot} />
+                    Next Event
+                  </span>
                   <a
                     href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
                     target="_blank"
@@ -89,17 +124,31 @@ export default function Home() {
 
           {/* FOOTER */}
           <div style={styles.footer}>
-            <p style={styles.footerText}>
-              2026 © nooise ·{" "}
+            <div style={styles.footerRow}>
+              <a
+                href="https://www.instagram.com/nooise___/"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.footerInsta}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <circle cx="12" cy="12" r="4"/>
+                  <circle cx="17.5" cy="6.5" r="0.8" fill="#aaa" stroke="none"/>
+                </svg>
+                <span>nooise___</span>
+              </a>
+              <span style={styles.footerDot}>·</span>
               <a
                 href="https://www.instagram.com/bogdanhener/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={styles.footerLink}
+                style={styles.footerCredit}
               >
-                designed by bogdanhener
+                by bogdanhener
               </a>
-            </p>
+            </div>
+            <p style={styles.footerYear}>2026 © nooise</p>
           </div>
 
         </div>
@@ -123,10 +172,7 @@ const styles = {
   /* INTRO */
   intro: {
     position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: 0, left: 0, right: 0, bottom: 0,
     background: "#ffffff",
     display: "flex",
     justifyContent: "center",
@@ -135,7 +181,7 @@ const styles = {
   },
   logoImgIntro: {
     width: 180,
-    opacity: 1
+    animation: "logoIn 0.6s ease forwards"
   },
 
   /* MAIN */
@@ -143,7 +189,28 @@ const styles = {
     width: "100%",
     minHeight: "100dvh",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    animation: "fadeIn 0.5s ease forwards"
+  },
+
+  /* TOP BAR */
+  topBar: {
+    display: "flex",
+    justifyContent: "flex-end",
+    padding: "16px 20px 0"
+  },
+  instaLink: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    textDecoration: "none",
+    color: "#111"
+  },
+  instaLabel: {
+    fontSize: 12,
+    fontWeight: 600,
+    color: "#111",
+    opacity: 0.5
   },
 
   /* HERO */
@@ -154,18 +221,18 @@ const styles = {
     flexDirection: "column",
     justifyContent: "flex-end",
     alignItems: "center",
-    paddingBottom: 36
+    paddingBottom: 32
   },
   logoImg: {
-    width: 160,
+    width: 155,
     display: "block",
     margin: "0 auto"
   },
-  tagline: {
-    marginTop: 10,
-    fontSize: 13,
-    color: "#888",
-    letterSpacing: 1
+  divider: {
+    width: 40,
+    height: 1,
+    background: "rgba(0,0,0,0.1)",
+    margin: "24px auto 0"
   },
 
   /* CONTAINER */
@@ -189,9 +256,9 @@ const styles = {
   cardPrimary: {
     padding: "18px 20px",
     borderRadius: 18,
-    background: "white",
-    border: "1px solid rgba(0,0,0,0.08)",
-    boxShadow: "0 2px 16px rgba(0,0,0,0.06)"
+    background: "#f7f7f7",
+    border: "1px solid rgba(0,0,0,0.06)",
+    boxShadow: "0 2px 16px rgba(0,0,0,0.05)"
   },
   cardRow: {
     display: "flex",
@@ -206,22 +273,27 @@ const styles = {
   },
   cardText: {
     fontSize: 13,
-    color: "#888",
+    color: "#999",
     marginTop: 3
   },
-  cardArrow: {
-    fontSize: 20,
-    color: "#111",
-    opacity: 0.4
+  cardIconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: "50%",
+    background: "rgba(0,0,0,0.06)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0
   },
 
   /* EVENT CARD */
   eventCard: {
     padding: "18px 20px",
     borderRadius: 18,
-    background: "white",
-    border: "1px solid rgba(0,0,0,0.08)",
-    boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+    background: "#111",
+    border: "none",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
     position: "relative",
     overflow: "hidden"
   },
@@ -233,32 +305,38 @@ const styles = {
   },
   eventBadge: {
     fontSize: 11,
-    letterSpacing: 2,
+    letterSpacing: 1.5,
     textTransform: "uppercase",
-    color: "#111",
+    color: "rgba(255,255,255,0.6)",
     fontWeight: 600,
-    background: "rgba(0,0,0,0.05)",
-    padding: "3px 8px",
-    borderRadius: 6,
-    border: "1px solid rgba(0,0,0,0.08)"
+    display: "flex",
+    alignItems: "center",
+    gap: 6
+  },
+  pulseDot: {
+    display: "inline-block",
+    width: 6,
+    height: 6,
+    borderRadius: "50%",
+    background: "#4ade80",
+    animation: "pulse 2s ease-in-out infinite"
   },
   ticketLink: {
     fontSize: 12,
-    color: "#111",
+    color: "rgba(255,255,255,0.5)",
     fontWeight: 600,
     textDecoration: "none",
-    opacity: 0.5,
     zIndex: 10
   },
   eventName: {
     fontSize: 17,
     fontWeight: 700,
-    color: "#111",
+    color: "#ffffff",
     margin: 0
   },
   eventSubtitle: {
     fontSize: 13,
-    color: "#888",
+    color: "rgba(255,255,255,0.5)",
     marginTop: 4
   },
   eventMeta: {
@@ -268,22 +346,41 @@ const styles = {
   },
   eventMetaItem: {
     fontSize: 12,
-    color: "#888"
+    color: "rgba(255,255,255,0.4)"
   },
 
   /* FOOTER */
   footer: {
-    marginTop: 20,
+    marginTop: 24,
     textAlign: "center",
     paddingBottom: 40
   },
-  footerText: {
-    fontSize: 12,
-    color: "#bbb"
+  footerRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8
   },
-  footerLink: {
-    color: "#111",
+  footerInsta: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
     textDecoration: "none",
-    fontWeight: 600
+    color: "#aaa",
+    fontSize: 12
+  },
+  footerDot: {
+    color: "#ccc",
+    fontSize: 12
+  },
+  footerCredit: {
+    fontSize: 12,
+    color: "#aaa",
+    textDecoration: "none"
+  },
+  footerYear: {
+    fontSize: 11,
+    color: "#ddd",
+    marginTop: 6
   }
 };
