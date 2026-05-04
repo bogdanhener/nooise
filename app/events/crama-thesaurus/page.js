@@ -397,8 +397,8 @@ const styles = {
   ticketsBlock: {
     marginTop: 32,
     padding: "24px 24px 22px",
-    background: "var(--ink)",
-    color: "var(--paper)",
+    background: "var(--soft-dark)",
+    color: "var(--soft-dark-text)",
     borderRadius: 14,
     position: "relative",
     overflow: "hidden"
@@ -414,7 +414,7 @@ const styles = {
     fontWeight: 500,
     letterSpacing: "0.18em",
     textTransform: "uppercase",
-    color: "rgba(250,250,247,0.5)",
+    color: "rgba(245,243,239,0.5)",
     margin: "0 0 8px"
   },
   ticketsPrice: {
@@ -429,19 +429,19 @@ const styles = {
     fontSize: 36,
     fontWeight: 400,
     letterSpacing: "-0.02em",
-    color: "var(--paper)",
+    color: "var(--soft-dark-text)",
     lineHeight: 1
   },
   priceAfter: {
     fontSize: 11,
-    color: "rgba(250,250,247,0.4)",
+    color: "rgba(245,243,239,0.4)",
     letterSpacing: "0.02em"
   },
   ticketsAccent: {
     fontFamily: "var(--serif)",
     fontStyle: "italic",
     fontSize: 72,
-    color: "rgba(250,250,247,0.08)",
+    color: "rgba(245,243,239,0.08)",
     fontWeight: 400,
     lineHeight: 1,
     letterSpacing: "-0.05em"
@@ -462,7 +462,7 @@ const styles = {
   ticketNote: {
     textAlign: "center",
     fontSize: 10,
-    color: "rgba(250,250,247,0.4)",
+    color: "rgba(245,243,239,0.4)",
     letterSpacing: "0.18em",
     textTransform: "uppercase",
     fontWeight: 500,
@@ -548,8 +548,8 @@ const styles = {
     justifyContent: "space-between",
     padding: "13px 16px",
     borderRadius: 10,
-    background: "var(--ink)",
-    color: "var(--paper)",
+    background: "var(--soft-dark)",
+    color: "var(--soft-dark-text)",
     fontWeight: 500,
     fontSize: 13,
     textDecoration: "none",

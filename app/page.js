@@ -79,9 +79,6 @@ export default function Home() {
           {/* HERO */}
           <div style={styles.hero}>
             <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
-            <p style={styles.tagline}>
-              <span style={styles.serif}>Events.</span> Energy. Moments.
-            </p>
           </div>
 
           {/* DIVIDER */}
@@ -95,9 +92,6 @@ export default function Home() {
             {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
               <div className="card" style={styles.cardPrimary}>
-                <div style={styles.cardLabelRow}>
-                  <span style={styles.cardEyebrow}>01 — Archive</span>
-                </div>
                 <div style={styles.cardRow}>
                   <div>
                     <h2 style={styles.cardTitle}>
@@ -121,7 +115,7 @@ export default function Home() {
                 <div style={styles.cardLabelRow}>
                   <span style={styles.cardEyebrowAccent}>
                     <span style={styles.pulseDot} />
-                    02 — Next Event
+                    Next Event
                   </span>
                   <a
                     href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
@@ -371,8 +365,8 @@ const styles = {
   eventCard: {
     padding: "20px 22px 22px",
     borderRadius: 14,
-    background: "var(--ink)",
-    color: "var(--paper)",
+    background: "var(--soft-dark)",
+    color: "var(--soft-dark-text)",
     cursor: "pointer"
   },
   pulseDot: {
@@ -385,7 +379,7 @@ const styles = {
   },
   ticketLink: {
     fontSize: 11,
-    color: "rgba(250,250,247,0.7)",
+    color: "rgba(245,243,239,0.7)",
     fontWeight: 500,
     letterSpacing: "0.04em",
     textDecoration: "none",
@@ -394,14 +388,14 @@ const styles = {
   eventName: {
     fontSize: 22,
     fontWeight: 500,
-    color: "var(--paper)",
+    color: "var(--soft-dark-text)",
     margin: 0,
     letterSpacing: "-0.02em",
     lineHeight: 1.15
   },
   eventSubtitle: {
     fontSize: 13,
-    color: "rgba(250,250,247,0.55)",
+    color: "rgba(245,243,239,0.55)",
     marginTop: 4,
     margin: "4px 0 0",
     fontStyle: "italic",
@@ -412,7 +406,7 @@ const styles = {
     gap: 28,
     marginTop: 18,
     paddingTop: 14,
-    borderTop: "1px solid rgba(250,250,247,0.12)"
+    borderTop: "1px solid rgba(245,243,239,0.12)"
   },
   metaCol: {
     display: "flex",
@@ -424,11 +418,11 @@ const styles = {
     fontWeight: 500,
     letterSpacing: "0.18em",
     textTransform: "uppercase",
-    color: "rgba(250,250,247,0.4)"
+    color: "rgba(245,243,239,0.4)"
   },
   metaValue: {
     fontSize: 13,
-    color: "rgba(250,250,247,0.9)",
+    color: "rgba(245,243,239,0.9)",
     letterSpacing: "0.01em"
   },
 

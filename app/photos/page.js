@@ -124,6 +124,25 @@ export default function PhotosPage() {
             >
               <article className="event-card" style={styles.card}>
 
+                {/* CAPTION — above image now */}
+                <div style={styles.caption}>
+                  <div>
+                    <h2 style={styles.captionTitle}>{event.name}</h2>
+                    <p style={styles.captionDate}>
+                      {event.event_date
+                        ? new Date(event.event_date).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric"
+                          })
+                        : ""}
+                    </p>
+                  </div>
+                  <span style={styles.captionNumber}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                </div>
+
                 {/* IMAGE */}
                 <div style={styles.imageWrap}>
                   <div style={{ ...styles.imagePlaceholder, background: "#ececea" }} />
@@ -134,32 +153,6 @@ export default function PhotosPage() {
                     />
                   )}
                   <div style={styles.imageBorder} />
-                </div>
-
-                {/* CAPTION — editorial style, below image */}
-                <div style={styles.caption}>
-                  <div style={styles.captionLeft}>
-                    <span style={styles.captionNumber}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <h2 style={styles.captionTitle}>{event.name}</h2>
-                      <p style={styles.captionDate}>
-                        {event.event_date
-                          ? new Date(event.event_date).toLocaleDateString("en-GB", {
-                              day: "numeric",
-                              month: "long",
-                              year: "numeric"
-                            })
-                          : ""}
-                      </p>
-                    </div>
-                  </div>
-                  <div style={styles.captionArrow}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </div>
                 </div>
 
               </article>
@@ -313,7 +306,7 @@ const styles = {
   grid: {
     display: "flex",
     flexDirection: "column",
-    gap: 32,
+    gap: 40,
     padding: "16px 22px 24px",
     maxWidth: 480,
     margin: "0 auto",
@@ -350,23 +343,11 @@ const styles = {
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    paddingTop: 14,
+    paddingBottom: 14,
     gap: 16
   },
-  captionLeft: {
-    display: "flex",
-    gap: 14,
-    alignItems: "flex-start"
-  },
-  captionNumber: {
-    fontSize: 10,
-    fontWeight: 500,
-    letterSpacing: "0.18em",
-    color: "var(--ink-mute)",
-    paddingTop: 5
-  },
   captionTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: 500,
     margin: 0,
     color: "var(--ink)",
@@ -374,13 +355,18 @@ const styles = {
     lineHeight: 1.2
   },
   captionDate: {
-    fontSize: 12,
+    fontSize: 11,
     color: "var(--ink-mute)",
-    margin: "4px 0 0"
+    margin: "4px 0 0",
+    letterSpacing: "0.02em"
   },
-  captionArrow: {
-    color: "var(--ink-soft)",
-    paddingTop: 4
+  captionNumber: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    color: "var(--ink-mute)",
+    paddingTop: 3,
+    flexShrink: 0
   },
 
   /* FOOTER */
