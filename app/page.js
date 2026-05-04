@@ -160,7 +160,7 @@ export default function Home() {
                 <div style={styles.cardRow}>
                   <div>
                     <h2 style={styles.cardTitle}>
-                      <span style={styles.serif}>Find</span> your photos
+                      Find your photos
                     </h2>
                     <p style={styles.cardText}>Relive every moment from past nights</p>
                   </div>
@@ -225,7 +225,7 @@ export default function Home() {
                 rel="noopener noreferrer"
                 style={styles.footerCredit}
               >
-                Site by bogdanhener
+                designed by bogdanhener
               </a>
             </div>
           </div>
@@ -312,7 +312,7 @@ const styles = {
     minHeight: "38vh"
   },
   logoImg: {
-    width: 160,
+    width: 200,
     display: "block",
     margin: "0 auto"
   },
@@ -520,8 +520,7 @@ const styles = {
   footerCredit: {
     fontSize: 10,
     fontWeight: 500,
-    letterSpacing: "0.18em",
-    textTransform: "uppercase",
+    letterSpacing: "0.04em",
     color: "var(--ink-mute)",
     textDecoration: "none"
   }
