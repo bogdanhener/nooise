@@ -10,18 +10,15 @@ const PAGE_SIZE = 30;
 const EVENT_CONFIG = {
   "mall-takeover": {
     title: "Mall Takeover",
-    story: "Energy takes over the space. Movement, sound, and crowd in sync.",
-    glow: "rgba(0, 200, 255, 0.5)"
+    story: "Energy takes over the space. Movement, sound, and crowd in sync."
   },
   "matchaty": {
     title: "MatchaTy",
-    story: "A curated moment of rhythm, aesthetic and connection.",
-    glow: "rgba(120, 255, 160, 0.5)"
+    story: "A curated moment of rhythm, aesthetic and connection."
   },
   "sudplazza": {
     title: "SudPlazza",
-    story: "Deeper sounds. Late energy. A different side of Nooise.",
-    glow: "rgba(168, 85, 247, 0.5)"
+    story: "Deeper sounds. Late energy. A different side of Nooise."
   }
 };
 
@@ -29,8 +26,7 @@ export default function EventGallery() {
   const params = useParams();
   const config = EVENT_CONFIG[params?.id] || {
     title: params?.id,
-    story: "Nooise experience.",
-    glow: "rgba(255,255,255,0.3)"
+    story: "Nooise experience."
   };
 
   const [images, setImages] = useState([]);
@@ -48,11 +44,10 @@ export default function EventGallery() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#05050a";
+    document.body.style.background = "#ffffff";
     if (params?.id) load();
   }, [params]);
 
-  // watch sentinel div — when it enters viewport, render 30 more
   useEffect(() => {
     if (!sentinelRef.current) return;
     const observer = new IntersectionObserver(
@@ -141,7 +136,6 @@ export default function EventGallery() {
 
       {/* HERO */}
       <div style={styles.hero}>
-        <div style={{ ...styles.glow, background: `radial-gradient(circle, ${config.glow}, transparent)` }} />
         <h1 style={styles.title}>{config.title}</h1>
         <p style={styles.story}>{config.story}</p>
       </div>
@@ -172,7 +166,7 @@ export default function EventGallery() {
         <p style={styles.count}>{images.length} photos</p>
       )}
 
-      {/* GRID — only renders visible slice, not all at once */}
+      {/* GRID */}
       {!loading && !error && displayedImages.length > 0 && (
         <div style={styles.grid}>
           {displayedImages.map((url, i) => (
@@ -195,7 +189,7 @@ export default function EventGallery() {
         </div>
       )}
 
-      {/* SENTINEL — invisible, triggers more photos when scrolled into view */}
+      {/* SENTINEL */}
       {!loading && hasMore && (
         <div ref={sentinelRef} style={styles.sentinel}>
           <div style={styles.spinner} />
@@ -207,7 +201,7 @@ export default function EventGallery() {
         <p style={styles.endMessage}>All {images.length} photos loaded</p>
       )}
 
-      {/* MODAL */}
+      {/* MODAL — stays dark for photo viewing */}
       {active && (
         <div
           style={styles.modal}
@@ -232,45 +226,38 @@ export default function EventGallery() {
 
 const styles = {
   page: {
-    background: "#05050a",
-    color: "white",
+    background: "#ffffff",
+    color: "#111",
     minHeight: "100dvh",
     margin: 0,
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
   },
   backLink: {
-    color: "#ffcf6a",
+    color: "#111",
     textDecoration: "none",
     fontSize: 13,
-    opacity: 0.8,
+    fontWeight: 600,
+    opacity: 0.5,
     display: "inline-block",
     padding: "16px 16px 0"
   },
   hero: {
-    padding: "20px 16px",
-    position: "relative"
-  },
-  glow: {
-    position: "absolute",
-    width: 220,
-    height: 220,
-    filter: "blur(50px)",
-    top: 0,
-    left: 20
+    padding: "20px 16px"
   },
   title: {
     fontSize: 22,
-    fontWeight: 600,
-    margin: 0
+    fontWeight: 700,
+    margin: 0,
+    color: "#111"
   },
   story: {
     fontSize: 13,
-    opacity: 0.65,
+    color: "#888",
     marginTop: 6
   },
   count: {
     fontSize: 12,
-    opacity: 0.4,
+    color: "#bbb",
     padding: "0 16px 4px",
     margin: 0
   },
@@ -284,33 +271,33 @@ const styles = {
   spinner: {
     width: 24,
     height: 24,
-    border: "2px solid rgba(255,207,106,0.2)",
-    borderTop: "2px solid #ffcf6a",
+    border: "2px solid rgba(0,0,0,0.08)",
+    borderTop: "2px solid #111",
     borderRadius: "50%",
     animation: "spin 0.8s linear infinite"
   },
   message: {
-    opacity: 0.6,
+    color: "#aaa",
     fontSize: 14,
     padding: "0 16px"
   },
   errorBox: {
     margin: "0 16px",
-    background: "rgba(255,60,60,0.1)",
-    border: "1px solid rgba(255,60,60,0.3)",
+    background: "rgba(255,60,60,0.06)",
+    border: "1px solid rgba(255,60,60,0.2)",
     borderRadius: 12,
     padding: 16
   },
   errorText: {
-    color: "#ff6b6b",
+    color: "#e05555",
     fontSize: 14,
     margin: 0
   },
   retryBtn: {
     marginTop: 10,
     background: "transparent",
-    border: "1px solid rgba(255,100,100,0.4)",
-    color: "#ff6b6b",
+    border: "1px solid rgba(200,60,60,0.3)",
+    color: "#e05555",
     borderRadius: 8,
     padding: "6px 14px",
     fontSize: 13,
@@ -319,12 +306,12 @@ const styles = {
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(3, 1fr)",
-    gap: 6,
+    gap: 4,
     padding: 10
   },
   card: {
     position: "relative",
-    borderRadius: 12,
+    borderRadius: 10,
     overflow: "hidden"
   },
   image: {
@@ -341,7 +328,7 @@ const styles = {
     width: 28,
     height: 28,
     borderRadius: "50%",
-    background: "rgba(0,0,0,0.6)",
+    background: "rgba(0,0,0,0.5)",
     border: "none",
     color: "white",
     fontSize: 12,
@@ -355,14 +342,15 @@ const styles = {
   endMessage: {
     textAlign: "center",
     fontSize: 12,
-    opacity: 0.3,
+    color: "#ccc",
     padding: "16px 0 40px",
     margin: 0
   },
+  /* modal stays dark — you can't view photos on white */
   modal: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.92)",
+    background: "rgba(0,0,0,0.95)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center"
@@ -372,7 +360,7 @@ const styles = {
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "blur(60px) brightness(0.4)"
+    filter: "blur(60px) brightness(0.3)"
   },
   fullImage: {
     maxWidth: "90%",
