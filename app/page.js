@@ -17,12 +17,12 @@ export default function Home() {
     }
 
     // Stage 1: hold the logo for a beat
-    const t1 = setTimeout(() => setPhase("diving"), 700);
+    const t1 = setTimeout(() => setPhase("diving"), 1200);
     // Stage 2: after the dive completes, switch to home
     const t2 = setTimeout(() => {
       setPhase("home");
       sessionStorage.setItem("nooise_intro_seen", "1");
-    }, 1450);
+    }, 2400);
 
     return () => {
       clearTimeout(t1);
@@ -96,18 +96,18 @@ export default function Home() {
           pointer-events: none;
         }
         .intro-overlay.diving {
-          animation: introBgFade 0.75s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+          animation: introBgFade 1.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
         .intro-logo {
-          animation: logoIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: logoIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
           transform-origin: 48% 52%;
           will-change: transform, opacity, filter;
         }
         .intro-logo.diving {
-          animation: diveThrough 0.75s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+          animation: diveThrough 1.2s cubic-bezier(0.7, 0, 0.84, 0) forwards;
         }
         .home-arriving {
-          animation: homeArrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: homeArrive 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           transform-origin: 48% 52%;
         }
       `}</style>
