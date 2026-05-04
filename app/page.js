@@ -431,7 +431,8 @@ const styles = {
     borderRadius: 14,
     background: "var(--soft-dark)",
     color: "var(--soft-dark-text)",
-    cursor: "pointer"
+    cursor: "pointer",
+    overflow: "hidden"
   },
   pulseDot: {
     display: "inline-block",
@@ -469,8 +470,13 @@ const styles = {
     display: "flex",
     gap: 28,
     marginTop: 18,
-    paddingTop: 14,
-    borderTop: "1px solid rgba(245,243,239,0.12)"
+    marginLeft: -22,
+    marginRight: -22,
+    marginBottom: -22,
+    padding: "14px 22px 16px",
+    background: "var(--paper)",
+    borderBottomLeftRadius: 14,
+    borderBottomRightRadius: 14
   },
   metaCol: {
     display: "flex",
@@ -482,12 +488,13 @@ const styles = {
     fontWeight: 500,
     letterSpacing: "0.18em",
     textTransform: "uppercase",
-    color: "rgba(245,243,239,0.4)"
+    color: "var(--ink-mute)"
   },
   metaValue: {
     fontSize: 13,
-    color: "rgba(245,243,239,0.9)",
-    letterSpacing: "0.01em"
+    color: "var(--ink)",
+    letterSpacing: "0.01em",
+    fontWeight: 500
   },
 
   /* FOOTER */
@@ -513,8 +520,7 @@ const styles = {
   footerYear: {
     fontSize: 10,
     fontWeight: 500,
-    letterSpacing: "0.18em",
-    textTransform: "uppercase",
+    letterSpacing: "0.04em",
     color: "var(--ink-mute)"
   },
   footerCredit: {
