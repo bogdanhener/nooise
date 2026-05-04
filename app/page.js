@@ -22,9 +22,27 @@ export default function Home() {
     const t1 = setTimeout(() => {
       setPhase("diving");
       // Start video playback as the dive begins
-      if (videoRef.current) {
-        videoRef.current.currentTime = 0;
-        videoRef.current.play().catch(() => {});
+      const v = videoRef.current;
+      if (v) {
+        // Force muted property on the actual element — iOS Safari requires this
+        // to be set before play() to allow autoplay
+        v.muted = true;
+        v.defaultMuted = true;
+        v.playsInline = true;
+        v.setAttribute("muted", "");
+        v.setAttribute("playsinline", "");
+        v.setAttribute("webkit-playsinline", "");
+        v.currentTime = 0;
+        const playPromise = v.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.log("[intro] play rejected, retrying", err?.name);
+            // Retry once after a tick — sometimes mobile needs a moment
+            setTimeout(() => {
+              v.play().catch((e2) => console.log("[intro] retry failed", e2?.name));
+            }, 50);
+          });
+        }
       }
     }, 1200);
     // Stage 2: after the dive completes, switch to home
@@ -53,8 +71,8 @@ export default function Home() {
     if (typeof window === "undefined") return false;
     return !sessionStorage.getItem("nooise_intro_seen");
   });
-  // Video stays mounted only during the intro→home transition arc, then unmounts after fade
-  const showVideo = diveArrival && phase !== "intro";
+  // Video stays mounted from the start of a fresh-session visit so it can preload during the intro hold
+  const showVideo = diveArrival;
 
   return (
     <div style={styles.page}>
@@ -164,9 +182,14 @@ export default function Home() {
             className={`intro-video ${isDiving || phase === "home" ? "visible" : ""} ${videoFading ? "fading" : ""}`}
             src="/intro.mp4"
             muted
+            defaultMuted
             playsInline
+            webkit-playsinline=""
+            x5-playsinline=""
             preload="auto"
             autoPlay
+            loop
+            disableRemotePlayback
             onLoadedData={() => console.log("[intro] video loaded")}
             onPlay={() => console.log("[intro] video playing")}
             onError={(e) => console.log("[intro] video error", e?.target?.error)}
