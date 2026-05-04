@@ -30,6 +30,7 @@ export default function EventGallery() {
   };
 
   const [images, setImages] = useState([]);
+  const [eventData, setEventData] = useState(null);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -67,6 +68,14 @@ export default function EventGallery() {
     setError(null);
     setImages([]);
     setVisible(PAGE_SIZE);
+
+    // fetch event info for cover image
+    const { data: evData } = await supabase
+      .from("events")
+      .select("id, name, event_date, cover_image_url")
+      .eq("id", params.id)
+      .single();
+    if (evData) setEventData(evData);
 
     const { data, error } = await supabase.storage
       .from("nooise-photos")
@@ -126,6 +135,14 @@ export default function EventGallery() {
   const displayedImages = images.slice(0, visible);
   const hasMore = visible < images.length;
 
+  const coverUrl = eventData?.cover_image_url || null;
+  const displayName = eventData?.name || config.title;
+  const displayDate = eventData?.event_date
+    ? new Date(eventData.event_date).toLocaleDateString("ro-RO", {
+        day: "numeric", month: "long", year: "numeric"
+      })
+    : null;
+
   return (
     <div style={styles.page}>
 
@@ -134,11 +151,25 @@ export default function EventGallery() {
       {/* BACK */}
       <Link href="/photos" style={styles.backLink}>← All Events</Link>
 
-      {/* HERO */}
-      <div style={styles.hero}>
-        <h1 style={styles.title}>{config.title}</h1>
-        <p style={styles.story}>{config.story}</p>
-      </div>
+      {/* COVER HERO — only if cover image exists in DB */}
+      {coverUrl && (
+        <div style={styles.coverWrap}>
+          <div style={{ ...styles.coverImg, backgroundImage: `url(${coverUrl})` }} />
+          <div style={styles.coverOverlay} />
+          <div style={styles.coverText}>
+            <h1 style={styles.coverTitle}>{displayName}</h1>
+            {displayDate && <p style={styles.coverDate}>{displayDate}</p>}
+          </div>
+        </div>
+      )}
+
+      {/* HERO — fallback when no cover image */}
+      {!coverUrl && (
+        <div style={styles.hero}>
+          <h1 style={styles.title}>{config.title}</h1>
+          <p style={styles.story}>{config.story}</p>
+        </div>
+      )}
 
       {/* LOADING */}
       {loading && (
@@ -241,6 +272,46 @@ const styles = {
     display: "inline-block",
     padding: "16px 16px 0"
   },
+
+  /* COVER HERO */
+  coverWrap: {
+    position: "relative",
+    margin: "14px 16px 0",
+    height: 200,
+    borderRadius: 20,
+    overflow: "hidden",
+    boxShadow: "0 4px 24px rgba(0,0,0,0.12)"
+  },
+  coverImg: {
+    position: "absolute",
+    inset: 0,
+    backgroundSize: "cover",
+    backgroundPosition: "center"
+  },
+  coverOverlay: {
+    position: "absolute",
+    inset: 0,
+    background: "linear-gradient(to top, rgba(0,0,0,0.7), rgba(0,0,0,0.1))"
+  },
+  coverText: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16
+  },
+  coverTitle: {
+    fontSize: 22,
+    fontWeight: 800,
+    color: "white",
+    margin: 0
+  },
+  coverDate: {
+    fontSize: 12,
+    color: "rgba(255,255,255,0.7)",
+    marginTop: 4
+  },
+
+  /* FALLBACK HERO */
   hero: {
     padding: "20px 16px"
   },
@@ -255,6 +326,7 @@ const styles = {
     color: "#888",
     marginTop: 6
   },
+
   count: {
     fontSize: 12,
     color: "#bbb",
@@ -346,7 +418,6 @@ const styles = {
     padding: "16px 0 40px",
     margin: 0
   },
-  /* modal stays dark — you can't view photos on white */
   modal: {
     position: "fixed",
     inset: 0,
