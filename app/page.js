@@ -137,6 +137,7 @@ export default function Home() {
           opacity: 0;
           transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
           pointer-events: none;
+          display: block;
         }
         .intro-video.visible { opacity: 1; }
         .intro-video.fading { opacity: 0; transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -166,6 +167,9 @@ export default function Home() {
             playsInline
             preload="auto"
             autoPlay
+            onLoadedData={() => console.log("[intro] video loaded")}
+            onPlay={() => console.log("[intro] video playing")}
+            onError={(e) => console.log("[intro] video error", e?.target?.error)}
           />
           <div className={`intro-video-overlay ${isDiving || phase === "home" ? "visible" : ""} ${videoFading ? "fading" : ""}`} />
         </>
@@ -304,9 +308,7 @@ const styles = {
     fontFamily: "var(--sans)",
     overflowX: "hidden",
     margin: 0,
-    padding: 0,
-    position: "relative",
-    zIndex: 3
+    padding: 0
   },
 
   /* INTRO */
@@ -330,7 +332,9 @@ const styles = {
     width: "100%",
     minHeight: "100dvh",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    position: "relative",
+    zIndex: 5
   },
 
   /* TOP BAR */
