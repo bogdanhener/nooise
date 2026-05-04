@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#f5f5f0";
+    document.body.style.background = "#ffffff";
     const t = setTimeout(() => setEnter(true), 2400);
     return () => clearTimeout(t);
   }, []);
@@ -112,7 +112,7 @@ export default function Home() {
 const styles = {
   page: {
     minHeight: "100dvh",
-    background: "#f5f5f0",
+    background: "#ffffff",
     color: "#111",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
     overflowX: "hidden",
@@ -127,7 +127,7 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    background: "#f5f5f0",
+    background: "#ffffff",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
