@@ -81,11 +81,6 @@ export default function Home() {
             <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
           </div>
 
-          {/* DIVIDER */}
-          <div style={styles.dividerWrap}>
-            <div style={styles.divider} />
-          </div>
-
           {/* CARDS */}
           <div style={styles.container}>
 
@@ -324,7 +319,7 @@ const styles = {
     fontWeight: 500,
     letterSpacing: "0.18em",
     textTransform: "uppercase",
-    color: "var(--ink)",
+    color: "var(--soft-dark-text)",
     display: "flex",
     alignItems: "center",
     gap: 8
