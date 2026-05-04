@@ -221,12 +221,7 @@ export default function EventGallery() {
                 decoding="async"
                 onClick={() => open(i)}
               />
-              <button
-                style={styles.gridDownload}
-                onClick={(e) => { e.stopPropagation(); download(url, i); }}
-              >
-                ⬇
-              </button>
+
             </div>
           ))}
         </div>
@@ -253,13 +248,24 @@ export default function EventGallery() {
           onTouchEnd={onTouchEnd}
         >
           <div style={{ ...styles.bgGlow, backgroundImage: `url(${images[index]})` }} />
-          <button style={styles.close} onClick={close}>✕</button>
+          <button style={styles.close} onClick={close}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
           <img
             src={images[index]}
             style={{ ...styles.fullImage, opacity: fade ? 1 : 0 }}
           />
           <p style={styles.modalCounter}>{index + 1} / {images.length}</p>
-          <button style={styles.downloadBtn} onClick={() => download(images[index], index)}>⬇</button>
+          <button style={styles.downloadBtn} onClick={() => download(images[index], index)}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{marginRight: 6}}>
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            Save Photo
+          </button>
         </div>
       )}
 
@@ -405,19 +411,7 @@ const styles = {
     cursor: "pointer",
     display: "block"
   },
-  gridDownload: {
-    position: "absolute",
-    bottom: 6,
-    right: 6,
-    width: 28,
-    height: 28,
-    borderRadius: "50%",
-    background: "rgba(0,0,0,0.5)",
-    border: "none",
-    color: "white",
-    fontSize: 12,
-    cursor: "pointer"
-  },
+
   sentinel: {
     display: "flex",
     justifyContent: "center",
@@ -466,7 +460,7 @@ const styles = {
   },
   modalCounter: {
     position: "absolute",
-    bottom: 24,
+    bottom: 90,
     left: "50%",
     transform: "translateX(-50%)",
     fontSize: 12,
@@ -479,24 +473,36 @@ const styles = {
     position: "absolute",
     top: 20,
     right: 20,
-    fontSize: 22,
-    background: "transparent",
+    width: 36,
+    height: 36,
+    borderRadius: "50%",
+    background: "rgba(255,255,255,0.15)",
     border: "none",
     color: "white",
     cursor: "pointer",
-    zIndex: 1001
+    zIndex: 1001,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backdropFilter: "blur(4px)"
   },
   downloadBtn: {
     position: "absolute",
-    top: 20,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: "50%",
-    background: "rgba(255,255,255,0.1)",
-    border: "none",
+    bottom: 36,
+    left: "50%",
+    transform: "translateX(-50%)",
+    display: "flex",
+    alignItems: "center",
+    background: "rgba(255,255,255,0.15)",
+    border: "1px solid rgba(255,255,255,0.2)",
     color: "white",
+    borderRadius: 24,
+    padding: "10px 20px",
+    fontSize: 13,
+    fontWeight: 600,
     cursor: "pointer",
-    zIndex: 1001
+    zIndex: 1001,
+    backdropFilter: "blur(8px)",
+    whiteSpace: "nowrap"
   }
 };

@@ -27,10 +27,28 @@ export default function PhotosPage() {
 
     if (error) {
       setError("Could not load events. Please try again.");
-    } else {
-      setEvents(data || []);
+      setLoading(false);
+      return;
     }
 
+    // For events without a cover_image_url, grab first photo from storage as fallback
+    const enriched = await Promise.all(
+      (data || []).map(async (event) => {
+        if (event.cover_image_url) return event;
+        const { data: files } = await supabase.storage
+          .from("nooise-photos")
+          .list(event.id, { limit: 1, sortBy: { column: "name", order: "asc" } });
+        if (files && files.length > 0 && !files[0].name.startsWith(".")) {
+          const { data: urlData } = supabase.storage
+            .from("nooise-photos")
+            .getPublicUrl(`${event.id}/${files[0].name}`);
+          return { ...event, cover_image_url: urlData.publicUrl };
+        }
+        return event;
+      })
+    );
+
+    setEvents(enriched);
     setLoading(false);
   }
 
