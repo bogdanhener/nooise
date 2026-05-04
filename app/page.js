@@ -429,10 +429,11 @@ const styles = {
   eventCard: {
     padding: "20px 22px 22px",
     borderRadius: 14,
-    background: "var(--soft-dark)",
+    background: "linear-gradient(180deg, var(--soft-dark) 0%, var(--soft-dark) 35%, #4a4540 60%, #ffffff 100%)",
     color: "var(--soft-dark-text)",
     cursor: "pointer",
-    overflow: "hidden"
+    overflow: "hidden",
+    border: "1px solid var(--line)"
   },
   pulseDot: {
     display: "inline-block",
@@ -470,13 +471,7 @@ const styles = {
     display: "flex",
     gap: 28,
     marginTop: 18,
-    marginLeft: -22,
-    marginRight: -22,
-    marginBottom: -22,
-    padding: "14px 22px 16px",
-    background: "var(--paper)",
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14
+    paddingTop: 14
   },
   metaCol: {
     display: "flex",
@@ -488,7 +483,7 @@ const styles = {
     fontWeight: 500,
     letterSpacing: "0.18em",
     textTransform: "uppercase",
-    color: "var(--ink-mute)"
+    color: "rgba(10,10,10,0.5)"
   },
   metaValue: {
     fontSize: 13,
