@@ -1,13 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  // phase: 'intro' | 'diving' | 'video' | 'home'
+  // phase: 'intro' | 'diving' | 'home'
   const [phase, setPhase] = useState("intro");
-  const [videoFading, setVideoFading] = useState(false);
-  const videoRef = useRef(null);
 
   useEffect(() => {
     // Check if intro has played this session
@@ -19,64 +17,28 @@ export default function Home() {
     }
 
     // Stage 1: hold the logo for a beat
-    const t1 = setTimeout(() => {
-      setPhase("diving");
-      // Start video playback as the dive begins so it's playing by the time it's revealed
-      const v = videoRef.current;
-      if (v) {
-        v.muted = true;
-        v.defaultMuted = true;
-        v.playsInline = true;
-        v.setAttribute("muted", "");
-        v.setAttribute("playsinline", "");
-        v.setAttribute("webkit-playsinline", "");
-        v.currentTime = 0;
-        const playPromise = v.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
-            setTimeout(() => v.play().catch(() => {}), 50);
-          });
-        }
-      }
-    }, 1200);
-
-    // Stage 2: dive completes, video takes over the full screen
+    const t1 = setTimeout(() => setPhase("diving"), 1200);
+    // Stage 2: after the dive completes, switch to home
     const t2 = setTimeout(() => {
-      setPhase("video");
-    }, 2400);
-
-    // Stage 3: start fading the video out
-    const t3 = setTimeout(() => {
-      setVideoFading(true);
-    }, 6400);
-
-    // Stage 4: switch to home — overlaps with video fade for a crossfade
-    const t4 = setTimeout(() => {
       setPhase("home");
       sessionStorage.setItem("nooise_intro_seen", "1");
-    }, 6600);
+    }, 2400);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
-      clearTimeout(t3);
-      clearTimeout(t4);
     };
   }, []);
 
-  const showIntro = phase === "intro" || phase === "diving";
+  const showIntro = phase !== "home";
   const isDiving = phase === "diving";
-  // Show home only in the home phase now — video has its own dedicated moment
-  const showHome = phase === "home";
+  // Show home content during diving phase too, so it fades up underneath the zooming logo
+  const showHome = phase === "diving" || phase === "home";
   // Track whether home is arriving via the dive (dramatic) or directly (subtle)
   const [diveArrival] = useState(() => {
     if (typeof window === "undefined") return false;
     return !sessionStorage.getItem("nooise_intro_seen");
   });
-  // Video stays mounted from the start so it can preload during the intro hold
-  const showVideo = diveArrival;
-  // Video should be visible during diving (last portion), video phase, and fading transition out
-  const videoVisible = phase === "diving" || phase === "video";
 
   return (
     <div style={styles.page}>
@@ -104,7 +66,7 @@ export default function Home() {
           100%    { opacity: 0; }
         }
         @keyframes homeArrive {
-          from { opacity: 0; transform: scale(1.02); }
+          from { opacity: 0; transform: scale(1.06); }
           to   { opacity: 1; transform: scale(1); }
         }
         @keyframes lineGrow {
@@ -148,43 +110,7 @@ export default function Home() {
           animation: homeArrive 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           transform-origin: 48% 52%;
         }
-
-        .intro-video {
-          position: fixed;
-          top: 0; left: 0;
-          width: 100vw;
-          height: 100vh;
-          object-fit: cover;
-          z-index: 1;
-          opacity: 0;
-          transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-          pointer-events: none;
-          display: block;
-        }
-        .intro-video.visible { opacity: 1; }
-        .intro-video.fading { opacity: 0; transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1); }
       `}</style>
-
-      {/* INTRO VIDEO — full-screen during the video phase */}
-      {showVideo && (
-        <video
-          ref={videoRef}
-          className={`intro-video ${videoVisible ? "visible" : ""} ${videoFading ? "fading" : ""}`}
-          src="/intro.mp4"
-          muted
-          defaultMuted
-          playsInline
-          webkit-playsinline=""
-          x5-playsinline=""
-          preload="auto"
-          autoPlay
-          loop
-          disableRemotePlayback
-          onLoadedData={() => console.log("[intro] video loaded")}
-          onPlay={() => console.log("[intro] video playing")}
-          onError={(e) => console.log("[intro] video error", e?.target?.error)}
-        />
-      )}
 
       {/* INTRO — dive-through */}
       {showIntro && (
@@ -314,7 +240,7 @@ export default function Home() {
 const styles = {
   page: {
     minHeight: "100dvh",
-    background: "transparent",
+    background: "var(--paper)",
     color: "var(--ink)",
     fontFamily: "var(--sans)",
     overflowX: "hidden",
@@ -343,9 +269,7 @@ const styles = {
     width: "100%",
     minHeight: "100dvh",
     display: "flex",
-    flexDirection: "column",
-    position: "relative",
-    zIndex: 5
+    flexDirection: "column"
   },
 
   /* TOP BAR */
