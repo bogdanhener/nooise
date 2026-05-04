@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     document.body.style.margin = "0";
     document.body.style.padding = "0";
-    document.body.style.background = "#05050a";
+    document.body.style.background = "#f5f5f0";
     const t = setTimeout(() => setEnter(true), 2400);
     return () => clearTimeout(t);
   }, []);
@@ -27,8 +27,7 @@ export default function Home() {
       {/* INTRO */}
       {!enter && (
         <div style={styles.intro}>
-          <h1 className={comfortaa.className} style={styles.logoIntro}>nooise</h1>
-          <div style={styles.introGlow} />
+          <img src="/nooise.jpg" alt="nooise" style={styles.logoImgIntro} />
         </div>
       )}
 
@@ -38,11 +37,11 @@ export default function Home() {
 
           {/* HERO */}
           <div style={styles.hero}>
-            <h1 className={comfortaa.className} style={styles.logo}>nooise</h1>
+            <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
             <p style={styles.tagline}>Events. Energy. Moments.</p>
           </div>
 
-          {/* ACTIONS */}
+          {/* CARDS */}
           <div style={styles.container}>
 
             {/* FIND PHOTOS */}
@@ -61,7 +60,6 @@ export default function Home() {
             {/* NEXT EVENT */}
             <Link href="/events/crama-thesaurus" style={styles.linkFix}>
               <div style={styles.eventCard}>
-                <div style={styles.eventGlow} />
 
                 <div style={styles.eventTopRow}>
                   <span style={styles.eventBadge}>Next Event</span>
@@ -83,6 +81,7 @@ export default function Home() {
                   <span style={styles.eventMetaItem}>📅 9 mai 2026</span>
                   <span style={styles.eventMetaItem}>🕓 16:00 – 23:00</span>
                 </div>
+
               </div>
             </Link>
 
@@ -113,72 +112,63 @@ export default function Home() {
 const styles = {
   page: {
     minHeight: "100dvh",
-    background: "#05050a",
-    color: "white",
+    background: "#f5f5f0",
+    color: "#111",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
     overflowX: "hidden",
     margin: 0,
     padding: 0
   },
+
+  /* INTRO */
   intro: {
     position: "fixed",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    background: "#05050a",
+    background: "#f5f5f0",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "column",
     zIndex: 999
   },
-  logoIntro: {
-    fontSize: 52,
-    fontWeight: 300,
-    letterSpacing: 12,
-    color: "#ffcf6a",
-    margin: 0,
-    textShadow: "0 0 15px rgba(255,215,120,0.8), 0 0 40px rgba(255,180,60,0.5)"
+  logoImgIntro: {
+    width: 180,
+    opacity: 1
   },
-  introGlow: {
-    position: "absolute",
-    width: 140,
-    height: 140,
-    borderRadius: "50%",
-    background: "rgba(255,210,120,0.7)",
-    filter: "blur(60px)",
-    zIndex: -1
-  },
+
+  /* MAIN */
   main: {
     width: "100%",
     minHeight: "100dvh",
     display: "flex",
     flexDirection: "column"
   },
+
+  /* HERO */
   hero: {
     flex: 1,
     textAlign: "center",
     display: "flex",
     flexDirection: "column",
     justifyContent: "flex-end",
-    paddingBottom: 40
+    alignItems: "center",
+    paddingBottom: 36
   },
-  logo: {
-    fontSize: 52,
-    fontWeight: 300,
-    letterSpacing: 12,
-    color: "#ffcf6a",
-    margin: 0,
-    textShadow: "0 0 15px rgba(255,215,120,0.8), 0 0 45px rgba(255,180,60,0.4)"
+  logoImg: {
+    width: 160,
+    display: "block",
+    margin: "0 auto"
   },
   tagline: {
-    marginTop: 12,
-    opacity: 0.6,
+    marginTop: 10,
     fontSize: 13,
-    color: "#f3e2b3",
+    color: "#888",
     letterSpacing: 1
   },
+
+  /* CONTAINER */
   container: {
     width: "100%",
     maxWidth: 420,
@@ -194,14 +184,14 @@ const styles = {
     width: "100%",
     color: "inherit"
   },
+
+  /* PHOTOS CARD */
   cardPrimary: {
     padding: "18px 20px",
     borderRadius: 18,
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,215,120,0.2)",
-    position: "relative",
-    overflow: "hidden",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
+    background: "white",
+    border: "1px solid rgba(0,0,0,0.08)",
+    boxShadow: "0 2px 16px rgba(0,0,0,0.06)"
   },
   cardRow: {
     display: "flex",
@@ -212,89 +202,76 @@ const styles = {
     fontSize: 17,
     fontWeight: 700,
     margin: 0,
-    color: "white"
+    color: "#111"
   },
   cardText: {
     fontSize: 13,
-    opacity: 0.7,
-    marginTop: 3,
-    color: "white"
+    color: "#888",
+    marginTop: 3
   },
   cardArrow: {
     fontSize: 20,
-    color: "#ffcf6a",
-    opacity: 0.8
+    color: "#111",
+    opacity: 0.4
   },
+
+  /* EVENT CARD */
   eventCard: {
     padding: "18px 20px",
     borderRadius: 18,
-    background: "rgba(255,255,255,0.04)",
-    border: "1px solid rgba(255,215,120,0.2)",
+    background: "white",
+    border: "1px solid rgba(0,0,0,0.08)",
+    boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
     position: "relative",
-    overflow: "hidden",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
-  },
-  eventGlow: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    top: -60,
-    right: -60,
-    background: "rgba(255,200,100,0.2)",
-    filter: "blur(50px)",
-    pointerEvents: "none"
+    overflow: "hidden"
   },
   eventTopRow: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 12,
-    position: "relative"
+    marginBottom: 12
   },
   eventBadge: {
     fontSize: 11,
     letterSpacing: 2,
     textTransform: "uppercase",
-    color: "#ffcf6a",
+    color: "#111",
     fontWeight: 600,
-    background: "rgba(255,207,106,0.12)",
+    background: "rgba(0,0,0,0.05)",
     padding: "3px 8px",
     borderRadius: 6,
-    border: "1px solid rgba(255,207,106,0.25)"
+    border: "1px solid rgba(0,0,0,0.08)"
   },
   ticketLink: {
     fontSize: 12,
-    color: "#ffcf6a",
+    color: "#111",
     fontWeight: 600,
     textDecoration: "none",
-    position: "relative",
+    opacity: 0.5,
     zIndex: 10
   },
   eventName: {
     fontSize: 17,
     fontWeight: 700,
-    color: "white",
-    margin: 0,
-    position: "relative"
+    color: "#111",
+    margin: 0
   },
   eventSubtitle: {
     fontSize: 13,
-    marginTop: 4,
-    opacity: 0.7,
-    color: "white",
-    position: "relative"
+    color: "#888",
+    marginTop: 4
   },
   eventMeta: {
     display: "flex",
     gap: 14,
-    marginTop: 12,
-    position: "relative"
+    marginTop: 12
   },
   eventMetaItem: {
     fontSize: 12,
-    opacity: 0.6,
-    color: "white"
+    color: "#888"
   },
+
+  /* FOOTER */
   footer: {
     marginTop: 20,
     textAlign: "center",
@@ -302,10 +279,10 @@ const styles = {
   },
   footerText: {
     fontSize: 12,
-    opacity: 0.4
+    color: "#bbb"
   },
   footerLink: {
-    color: "#ffcf6a",
+    color: "#111",
     textDecoration: "none",
     fontWeight: 600
   }
