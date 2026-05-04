@@ -246,28 +246,13 @@ export default function EventGallery() {
           onTouchEnd={onTouchEnd}
         >
           <div style={{ ...styles.bgGlow, backgroundImage: `url(${images[index]})` }} />
-
           <button style={styles.close} onClick={close}>✕</button>
-
           <img
             src={images[index]}
             style={{ ...styles.fullImage, opacity: fade ? 1 : 0 }}
           />
-
-          <div style={styles.modalBottom}>
-            <p style={styles.modalCounter}>{index + 1} / {images.length}</p>
-            <button
-              style={styles.downloadBtn}
-              onClick={() => download(images[index], index)}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-              Save Photo
-            </button>
-          </div>
+          <p style={styles.modalCounter}>{index + 1} / {images.length}</p>
+          <button style={styles.downloadBtn} onClick={() => download(images[index], index)}>⬇</button>
         </div>
       )}
 
@@ -436,73 +421,58 @@ const styles = {
   modal: {
     position: "fixed",
     inset: 0,
-    background: "rgba(0,0,0,0.95)",
+    background: "rgba(0,0,0,0.92)",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
-    animation: "fadeIn 0.2s ease"
+    alignItems: "center"
   },
   bgGlow: {
     position: "absolute",
     inset: 0,
     backgroundSize: "cover",
     backgroundPosition: "center",
-    filter: "blur(60px) brightness(0.25)"
+    filter: "blur(60px) brightness(0.4)"
   },
   fullImage: {
     maxWidth: "90%",
-    maxHeight: "80%",
+    maxHeight: "90%",
     borderRadius: 16,
     zIndex: 2,
-    transition: "opacity 0.2s ease",
-    boxShadow: "0 8px 40px rgba(0,0,0,0.5)"
+    transition: "opacity 0.2s ease"
   },
   close: {
     position: "absolute",
     top: 20,
     right: 20,
-    fontSize: 20,
+    fontSize: 22,
+    background: "transparent",
+    border: "none",
+    color: "white",
+    cursor: "pointer",
+    zIndex: 3
+  },
+  modalCounter: {
+    position: "absolute",
+    bottom: 24,
+    left: "50%",
+    transform: "translateX(-50%)",
+    fontSize: 12,
+    opacity: 0.5,
+    color: "white",
+    zIndex: 3,
+    margin: 0
+  },
+  downloadBtn: {
+    position: "absolute",
+    top: 20,
+    left: 20,
+    width: 40,
+    height: 40,
+    borderRadius: "50%",
     background: "rgba(255,255,255,0.1)",
     border: "none",
     color: "white",
     cursor: "pointer",
-    zIndex: 3,
-    width: 36,
-    height: 36,
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "blur(4px)"
-  },
-  modalBottom: {
-    position: "absolute",
-    bottom: 30,
-    left: 0,
-    right: 0,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 10,
     zIndex: 3
-  },
-  modalCounter: {
-    fontSize: 12,
-    color: "rgba(255,255,255,0.4)",
-    margin: 0
-  },
-  downloadBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    background: "rgba(255,255,255,0.12)",
-    border: "1px solid rgba(255,255,255,0.15)",
-    color: "white",
-    borderRadius: 24,
-    padding: "10px 20px",
-    fontSize: 13,
-    fontWeight: 600,
-    cursor: "pointer",
-    backdropFilter: "blur(8px)"
   }
 };
