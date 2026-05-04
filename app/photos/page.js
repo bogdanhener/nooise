@@ -92,7 +92,7 @@ export default function PhotosPage() {
               href={`/photos/${event.id}`}
               style={{ textDecoration: "none", animation: `fadeIn 0.4s ease ${i * 0.07}s both` }}
             >
-              <div className="card-press" style={styles.card}>
+  <div className="card-press" style={styles.card}>
 
                 {/* COVER IMAGE */}
                 <div
@@ -101,7 +101,7 @@ export default function PhotosPage() {
                     backgroundImage: event.cover_image_url
                       ? `url(${event.cover_image_url})`
                       : "none",
-                    background: event.cover_image_url ? undefined : "#f0f0f0"
+                    background: event.cover_image_url ? undefined : "#e8e8e8"
                   }}
                 />
 

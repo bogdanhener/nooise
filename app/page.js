@@ -291,11 +291,12 @@ const styles = {
   eventCard: {
     padding: "18px 20px",
     borderRadius: 18,
-    background: "#111",
-    border: "none",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
+    background: "rgba(20,20,20,0.06)",
+    border: "1px solid rgba(0,0,0,0.1)",
+    boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
     position: "relative",
-    overflow: "hidden"
+    overflow: "hidden",
+    backdropFilter: "blur(12px)"
   },
   eventTopRow: {
     display: "flex",
@@ -307,7 +308,7 @@ const styles = {
     fontSize: 11,
     letterSpacing: 1.5,
     textTransform: "uppercase",
-    color: "rgba(255,255,255,0.6)",
+    color: "rgba(0,0,0,0.4)",
     fontWeight: 600,
     display: "flex",
     alignItems: "center",
@@ -323,7 +324,7 @@ const styles = {
   },
   ticketLink: {
     fontSize: 12,
-    color: "rgba(255,255,255,0.5)",
+    color: "rgba(0,0,0,0.4)",
     fontWeight: 600,
     textDecoration: "none",
     zIndex: 10
@@ -331,12 +332,12 @@ const styles = {
   eventName: {
     fontSize: 17,
     fontWeight: 700,
-    color: "#ffffff",
+    color: "#111",
     margin: 0
   },
   eventSubtitle: {
     fontSize: 13,
-    color: "rgba(255,255,255,0.5)",
+    color: "rgba(0,0,0,0.45)",
     marginTop: 4
   },
   eventMeta: {
@@ -346,7 +347,7 @@ const styles = {
   },
   eventMetaItem: {
     fontSize: 12,
-    color: "rgba(255,255,255,0.4)"
+    color: "rgba(0,0,0,0.4)"
   },
 
   /* FOOTER */
