@@ -1,4 +1,5 @@
 import "../styles/globals.css";
+import RouteLoader from "../components/RouteLoader";
 
 export const metadata = {
   title: "nooise — events, energy, moments",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body>
+        <RouteLoader />
         <div className="page-wrapper">
           {children}
         </div>

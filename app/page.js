@@ -4,12 +4,41 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
-  const [enter, setEnter] = useState(false);
+  // phase: 'intro' | 'diving' | 'home'
+  const [phase, setPhase] = useState("intro");
 
   useEffect(() => {
-    const t = setTimeout(() => setEnter(true), 1100);
-    return () => clearTimeout(t);
+    // Check if intro has played this session
+    const seen = typeof window !== "undefined" && sessionStorage.getItem("nooise_intro_seen");
+
+    if (seen) {
+      setPhase("home");
+      return;
+    }
+
+    // Stage 1: hold the logo for a beat
+    const t1 = setTimeout(() => setPhase("diving"), 700);
+    // Stage 2: after the dive completes, switch to home
+    const t2 = setTimeout(() => {
+      setPhase("home");
+      sessionStorage.setItem("nooise_intro_seen", "1");
+    }, 1450);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
   }, []);
+
+  const showIntro = phase !== "home";
+  const isDiving = phase === "diving";
+  // Show home content during diving phase too, so it fades up underneath the zooming logo
+  const showHome = phase === "diving" || phase === "home";
+  // Track whether home is arriving via the dive (dramatic) or directly (subtle)
+  const [diveArrival] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return !sessionStorage.getItem("nooise_intro_seen");
+  });
 
   return (
     <div style={styles.page}>
@@ -20,16 +49,25 @@ export default function Home() {
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes logoIn {
-          from { opacity: 0; transform: scale(0.96); }
+          from { opacity: 0; transform: scale(0.94); }
           to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes logoOut {
-          from { opacity: 1; transform: scale(1); }
-          to   { opacity: 0; transform: scale(1.02); }
         }
         @keyframes pulse {
           0%, 100% { opacity: 0.4; transform: scale(1); }
           50%       { opacity: 1; transform: scale(1.15); }
+        }
+        @keyframes diveThrough {
+          0%   { transform: scale(1); opacity: 1; filter: blur(0px); }
+          70%  { transform: scale(18); opacity: 0.85; filter: blur(0.5px); }
+          100% { transform: scale(40); opacity: 0; filter: blur(1.5px); }
+        }
+        @keyframes introBgFade {
+          0%, 60% { opacity: 1; }
+          100%    { opacity: 0; }
+        }
+        @keyframes homeArrive {
+          from { opacity: 0; transform: scale(1.06); }
+          to   { opacity: 1; transform: scale(1); }
         }
         @keyframes lineGrow {
           from { transform: scaleX(0); }
@@ -45,18 +83,50 @@ export default function Home() {
         .card:active { opacity: 0.65; transform: scale(0.995); }
         .arrow-shift { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
         .card:hover .arrow-shift { transform: translateX(3px); }
+
+        .intro-overlay {
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          background: var(--paper);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 999;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        .intro-overlay.diving {
+          animation: introBgFade 0.75s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+        .intro-logo {
+          animation: logoIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          transform-origin: 48% 52%;
+          will-change: transform, opacity, filter;
+        }
+        .intro-logo.diving {
+          animation: diveThrough 0.75s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+        }
+        .home-arriving {
+          animation: homeArrive 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform-origin: 48% 52%;
+        }
       `}</style>
 
-      {/* INTRO */}
-      {!enter && (
-        <div style={styles.intro}>
-          <img src="/nooise.jpg" alt="nooise" style={styles.logoImgIntro} />
+      {/* INTRO — dive-through */}
+      {showIntro && (
+        <div className={`intro-overlay ${isDiving ? "diving" : ""}`}>
+          <img
+            src="/nooise.jpg"
+            alt="nooise"
+            className={`intro-logo ${isDiving ? "diving" : ""}`}
+            style={styles.logoImgIntro}
+          />
         </div>
       )}
 
       {/* MAIN */}
-      {enter && (
-        <div style={styles.main} className="stagger">
+      {showHome && (
+        <div style={styles.main} className={`stagger ${diveArrival ? "home-arriving" : ""}`}>
 
           {/* TOP BAR */}
           <div style={styles.topBar}>
@@ -187,12 +257,11 @@ const styles = {
     justifyContent: "center",
     alignItems: "center",
     zIndex: 999,
-    animation: "logoOut 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards",
-    animationDelay: "0.85s"
+    overflow: "hidden"
   },
   logoImgIntro: {
-    width: 140,
-    animation: "logoIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards"
+    width: 220,
+    display: "block"
   },
 
   /* MAIN */
