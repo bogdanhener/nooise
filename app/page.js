@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 export default function Home() {
   // phase: 'intro' | 'diving' | 'home'
   const [phase, setPhase] = useState("intro");
+  const [videoFading, setVideoFading] = useState(false);
+  const videoRef = useRef(null);
 
   useEffect(() => {
     // Check if intro has played this session
@@ -17,16 +19,28 @@ export default function Home() {
     }
 
     // Stage 1: hold the logo for a beat
-    const t1 = setTimeout(() => setPhase("diving"), 1200);
+    const t1 = setTimeout(() => {
+      setPhase("diving");
+      // Start video playback as the dive begins
+      if (videoRef.current) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch(() => {});
+      }
+    }, 1200);
     // Stage 2: after the dive completes, switch to home
     const t2 = setTimeout(() => {
       setPhase("home");
       sessionStorage.setItem("nooise_intro_seen", "1");
     }, 2400);
+    // Stage 3: fade out the video once home has settled
+    const t3 = setTimeout(() => {
+      setVideoFading(true);
+    }, 3400);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
+      clearTimeout(t3);
     };
   }, []);
 
@@ -39,6 +53,8 @@ export default function Home() {
     if (typeof window === "undefined") return false;
     return !sessionStorage.getItem("nooise_intro_seen");
   });
+  // Video stays mounted only during the intro→home transition arc, then unmounts after fade
+  const showVideo = diveArrival && phase !== "intro";
 
   return (
     <div style={styles.page}>
@@ -110,7 +126,50 @@ export default function Home() {
           animation: homeArrive 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           transform-origin: 48% 52%;
         }
+
+        .intro-video {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100vw;
+          height: 100vh;
+          object-fit: cover;
+          z-index: 1;
+          opacity: 0;
+          transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+          pointer-events: none;
+        }
+        .intro-video.visible { opacity: 1; }
+        .intro-video.fading { opacity: 0; transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
+        .intro-video-overlay {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 2;
+          pointer-events: none;
+          background: linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.35) 30%, rgba(255,255,255,0.7) 70%, rgba(255,255,255,0.92) 100%);
+          opacity: 0;
+          transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .intro-video-overlay.visible { opacity: 1; }
+        .intro-video-overlay.fading { opacity: 0; transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1); }
       `}</style>
+
+      {/* INTRO VIDEO — plays behind everything during the dive→home transition */}
+      {showVideo && (
+        <>
+          <video
+            ref={videoRef}
+            className={`intro-video ${isDiving || phase === "home" ? "visible" : ""} ${videoFading ? "fading" : ""}`}
+            src="/intro.mp4"
+            muted
+            playsInline
+            preload="auto"
+            autoPlay
+          />
+          <div className={`intro-video-overlay ${isDiving || phase === "home" ? "visible" : ""} ${videoFading ? "fading" : ""}`} />
+        </>
+      )}
 
       {/* INTRO — dive-through */}
       {showIntro && (
@@ -240,12 +299,14 @@ export default function Home() {
 const styles = {
   page: {
     minHeight: "100dvh",
-    background: "var(--paper)",
+    background: "transparent",
     color: "var(--ink)",
     fontFamily: "var(--sans)",
     overflowX: "hidden",
     margin: 0,
-    padding: 0
+    padding: 0,
+    position: "relative",
+    zIndex: 3
   },
 
   /* INTRO */
