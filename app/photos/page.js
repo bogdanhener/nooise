@@ -113,15 +113,10 @@ export default function PhotosPage() {
   <div className="card-press" style={styles.card}>
 
                 {/* COVER IMAGE */}
-                <div
-                  style={{
-                    ...styles.image,
-                    backgroundImage: event.cover_image_url
-                      ? `url(${event.cover_image_url})`
-                      : "none",
-                    background: event.cover_image_url ? undefined : "#e8e8e8"
-                  }}
-                />
+                <div style={{ ...styles.image, background: "#e8e8e8" }} />
+                {event.cover_image_url && (
+                  <div style={{ ...styles.image, backgroundImage: `url(${event.cover_image_url})` }} />
+                )}
 
                 {/* GRADIENT OVERLAY */}
                 <div style={styles.overlay} />

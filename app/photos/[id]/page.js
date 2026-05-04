@@ -247,9 +247,8 @@ export default function EventGallery() {
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
-          <div style={{ ...styles.bgGlow, backgroundImage: `url(${images[index]})` }} />
           <button style={styles.close} onClick={close}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
@@ -432,22 +431,14 @@ const styles = {
     bottom: 0,
     width: "100vw",
     height: "100vh",
-    background: "rgba(0,0,0,0.95)",
+    background: "#ffffff",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1000
   },
   bgGlow: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    filter: "blur(60px) brightness(0.3)",
-    zIndex: 0
+    display: "none"
   },
   fullImage: {
     maxWidth: "90vw",
@@ -456,7 +447,8 @@ const styles = {
     zIndex: 2,
     transition: "opacity 0.2s ease",
     display: "block",
-    margin: "auto"
+    margin: "auto",
+    boxShadow: "0 4px 30px rgba(0,0,0,0.12)"
   },
   modalCounter: {
     position: "absolute",
@@ -465,7 +457,7 @@ const styles = {
     transform: "translateX(-50%)",
     fontSize: 12,
     opacity: 0.5,
-    color: "white",
+    color: "#aaa",
     zIndex: 1001,
     margin: 0
   },
@@ -476,15 +468,14 @@ const styles = {
     width: 36,
     height: 36,
     borderRadius: "50%",
-    background: "rgba(255,255,255,0.15)",
-    border: "none",
-    color: "white",
+    background: "rgba(0,0,0,0.06)",
+    border: "1px solid rgba(0,0,0,0.08)",
+    color: "#111",
     cursor: "pointer",
     zIndex: 1001,
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "blur(4px)"
+    justifyContent: "center"
   },
   downloadBtn: {
     position: "absolute",
@@ -493,8 +484,8 @@ const styles = {
     transform: "translateX(-50%)",
     display: "flex",
     alignItems: "center",
-    background: "rgba(255,255,255,0.15)",
-    border: "1px solid rgba(255,255,255,0.2)",
+    background: "#111",
+    border: "none",
     color: "white",
     borderRadius: 24,
     padding: "10px 20px",
@@ -502,7 +493,6 @@ const styles = {
     fontWeight: 600,
     cursor: "pointer",
     zIndex: 1001,
-    backdropFilter: "blur(8px)",
     whiteSpace: "nowrap"
   }
 };
