@@ -1,28 +1,50 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter+Tight:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --paper: #fafaf7;
+  --ink: #0a0a0a;
+  --ink-soft: #555;
+  --ink-mute: #999;
+  --ink-faint: #cfcfcf;
+  --line: rgba(10, 10, 10, 0.08);
+  --line-strong: rgba(10, 10, 10, 0.14);
+  --accent: #7cc77c;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
+}
 
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: '-apple-system', BlinkMacSystemFont, 'Inter', sans-serif;
-  background: #ffffff;
-  color: #111;
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'ss01', 'cv11';
+  text-rendering: optimizeLegibility;
 }
 
-/* PAGE TRANSITION — fades in every page on mount */
+/* PAGE TRANSITION */
 .page-wrapper {
-  animation: pageIn 0.3s ease forwards;
+  animation: pageIn 0.5s var(--ease) forwards;
 }
 
 @keyframes pageIn {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -30,12 +52,29 @@ body {
   }
 }
 
-/* TAP HIGHLIGHT — removes default blue flash on mobile */
-* {
-  -webkit-tap-highlight-color: transparent;
+/* EDITORIAL UTILITIES */
+.eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
 }
 
-/* SCROLLBAR — subtle on desktop */
+.serif {
+  font-family: var(--serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* SELECTION */
+::selection {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* SCROLLBAR */
 ::-webkit-scrollbar {
   width: 4px;
 }
@@ -43,6 +82,15 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.1);
+  background: rgba(10, 10, 10, 0.12);
   border-radius: 4px;
+}
+
+/* PRESS STATE — opacity-based, used across cards */
+.press {
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.press:active {
+  opacity: 0.6;
+  transform: scale(0.995);
 }

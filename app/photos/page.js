@@ -10,9 +10,6 @@ export default function PhotosPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.body.style.background = "#ffffff";
     loadEvents();
   }, []);
 
@@ -31,7 +28,6 @@ export default function PhotosPage() {
       return;
     }
 
-    // For events without a cover_image_url, grab first photo from storage as fallback
     const enriched = await Promise.all(
       (data || []).map(async (event) => {
         if (event.cover_image_url) return event;
@@ -56,29 +52,40 @@ export default function PhotosPage() {
     <div style={styles.page}>
 
       <style>{`
-        @keyframes fadeIn {
+        @keyframes fadeUp {
           from { opacity: 0; transform: translateY(10px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .card-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
-        .card-press:active { transform: scale(0.98); }
+        @keyframes lineGrow {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
+        }
+        .event-card { transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1), transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .event-card:active { opacity: 0.75; transform: scale(0.995); }
+        .img-zoom { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+        .event-card:hover .img-zoom { transform: scale(1.03); }
       `}</style>
 
       {/* TOP BAR */}
       <div style={styles.topBar}>
         <Link href="/" style={styles.backLink}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
           </svg>
-          <span style={styles.backLabel}>nooise</span>
+          <span>nooise</span>
         </Link>
+        <span style={styles.pageNumber}>Archive</span>
       </div>
 
       {/* HEADER */}
       <div style={styles.header}>
-        <h1 style={styles.title}>Your Photos</h1>
+        <span style={styles.eyebrow}>The Archive</span>
+        <h1 style={styles.title}>
+          Your <span style={styles.titleSerif}>photos</span>
+        </h1>
         <p style={styles.subtitle}>Select an event to browse</p>
+        <div style={styles.headerLine} />
       </div>
 
       {/* LOADING */}
@@ -108,41 +115,54 @@ export default function PhotosPage() {
             <Link
               key={event.id}
               href={`/photos/${event.id}`}
-              style={{ textDecoration: "none", animation: `fadeIn 0.4s ease ${i * 0.07}s both` }}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                opacity: 0,
+                animation: `fadeUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) ${i * 0.08}s forwards`
+              }}
             >
-  <div className="card-press" style={styles.card}>
+              <article className="event-card" style={styles.card}>
 
-                {/* COVER IMAGE */}
-                <div style={{ ...styles.image, background: "#e8e8e8" }} />
-                {event.cover_image_url && (
-                  <div style={{ ...styles.image, backgroundImage: `url(${event.cover_image_url})` }} />
-                )}
-
-                {/* GRADIENT OVERLAY */}
-                <div style={styles.overlay} />
-
-                {/* TEXT */}
-                <div style={styles.content}>
-                  <h2 style={styles.titleText}>{event.name}</h2>
-                  <p style={styles.dateText}>
-                    {event.event_date
-                      ? new Date(event.event_date).toLocaleDateString("ro-RO", {
-                          day: "numeric",
-                          month: "long",
-                          year: "numeric"
-                        })
-                      : ""}
-                  </p>
+                {/* IMAGE */}
+                <div style={styles.imageWrap}>
+                  <div style={{ ...styles.imagePlaceholder, background: "#ececea" }} />
+                  {event.cover_image_url && (
+                    <div
+                      className="img-zoom"
+                      style={{ ...styles.image, backgroundImage: `url(${event.cover_image_url})` }}
+                    />
+                  )}
+                  <div style={styles.imageBorder} />
                 </div>
 
-                {/* ARROW */}
-                <div style={styles.cardArrow}>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                  </svg>
+                {/* CAPTION — editorial style, below image */}
+                <div style={styles.caption}>
+                  <div style={styles.captionLeft}>
+                    <span style={styles.captionNumber}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div>
+                      <h2 style={styles.captionTitle}>{event.name}</h2>
+                      <p style={styles.captionDate}>
+                        {event.event_date
+                          ? new Date(event.event_date).toLocaleDateString("en-GB", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric"
+                            })
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={styles.captionArrow}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </div>
                 </div>
 
-              </div>
+              </article>
             </Link>
           ))}
         </div>
@@ -150,18 +170,14 @@ export default function PhotosPage() {
 
       {/* FOOTER */}
       <div style={styles.footer}>
+        <div style={styles.footerLine} />
         <a
           href="https://www.instagram.com/nooise___/"
           target="_blank"
           rel="noopener noreferrer"
           style={styles.footerInsta}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#bbb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-            <circle cx="12" cy="12" r="4"/>
-            <circle cx="17.5" cy="6.5" r="0.8" fill="#bbb" stroke="none"/>
-          </svg>
-          <span>nooise___</span>
+          @nooise___
         </a>
       </div>
 
@@ -171,97 +187,151 @@ export default function PhotosPage() {
 
 const styles = {
   page: {
-    background: "#ffffff",
+    background: "var(--paper)",
     minHeight: "100dvh",
-    color: "#111",
+    color: "var(--ink)",
     margin: 0,
     boxSizing: "border-box",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif"
+    fontFamily: "var(--sans)"
   },
+
+  /* TOP BAR */
   topBar: {
     display: "flex",
     alignItems: "center",
-    padding: "16px 20px 0"
+    justifyContent: "space-between",
+    padding: "20px 22px 0"
   },
   backLink: {
     display: "flex",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
     textDecoration: "none",
-    color: "#111"
+    color: "var(--ink-soft)",
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.04em"
   },
-  backLabel: {
-    fontSize: 13,
-    fontWeight: 600,
-    opacity: 0.5
+  pageNumber: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)"
   },
+
+  /* HEADER */
   header: {
-    padding: "20px 20px 8px"
+    padding: "40px 22px 24px",
+    maxWidth: 480,
+    margin: "0 auto",
+    boxSizing: "border-box"
+  },
+  eyebrow: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-soft)"
   },
   title: {
-    fontSize: 28,
-    fontWeight: 800,
-    margin: 0,
-    color: "#111",
-    letterSpacing: -0.5
+    fontSize: 40,
+    fontWeight: 500,
+    margin: "10px 0 0",
+    color: "var(--ink)",
+    letterSpacing: "-0.03em",
+    lineHeight: 1
+  },
+  titleSerif: {
+    fontFamily: "var(--serif)",
+    fontStyle: "italic",
+    fontWeight: 400
   },
   subtitle: {
-    color: "#aaa",
+    color: "var(--ink-mute)",
     fontSize: 13,
-    marginTop: 4
+    marginTop: 14,
+    margin: "14px 0 0"
   },
+  headerLine: {
+    width: 40,
+    height: 1,
+    background: "var(--ink)",
+    marginTop: 22,
+    transformOrigin: "left",
+    animation: "lineGrow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both"
+  },
+
+  /* LOADING */
   loadingWrap: {
     display: "flex",
     justifyContent: "center",
     padding: "60px 0"
   },
   spinner: {
-    width: 22,
-    height: 22,
-    border: "2px solid rgba(0,0,0,0.08)",
-    borderTop: "2px solid #111",
+    width: 18,
+    height: 18,
+    border: "1.5px solid rgba(10,10,10,0.1)",
+    borderTop: "1.5px solid var(--ink)",
     borderRadius: "50%",
-    animation: "spin 0.8s linear infinite"
+    animation: "spin 0.9s linear infinite"
   },
   message: {
-    color: "#aaa",
-    fontSize: 14,
-    padding: "0 20px"
+    color: "var(--ink-mute)",
+    fontSize: 13,
+    padding: "0 22px",
+    maxWidth: 480,
+    margin: "0 auto"
   },
   errorBox: {
-    margin: "0 20px",
-    background: "rgba(255,60,60,0.06)",
-    border: "1px solid rgba(255,60,60,0.15)",
-    borderRadius: 12,
-    padding: 16
+    margin: "0 22px",
+    maxWidth: 480,
+    padding: "16px 18px",
+    border: "1px solid var(--line-strong)",
+    borderRadius: 12
   },
   errorText: {
-    color: "#e05555",
-    fontSize: 14,
+    color: "var(--ink)",
+    fontSize: 13,
     margin: 0
   },
   retryBtn: {
-    marginTop: 10,
+    marginTop: 12,
     background: "transparent",
-    border: "1px solid rgba(200,60,60,0.3)",
-    color: "#e05555",
+    border: "1px solid var(--line-strong)",
+    color: "var(--ink)",
     borderRadius: 8,
-    padding: "6px 14px",
-    fontSize: 13,
-    cursor: "pointer"
+    padding: "7px 14px",
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.04em",
+    cursor: "pointer",
+    fontFamily: "var(--sans)"
   },
+
+  /* GRID */
   grid: {
     display: "flex",
     flexDirection: "column",
-    gap: 12,
-    padding: "12px 16px"
+    gap: 32,
+    padding: "16px 22px 24px",
+    maxWidth: 480,
+    margin: "0 auto",
+    boxSizing: "border-box"
   },
   card: {
+    cursor: "pointer"
+  },
+  imageWrap: {
     position: "relative",
-    height: 190,
-    borderRadius: 20,
-    overflow: "hidden",
-    boxShadow: "0 2px 20px rgba(0,0,0,0.1)"
+    width: "100%",
+    aspectRatio: "16 / 11",
+    borderRadius: 10,
+    overflow: "hidden"
+  },
+  imagePlaceholder: {
+    position: "absolute",
+    inset: 0
   },
   image: {
     position: "absolute",
@@ -269,53 +339,70 @@ const styles = {
     backgroundSize: "cover",
     backgroundPosition: "center"
   },
-  overlay: {
+  imageBorder: {
     position: "absolute",
     inset: 0,
-    background: "linear-gradient(to top, rgba(0,0,0,0.65), rgba(0,0,0,0.0) 60%)"
+    border: "1px solid var(--line)",
+    borderRadius: 10,
+    pointerEvents: "none"
   },
-  content: {
-    position: "absolute",
-    bottom: 14,
-    left: 16,
-    right: 48
+  caption: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    paddingTop: 14,
+    gap: 16
   },
-  titleText: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: "white",
-    margin: 0
+  captionLeft: {
+    display: "flex",
+    gap: 14,
+    alignItems: "flex-start"
   },
-  dateText: {
+  captionNumber: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    color: "var(--ink-mute)",
+    paddingTop: 5
+  },
+  captionTitle: {
+    fontSize: 17,
+    fontWeight: 500,
+    margin: 0,
+    color: "var(--ink)",
+    letterSpacing: "-0.01em",
+    lineHeight: 1.2
+  },
+  captionDate: {
     fontSize: 12,
-    marginTop: 3,
-    color: "rgba(255,255,255,0.7)"
+    color: "var(--ink-mute)",
+    margin: "4px 0 0"
   },
-  cardArrow: {
-    position: "absolute",
-    bottom: 14,
-    right: 14,
-    width: 32,
-    height: 32,
-    borderRadius: "50%",
-    background: "rgba(255,255,255,0.15)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "blur(4px)"
+  captionArrow: {
+    color: "var(--ink-soft)",
+    paddingTop: 4
   },
+
+  /* FOOTER */
   footer: {
-    marginTop: 16,
-    paddingBottom: 40,
-    display: "flex",
-    justifyContent: "center"
+    marginTop: 32,
+    paddingBottom: 40
+  },
+  footerLine: {
+    width: "100%",
+    maxWidth: 480,
+    height: 1,
+    background: "var(--line)",
+    margin: "0 auto"
   },
   footerInsta: {
-    display: "flex",
-    alignItems: "center",
-    gap: 5,
+    display: "block",
+    textAlign: "center",
+    paddingTop: 18,
     textDecoration: "none",
-    color: "#bbb",
-    fontSize: 12
+    color: "var(--ink-mute)",
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.04em"
   }
 };

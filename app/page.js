@@ -5,13 +5,9 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const [enter, setEnter] = useState(false);
-  const [pressedCard, setPressedCard] = useState(null);
 
   useEffect(() => {
-    document.body.style.margin = "0";
-    document.body.style.padding = "0";
-    document.body.style.background = "#ffffff";
-    const t = setTimeout(() => setEnter(true), 2000);
+    const t = setTimeout(() => setEnter(true), 1100);
     return () => clearTimeout(t);
   }, []);
 
@@ -19,20 +15,36 @@ export default function Home() {
     <div style={styles.page}>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(12px); }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes logoIn {
-          from { opacity: 0; transform: scale(0.92); }
+          from { opacity: 0; transform: scale(0.96); }
           to   { opacity: 1; transform: scale(1); }
         }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.5; }
-          50%       { opacity: 1; }
+        @keyframes logoOut {
+          from { opacity: 1; transform: scale(1); }
+          to   { opacity: 0; transform: scale(1.02); }
         }
-        .card-press { transition: transform 0.12s ease, box-shadow 0.12s ease; }
-        .card-press:active { transform: scale(0.97); box-shadow: 0 1px 6px rgba(0,0,0,0.06) !important; }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50%       { opacity: 1; transform: scale(1.15); }
+        }
+        @keyframes lineGrow {
+          from { transform: scaleX(0); }
+          to   { transform: scaleX(1); }
+        }
+        .stagger > * { opacity: 0; animation: fadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+        .stagger > *:nth-child(2) { animation-delay: 0.18s; }
+        .stagger > *:nth-child(3) { animation-delay: 0.32s; }
+        .stagger > *:nth-child(4) { animation-delay: 0.46s; }
+        .stagger > *:nth-child(5) { animation-delay: 0.60s; }
+        .card { transition: opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1), transform 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+        .card:active { opacity: 0.65; transform: scale(0.995); }
+        .arrow-shift { transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+        .card:hover .arrow-shift { transform: translateX(3px); }
       `}</style>
 
       {/* INTRO */}
@@ -44,28 +56,36 @@ export default function Home() {
 
       {/* MAIN */}
       {enter && (
-        <div style={styles.main}>
+        <div style={styles.main} className="stagger">
 
           {/* TOP BAR */}
           <div style={styles.topBar}>
+            <span style={styles.locationTag}>TIMIȘOARA</span>
             <a
               href="https://www.instagram.com/nooise___/"
               target="_blank"
               rel="noopener noreferrer"
               style={styles.instaLink}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <span style={styles.instaLabel}>@nooise___</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
                 <circle cx="12" cy="12" r="4"/>
-                <circle cx="17.5" cy="6.5" r="0.8" fill="#111" stroke="none"/>
+                <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
               </svg>
-              <span style={styles.instaLabel}>@nooise___</span>
             </a>
           </div>
 
           {/* HERO */}
           <div style={styles.hero}>
             <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
+            <p style={styles.tagline}>
+              <span style={styles.serif}>Events.</span> Energy. Moments.
+            </p>
+          </div>
+
+          {/* DIVIDER */}
+          <div style={styles.dividerWrap}>
             <div style={styles.divider} />
           </div>
 
@@ -74,14 +94,19 @@ export default function Home() {
 
             {/* FIND PHOTOS */}
             <Link href="/photos" style={styles.linkFix}>
-              <div className="card-press" style={styles.cardPrimary}>
+              <div className="card" style={styles.cardPrimary}>
+                <div style={styles.cardLabelRow}>
+                  <span style={styles.cardEyebrow}>01 — Archive</span>
+                </div>
                 <div style={styles.cardRow}>
                   <div>
-                    <h2 style={styles.cardTitle}>Find Your Photos</h2>
-                    <p style={styles.cardText}>Relive your event moments</p>
+                    <h2 style={styles.cardTitle}>
+                      <span style={styles.serif}>Find</span> your photos
+                    </h2>
+                    <p style={styles.cardText}>Relive every moment from past nights</p>
                   </div>
-                  <div style={styles.cardIconWrap}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <div style={styles.cardArrow}>
+                    <svg className="arrow-shift" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M5 12h14M12 5l7 7-7 7"/>
                     </svg>
                   </div>
@@ -91,12 +116,12 @@ export default function Home() {
 
             {/* NEXT EVENT */}
             <Link href="/events/crama-thesaurus" style={styles.linkFix}>
-              <div className="card-press" style={styles.eventCard}>
+              <div className="card" style={styles.eventCard}>
 
-                <div style={styles.eventTopRow}>
-                  <span style={styles.eventBadge}>
+                <div style={styles.cardLabelRow}>
+                  <span style={styles.cardEyebrowAccent}>
                     <span style={styles.pulseDot} />
-                    Next Event
+                    02 — Next Event
                   </span>
                   <a
                     href="https://www.livetickets.ro/bilete/nooise-x-crama-thesaurus-winery-session"
@@ -105,16 +130,24 @@ export default function Home() {
                     style={styles.ticketLink}
                     onClick={(e) => e.stopPropagation()}
                   >
-                    Tickets →
+                    Tickets ↗
                   </a>
                 </div>
 
-                <h3 style={styles.eventName}>NOOISE x Crama Thesaurus</h3>
+                <h3 style={styles.eventName}>
+                  <span style={styles.serif}>nooise</span> × Crama Thesaurus
+                </h3>
                 <p style={styles.eventSubtitle}>Winery Session</p>
 
                 <div style={styles.eventMeta}>
-                  <span style={styles.eventMetaItem}>📅 9 mai 2026</span>
-                  <span style={styles.eventMetaItem}>🕓 16:00 – 23:00</span>
+                  <div style={styles.metaCol}>
+                    <span style={styles.metaLabel}>Date</span>
+                    <span style={styles.metaValue}>9 May 2026</span>
+                  </div>
+                  <div style={styles.metaCol}>
+                    <span style={styles.metaLabel}>Time</span>
+                    <span style={styles.metaValue}>16:00 — 23:00</span>
+                  </div>
                 </div>
 
               </div>
@@ -124,31 +157,18 @@ export default function Home() {
 
           {/* FOOTER */}
           <div style={styles.footer}>
+            <div style={styles.footerLine} />
             <div style={styles.footerRow}>
-              <a
-                href="https://www.instagram.com/nooise___/"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.footerInsta}
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#aaa" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
-                  <circle cx="12" cy="12" r="4"/>
-                  <circle cx="17.5" cy="6.5" r="0.8" fill="#aaa" stroke="none"/>
-                </svg>
-                <span>nooise___</span>
-              </a>
-              <span style={styles.footerDot}>·</span>
+              <span style={styles.footerYear}>2026 © nooise</span>
               <a
                 href="https://www.instagram.com/bogdanhener/"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={styles.footerCredit}
               >
-                by bogdanhener
+                Site by bogdanhener
               </a>
             </div>
-            <p style={styles.footerYear}>2026 © nooise</p>
           </div>
 
         </div>
@@ -161,9 +181,9 @@ export default function Home() {
 const styles = {
   page: {
     minHeight: "100dvh",
-    background: "#ffffff",
-    color: "#111",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+    background: "var(--paper)",
+    color: "var(--ink)",
+    fontFamily: "var(--sans)",
     overflowX: "hidden",
     margin: 0,
     padding: 0
@@ -173,15 +193,17 @@ const styles = {
   intro: {
     position: "fixed",
     top: 0, left: 0, right: 0, bottom: 0,
-    background: "#ffffff",
+    background: "var(--paper)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 999
+    zIndex: 999,
+    animation: "logoOut 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+    animationDelay: "0.85s"
   },
   logoImgIntro: {
-    width: 180,
-    animation: "logoIn 0.6s ease forwards"
+    width: 140,
+    animation: "logoIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards"
   },
 
   /* MAIN */
@@ -189,28 +211,34 @@ const styles = {
     width: "100%",
     minHeight: "100dvh",
     display: "flex",
-    flexDirection: "column",
-    animation: "fadeIn 0.5s ease forwards"
+    flexDirection: "column"
   },
 
   /* TOP BAR */
   topBar: {
     display: "flex",
-    justifyContent: "flex-end",
-    padding: "16px 20px 0"
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: "20px 22px 0"
+  },
+  locationTag: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-soft)"
   },
   instaLink: {
     display: "flex",
     alignItems: "center",
     gap: 6,
     textDecoration: "none",
-    color: "#111"
+    color: "var(--ink-soft)"
   },
   instaLabel: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: "#111",
-    opacity: 0.5
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.04em"
   },
 
   /* HERO */
@@ -219,20 +247,44 @@ const styles = {
     textAlign: "center",
     display: "flex",
     flexDirection: "column",
-    justifyContent: "flex-end",
+    justifyContent: "center",
     alignItems: "center",
-    paddingBottom: 32
+    paddingTop: 24,
+    paddingBottom: 32,
+    minHeight: "38vh"
   },
   logoImg: {
-    width: 155,
+    width: 160,
     display: "block",
     margin: "0 auto"
   },
+  tagline: {
+    marginTop: 28,
+    fontSize: 13,
+    color: "var(--ink-soft)",
+    letterSpacing: "0.04em",
+    fontWeight: 400
+  },
+  serif: {
+    fontFamily: "var(--serif)",
+    fontWeight: 400,
+    letterSpacing: "-0.01em",
+    fontStyle: "italic"
+  },
+
+  /* DIVIDER */
+  dividerWrap: {
+    width: "100%",
+    maxWidth: 420,
+    margin: "0 auto",
+    padding: "0 22px",
+    boxSizing: "border-box"
+  },
   divider: {
-    width: 40,
     height: 1,
-    background: "rgba(0,0,0,0.1)",
-    margin: "24px auto 0"
+    background: "var(--line)",
+    transformOrigin: "center",
+    animation: "lineGrow 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards"
   },
 
   /* CONTAINER */
@@ -240,10 +292,10 @@ const styles = {
     width: "100%",
     maxWidth: 420,
     margin: "0 auto",
-    padding: "0 16px",
+    padding: "32px 22px 0",
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 14,
     boxSizing: "border-box"
   },
   linkFix: {
@@ -254,134 +306,165 @@ const styles = {
 
   /* PHOTOS CARD */
   cardPrimary: {
-    padding: "18px 20px",
-    borderRadius: 18,
-    background: "#f7f7f7",
-    border: "1px solid rgba(0,0,0,0.06)",
-    boxShadow: "0 2px 16px rgba(0,0,0,0.05)"
+    padding: "20px 22px 22px",
+    borderRadius: 14,
+    background: "transparent",
+    border: "1px solid var(--line)",
+    cursor: "pointer"
+  },
+  cardLabelRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14
+  },
+  cardEyebrow: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)"
+  },
+  cardEyebrowAccent: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink)",
+    display: "flex",
+    alignItems: "center",
+    gap: 8
   },
   cardRow: {
     display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between"
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: 16
   },
   cardTitle: {
-    fontSize: 17,
-    fontWeight: 700,
+    fontSize: 22,
+    fontWeight: 500,
     margin: 0,
-    color: "#111"
+    color: "var(--ink)",
+    letterSpacing: "-0.02em",
+    lineHeight: 1.1
   },
   cardText: {
-    fontSize: 13,
-    color: "#999",
-    marginTop: 3
+    fontSize: 12,
+    color: "var(--ink-mute)",
+    marginTop: 6,
+    margin: "6px 0 0"
   },
-  cardIconWrap: {
-    width: 34,
-    height: 34,
+  cardArrow: {
+    width: 36,
+    height: 36,
     borderRadius: "50%",
-    background: "rgba(0,0,0,0.06)",
+    border: "1px solid var(--line)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    flexShrink: 0
+    flexShrink: 0,
+    color: "var(--ink)"
   },
 
   /* EVENT CARD */
   eventCard: {
-    padding: "18px 20px",
-    borderRadius: 18,
-    background: "rgba(20,20,20,0.06)",
-    border: "1px solid rgba(0,0,0,0.1)",
-    boxShadow: "0 8px 32px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
-    position: "relative",
-    overflow: "hidden",
-    backdropFilter: "blur(12px)"
-  },
-  eventTopRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 12
-  },
-  eventBadge: {
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: "uppercase",
-    color: "rgba(0,0,0,0.4)",
-    fontWeight: 600,
-    display: "flex",
-    alignItems: "center",
-    gap: 6
+    padding: "20px 22px 22px",
+    borderRadius: 14,
+    background: "var(--ink)",
+    color: "var(--paper)",
+    cursor: "pointer"
   },
   pulseDot: {
     display: "inline-block",
     width: 6,
     height: 6,
     borderRadius: "50%",
-    background: "#4ade80",
+    background: "var(--accent)",
     animation: "pulse 2s ease-in-out infinite"
   },
   ticketLink: {
-    fontSize: 12,
-    color: "rgba(0,0,0,0.4)",
-    fontWeight: 600,
+    fontSize: 11,
+    color: "rgba(250,250,247,0.7)",
+    fontWeight: 500,
+    letterSpacing: "0.04em",
     textDecoration: "none",
     zIndex: 10
   },
   eventName: {
-    fontSize: 17,
-    fontWeight: 700,
-    color: "#111",
-    margin: 0
+    fontSize: 22,
+    fontWeight: 500,
+    color: "var(--paper)",
+    margin: 0,
+    letterSpacing: "-0.02em",
+    lineHeight: 1.15
   },
   eventSubtitle: {
     fontSize: 13,
-    color: "rgba(0,0,0,0.45)",
-    marginTop: 4
+    color: "rgba(250,250,247,0.55)",
+    marginTop: 4,
+    margin: "4px 0 0",
+    fontStyle: "italic",
+    fontFamily: "var(--serif)"
   },
   eventMeta: {
     display: "flex",
-    gap: 14,
-    marginTop: 12
+    gap: 28,
+    marginTop: 18,
+    paddingTop: 14,
+    borderTop: "1px solid rgba(250,250,247,0.12)"
   },
-  eventMetaItem: {
-    fontSize: 12,
-    color: "rgba(0,0,0,0.4)"
+  metaCol: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 3
+  },
+  metaLabel: {
+    fontSize: 9,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "rgba(250,250,247,0.4)"
+  },
+  metaValue: {
+    fontSize: 13,
+    color: "rgba(250,250,247,0.9)",
+    letterSpacing: "0.01em"
   },
 
   /* FOOTER */
   footer: {
-    marginTop: 24,
-    textAlign: "center",
-    paddingBottom: 40
+    marginTop: 48,
+    paddingBottom: 32
+  },
+  footerLine: {
+    width: "100%",
+    maxWidth: 420,
+    height: 1,
+    background: "var(--line)",
+    margin: "0 auto"
   },
   footerRow: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 8
-  },
-  footerInsta: {
-    display: "flex",
-    alignItems: "center",
-    gap: 4,
-    textDecoration: "none",
-    color: "#aaa",
-    fontSize: 12
-  },
-  footerDot: {
-    color: "#ccc",
-    fontSize: 12
-  },
-  footerCredit: {
-    fontSize: 12,
-    color: "#aaa",
-    textDecoration: "none"
+    justifyContent: "space-between",
+    maxWidth: 420,
+    margin: "0 auto",
+    padding: "16px 22px 0"
   },
   footerYear: {
-    fontSize: 11,
-    color: "#ddd",
-    marginTop: 6
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)"
+  },
+  footerCredit: {
+    fontSize: 10,
+    fontWeight: 500,
+    letterSpacing: "0.18em",
+    textTransform: "uppercase",
+    color: "var(--ink-mute)",
+    textDecoration: "none"
   }
 };
