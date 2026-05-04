@@ -438,7 +438,6 @@ const styles = {
     inset: 0,
     background: "rgba(0,0,0,0.95)",
     display: "flex",
-    flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
     animation: "fadeIn 0.2s ease"
@@ -484,7 +483,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 12,
+    gap: 10,
     zIndex: 3
   },
   modalCounter: {
