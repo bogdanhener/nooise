@@ -82,7 +82,7 @@ export default function TopNav() {
           font-style: italic;
         }
         .nav-logo img {
-          height: 22px;
+          height: 28px;
           width: auto;
           display: block;
         }

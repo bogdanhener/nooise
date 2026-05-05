@@ -513,28 +513,6 @@ export default function HomeDesktop() {
         </div>
       </section>
 
-      {/* MARQUEE */}
-      <div className="hd-marquee-wrap">
-        <div className="hd-marquee-track">
-          {Array.from({ length: 2 }).map((_, dup) => (
-            <div key={dup} style={{ display: "flex", gap: 64, alignItems: "center" }}>
-              <span><span style={{ fontFamily: "var(--serif)", fontStyle: "italic" }}>Events</span></span>
-              <span className="hd-marquee-dot" />
-              <span>Energy</span>
-              <span className="hd-marquee-dot" />
-              <span><span style={{ fontFamily: "var(--serif)", fontStyle: "italic" }}>Moments</span></span>
-              <span className="hd-marquee-dot" />
-              <span>Timișoara</span>
-              <span className="hd-marquee-dot" />
-              <span style={{ fontFamily: "var(--serif)", fontStyle: "italic" }}>Crafted with care</span>
-              <span className="hd-marquee-dot" />
-              <span>2026</span>
-              <span className="hd-marquee-dot" />
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* SPLIT PANELS */}
       <div className="hd-split">
         {/* LEFT — Next event */}
