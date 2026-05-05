@@ -82,9 +82,10 @@ export default function TopNav() {
           font-style: italic;
         }
         .nav-logo img {
-          height: 28px;
+          height: 38px;
           width: auto;
           display: block;
+          transition: height 0.4s var(--ease);
         }
         .nav-links {
           display: flex;
@@ -157,7 +158,7 @@ export default function TopNav() {
 
       <div className="nav-inner">
         <Link href="/" className="nav-logo">
-          <img src="/nooise.svg" alt="nooise" />
+          <img src="/nooise.svg" alt="nooise" style={{ height: shrunk ? 30 : 38 }} />
         </Link>
 
         <div className="nav-links">

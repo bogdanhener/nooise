@@ -116,8 +116,8 @@ body {
 
 /* DESKTOP-SPECIFIC TOKENS */
 :root {
-  --nav-height: 64px;
-  --nav-height-shrunk: 52px;
+  --nav-height: 76px;
+  --nav-height-shrunk: 60px;
   --container-max: 1280px;
   --container-pad: 48px;
 }
