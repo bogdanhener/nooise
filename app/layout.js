@@ -1,5 +1,6 @@
 import "../styles/globals.css";
 import RouteLoader from "../components/RouteLoader";
+import TopNav from "../components/TopNav";
 
 export const metadata = {
   title: "nooise — events, energy, moments",
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <RouteLoader />
+        <TopNav />
         <div className="page-wrapper">
           {children}
         </div>

@@ -104,3 +104,26 @@ body {
   opacity: 0.6;
   transform: scale(0.995);
 }
+
+/* RESPONSIVE VISIBILITY — desktop breakpoint at 768px */
+.mobile-only { display: block; }
+.desktop-only { display: none; }
+
+@media (min-width: 768px) {
+  .mobile-only { display: none; }
+  .desktop-only { display: block; }
+}
+
+/* DESKTOP-SPECIFIC TOKENS */
+:root {
+  --nav-height: 64px;
+  --nav-height-shrunk: 52px;
+  --container-max: 1280px;
+  --container-pad: 48px;
+}
+
+@media (min-width: 1440px) {
+  :root {
+    --container-pad: 72px;
+  }
+}

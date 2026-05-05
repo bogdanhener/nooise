@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-export default function Home() {
+export default function HomeMobile() {
   // phase: 'intro' | 'diving' | 'home'
   const [phase, setPhase] = useState("intro");
 
