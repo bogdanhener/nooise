@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { supabase } from "../../lib/supabase";
 
 const EVENT_DATE = new Date("2026-05-09T16:00:00+03:00");
 
@@ -22,13 +23,50 @@ function getRemaining() {
 
 export default function HomeDesktop() {
   const [time, setTime] = useState(getRemaining());
-  const [mouseY, setMouseY] = useState(0);
-  const [mouseX, setMouseX] = useState(0);
-  const [hoveredHalf, setHoveredHalf] = useState(null);
+  const [previewPhotos, setPreviewPhotos] = useState([]);
 
   useEffect(() => {
     const id = setInterval(() => setTime(getRemaining()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  // Fetch 6 real photos from the most recent event for the preview grid
+  useEffect(() => {
+    let cancelled = false;
+    async function loadPreview() {
+      try {
+        const { data: events } = await supabase
+          .from("events")
+          .select("id")
+          .order("event_date", { ascending: false })
+          .limit(1);
+
+        if (!events || events.length === 0) return;
+        const eventId = events[0].id;
+
+        const { data: files } = await supabase.storage
+          .from("nooise-photos")
+          .list(eventId, { limit: 30, sortBy: { column: "name", order: "asc" } });
+
+        if (!files) return;
+
+        const urls = files
+          .filter((f) => f.name && !f.name.startsWith("."))
+          .slice(0, 6)
+          .map((f) => {
+            const { data } = supabase.storage
+              .from("nooise-photos")
+              .getPublicUrl(`${eventId}/${f.name}`);
+            return data.publicUrl;
+          });
+
+        if (!cancelled) setPreviewPhotos(urls);
+      } catch (e) {
+        // silently fail — placeholders will remain
+      }
+    }
+    loadPreview();
+    return () => { cancelled = true; };
   }, []);
 
   return (
@@ -179,24 +217,28 @@ export default function HomeDesktop() {
           background-image: url('/img/nooise_crama.jpg');
           background-size: cover;
           background-position: center;
-          opacity: 0;
-          transform: scale(1.05);
-          transition: opacity 0.8s var(--ease), transform 1.2s var(--ease);
+          opacity: 0.55;
+          transform: scale(1);
+          transition: opacity 0.8s var(--ease), transform 1.4s var(--ease);
           pointer-events: none;
+          filter: grayscale(0.2);
         }
         .hd-event:hover .hd-event-bg {
-          opacity: 0.18;
-          transform: scale(1);
+          opacity: 0.85;
+          transform: scale(1.04);
+          filter: grayscale(0);
         }
         .hd-event-overlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(42,39,36,0.0) 0%, rgba(42,39,36,0.85) 100%);
-          opacity: 0;
+          background: linear-gradient(180deg, rgba(42,39,36,0.55) 0%, rgba(42,39,36,0.92) 100%);
+          opacity: 1;
           transition: opacity 0.6s var(--ease);
           pointer-events: none;
         }
-        .hd-event:hover .hd-event-overlay { opacity: 1; }
+        .hd-event:hover .hd-event-overlay {
+          background: linear-gradient(180deg, rgba(42,39,36,0.4) 0%, rgba(42,39,36,0.85) 100%);
+        }
 
         .hd-event-content {
           position: relative;
@@ -576,15 +618,20 @@ export default function HomeDesktop() {
             </div>
 
             <div className="hd-photos-grid">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`hd-photo-cell ${i === 0 ? "hero" : ""}`}
-                  style={{
-                    background: `linear-gradient(${135 + i * 20}deg, hsl(${30 + i * 8}, 8%, ${78 - i * 4}%), hsl(${20 + i * 6}, 6%, ${88 - i * 3}%))`
-                  }}
-                />
-              ))}
+              {Array.from({ length: 6 }).map((_, i) => {
+                const photo = previewPhotos[i];
+                return (
+                  <div
+                    key={i}
+                    className={`hd-photo-cell ${i === 0 ? "hero" : ""}`}
+                    style={{
+                      backgroundImage: photo
+                        ? `url(${photo})`
+                        : `linear-gradient(${135 + i * 20}deg, hsl(${30 + i * 8}, 8%, ${78 - i * 4}%), hsl(${20 + i * 6}, 6%, ${88 - i * 3}%))`
+                    }}
+                  />
+                );
+              })}
             </div>
 
             <div className="hd-photos-footer">
