@@ -233,7 +233,7 @@ export default function AboutDesktop() {
             </h1>
           </div>
           <div className="ad-head-meta">
-            A small events project from Timișoara, building nights that don't fit on a flyer.
+            A small events project from Timișoara, building day and nights that don't fit on a flyer.
           </div>
         </header>
 
@@ -283,7 +283,7 @@ export default function AboutDesktop() {
             <div className="ad-credit-row">
               <span className="ad-credit-label">Site & Identity</span>
               <span className="ad-credit-value">
-                <a href="https://www.instagram.com/bogdanhener/" target="_blank" rel="noopener noreferrer">Bogdan Hener</a>
+                <a href="https://www.instagram.com/ssssergiu/" target="_blank" rel="noopener noreferrer">Sergiu & Co</a>
               </span>
             </div>
             <div className="ad-credit-row">
