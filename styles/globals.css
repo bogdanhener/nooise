@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter+Tight:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@300;400;500;600;700&display=swap');
 
 :root {
   --paper: #ffffff;
@@ -15,7 +15,7 @@
   --soft-dark: #2a2724;
   --soft-dark-text: #f5f3ef;
 
-  --serif: 'Fraunces', Georgia, serif;
+  --serif: 'Instrument Serif', Georgia, serif;
   --sans: 'Inter Tight', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -70,6 +70,12 @@ body {
   font-family: var(--serif);
   font-weight: 400;
   letter-spacing: -0.02em;
+}
+
+/* TABULAR FIGURES for numerals — luxury typesetting touch */
+.tnum, time, .num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
 }
 
 /* SELECTION */

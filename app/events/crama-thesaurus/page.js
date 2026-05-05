@@ -50,7 +50,7 @@ export default function CramaThesaurusPage() {
               <span style={styles.pulseDot} />
               Upcoming
             </span>
-            <span style={styles.dateChip}>09.05.2026</span>
+            <span style={styles.dateChip} className="tnum">09.05.2026</span>
           </div>
 
           <h1 style={styles.title}>
@@ -94,17 +94,17 @@ export default function CramaThesaurusPage() {
 
           <div style={styles.infoRow}>
             <span style={styles.infoLabel}>Date</span>
-            <span style={styles.infoValue}>Saturday · 9 May 2026</span>
+            <span style={styles.infoValue} className="tnum">Saturday · 9 May 2026</span>
           </div>
 
           <div style={styles.infoRow}>
             <span style={styles.infoLabel}>Doors</span>
-            <span style={styles.infoValue}>16:00 — 23:00</span>
+            <span style={styles.infoValue} className="tnum">16:00 — 23:00</span>
           </div>
 
           <div style={styles.infoRow}>
             <span style={styles.infoLabel}>Contact</span>
-            <a href="tel:0750232421" style={styles.infoLink}>0750 232 421</a>
+            <a href="tel:0750232421" style={styles.infoLink} className="tnum">0750 232 421</a>
           </div>
         </section>
 
@@ -141,7 +141,7 @@ export default function CramaThesaurusPage() {
         <section style={styles.transportBlock}>
           <div style={styles.transportHeader}>
             <span style={styles.transportEyebrow}>Transport</span>
-            <span style={styles.transportPrice}>
+            <span style={styles.transportPrice} className="tnum">
               <span style={styles.serif}>30</span>
               <span style={styles.transportCurrency}>RON</span>
             </span>
@@ -185,7 +185,7 @@ export default function CramaThesaurusPage() {
 
           <div style={styles.transportFooter}>
             <span style={styles.transportFooterLabel}>Ticketing window</span>
-            <span style={styles.transportFooterValue}>04.05 — 07.05</span>
+            <span style={styles.transportFooterValue} className="tnum">04.05 — 07.05</span>
           </div>
 
           <a
@@ -225,7 +225,7 @@ export default function CramaThesaurusPage() {
           </div>
           <a href="tel:0750232421" style={styles.reserveBtn} className="press">
             <span>Call to reserve</span>
-            <span style={styles.reservePhone}>0750 232 421</span>
+            <span style={styles.reservePhone} className="tnum">0750 232 421</span>
           </a>
         </section>
 
@@ -272,7 +272,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "20px 22px 0"
+    padding: "20px 24px 0"
   },
   backLink: {
     display: "flex",
@@ -295,7 +295,7 @@ const styles = {
   /* POSTER */
   posterWrap: {
     position: "relative",
-    margin: "20px 22px 0",
+    margin: "20px 24px 0",
     borderRadius: 14,
     overflow: "hidden",
     aspectRatio: "9 / 13",
@@ -312,7 +312,7 @@ const styles = {
 
   /* CONTENT */
   content: {
-    padding: "0 22px",
+    padding: "0 24px",
     maxWidth: 520,
     margin: "0 auto",
     boxSizing: "border-box"
@@ -392,7 +392,7 @@ const styles = {
     fontWeight: 400,
     color: "var(--ink)",
     lineHeight: 1.4,
-    margin: "0 0 18px",
+    margin: "0 0 16px",
     letterSpacing: "-0.01em"
   },
   descText: {
@@ -455,7 +455,7 @@ const styles = {
   /* TICKETS BLOCK */
   ticketsBlock: {
     marginTop: 32,
-    padding: "24px 24px 22px",
+    padding: "24px 24px 24px",
     background: "var(--soft-dark)",
     color: "var(--soft-dark-text)",
     borderRadius: 14,
@@ -509,7 +509,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "14px 18px",
+    padding: "16px 20px",
     borderRadius: 10,
     background: "var(--paper)",
     color: "var(--ink)",
@@ -525,14 +525,14 @@ const styles = {
     letterSpacing: "0.18em",
     textTransform: "uppercase",
     fontWeight: 500,
-    marginTop: 14,
+    marginTop: 16,
     margin: "14px 0 0"
   },
 
   /* TRANSPORT BLOCK */
   transportBlock: {
     marginTop: 28,
-    padding: "22px 22px 20px",
+    padding: "24px 24px 20px",
     borderRadius: 14,
     border: "1px solid var(--line)"
   },
@@ -569,12 +569,12 @@ const styles = {
     fontSize: 13,
     color: "var(--ink-soft)",
     lineHeight: 1.6,
-    margin: "0 0 18px"
+    margin: "0 0 16px"
   },
   transportPoints: {
     display: "flex",
     flexDirection: "column",
-    gap: 14,
+    gap: 16,
     paddingTop: 16,
     paddingBottom: 16,
     borderTop: "1px solid var(--line)",
@@ -659,7 +659,7 @@ const styles = {
   /* ENTRY */
   entryBlock: {
     marginTop: 12,
-    padding: "16px 18px 18px",
+    padding: "16px 20px 20px",
     borderRadius: 12,
     border: "1px solid var(--line)"
   },
@@ -680,7 +680,7 @@ const styles = {
   /* TABLES BLOCK */
   tablesBlock: {
     marginTop: 28,
-    padding: "22px 22px 22px",
+    padding: "24px 24px 24px",
     borderRadius: 14,
     border: "1px solid var(--line)"
   },
@@ -705,7 +705,7 @@ const styles = {
   tablesText: {
     fontSize: 13,
     color: "var(--ink-soft)",
-    margin: "14px 0 14px",
+    margin: "16px 0 16px",
     lineHeight: 1.6
   },
   tableTypes: {

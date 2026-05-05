@@ -128,7 +128,7 @@ export default function PhotosPage() {
                 <div style={styles.caption}>
                   <div>
                     <h2 style={styles.captionTitle}>{event.name}</h2>
-                    <p style={styles.captionDate}>
+                    <p style={styles.captionDate} className="tnum">
                       {event.event_date
                         ? new Date(event.event_date).toLocaleDateString("en-GB", {
                             day: "numeric",
@@ -138,7 +138,7 @@ export default function PhotosPage() {
                         : ""}
                     </p>
                   </div>
-                  <span style={styles.captionNumber}>
+                  <span style={styles.captionNumber} className="tnum">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
@@ -193,7 +193,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "20px 22px 0"
+    padding: "20px 24px 0"
   },
   backLink: {
     display: "flex",
@@ -215,7 +215,7 @@ const styles = {
 
   /* HEADER */
   header: {
-    padding: "40px 22px 24px",
+    padding: "40px 24px 24px",
     maxWidth: 480,
     margin: "0 auto",
     boxSizing: "border-box"
@@ -243,14 +243,14 @@ const styles = {
   subtitle: {
     color: "var(--ink-mute)",
     fontSize: 13,
-    marginTop: 14,
+    marginTop: 16,
     margin: "14px 0 0"
   },
   headerLine: {
     width: 40,
     height: 1,
     background: "var(--ink)",
-    marginTop: 22,
+    marginTop: 24,
     transformOrigin: "left",
     animation: "lineGrow 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both"
   },
@@ -272,14 +272,14 @@ const styles = {
   message: {
     color: "var(--ink-mute)",
     fontSize: 13,
-    padding: "0 22px",
+    padding: "0 24px",
     maxWidth: 480,
     margin: "0 auto"
   },
   errorBox: {
-    margin: "0 22px",
+    margin: "0 24px",
     maxWidth: 480,
-    padding: "16px 18px",
+    padding: "16px 16px",
     border: "1px solid var(--line-strong)",
     borderRadius: 12
   },
@@ -294,7 +294,7 @@ const styles = {
     border: "1px solid var(--line-strong)",
     color: "var(--ink)",
     borderRadius: 8,
-    padding: "7px 14px",
+    padding: "8px 16px",
     fontSize: 11,
     fontWeight: 500,
     letterSpacing: "0.04em",
@@ -307,7 +307,7 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     gap: 40,
-    padding: "16px 22px 24px",
+    padding: "16px 24px 24px",
     maxWidth: 480,
     margin: "0 auto",
     boxSizing: "border-box"
@@ -343,7 +343,7 @@ const styles = {
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    paddingBottom: 14,
+    paddingBottom: 16,
     gap: 16
   },
   captionTitle: {
@@ -384,7 +384,7 @@ const styles = {
   footerInsta: {
     display: "block",
     textAlign: "center",
-    paddingTop: 18,
+    paddingTop: 20,
     textDecoration: "none",
     color: "var(--ink-mute)",
     fontSize: 11,

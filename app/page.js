@@ -201,11 +201,11 @@ export default function Home() {
                 <div style={styles.eventMeta}>
                   <div style={styles.metaCol}>
                     <span style={styles.metaLabel}>Date</span>
-                    <span style={styles.metaValue}>9 May 2026</span>
+                    <span style={styles.metaValue} className="tnum">9 May 2026</span>
                   </div>
                   <div style={styles.metaCol}>
                     <span style={styles.metaLabel}>Time</span>
-                    <span style={styles.metaValue}>16:00 — 23:00</span>
+                    <span style={styles.metaValue} className="tnum">16:00 — 23:00</span>
                   </div>
                 </div>
 
@@ -218,7 +218,7 @@ export default function Home() {
           <div style={styles.footer}>
             <div style={styles.footerLine} />
             <div style={styles.footerRow}>
-              <span style={styles.footerYear}>2026 © nooise</span>
+              <span style={styles.footerYear} className="tnum">2026 © nooise</span>
               <a
                 href="https://www.instagram.com/bogdanhener/"
                 target="_blank"
@@ -277,7 +277,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "20px 22px 0"
+    padding: "20px 24px 0"
   },
   locationTag: {
     fontSize: 10,
@@ -350,10 +350,10 @@ const styles = {
     width: "100%",
     maxWidth: 420,
     margin: "0 auto",
-    padding: "32px 22px 0",
+    padding: "32px 24px 0",
     display: "flex",
     flexDirection: "column",
-    gap: 14,
+    gap: 12,
     boxSizing: "border-box"
   },
   linkFix: {
@@ -364,8 +364,8 @@ const styles = {
 
   /* PHOTOS CARD */
   cardPrimary: {
-    padding: "20px 22px 22px",
-    borderRadius: 14,
+    padding: "20px 24px",
+    borderRadius: 16,
     background: "transparent",
     border: "1px solid var(--line)",
     cursor: "pointer"
@@ -374,7 +374,7 @@ const styles = {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 14
+    marginBottom: 16
   },
   cardEyebrow: {
     fontSize: 10,
@@ -427,8 +427,8 @@ const styles = {
 
   /* EVENT CARD */
   eventCard: {
-    padding: "20px 22px 22px",
-    borderRadius: 14,
+    padding: "20px 24px",
+    borderRadius: 16,
     background: "linear-gradient(180deg, var(--soft-dark) 0%, var(--soft-dark) 35%, #4a4540 60%, #ffffff 100%)",
     color: "var(--soft-dark-text)",
     cursor: "pointer",
@@ -462,21 +462,20 @@ const styles = {
   eventSubtitle: {
     fontSize: 13,
     color: "rgba(245,243,239,0.55)",
-    marginTop: 4,
     margin: "4px 0 0",
     fontStyle: "italic",
     fontFamily: "var(--serif)"
   },
   eventMeta: {
     display: "flex",
-    gap: 28,
-    marginTop: 18,
-    paddingTop: 14
+    gap: 32,
+    marginTop: 20,
+    paddingTop: 16
   },
   metaCol: {
     display: "flex",
     flexDirection: "column",
-    gap: 3
+    gap: 4
   },
   metaLabel: {
     fontSize: 9,
@@ -510,7 +509,7 @@ const styles = {
     justifyContent: "space-between",
     maxWidth: 420,
     margin: "0 auto",
-    padding: "16px 22px 0"
+    padding: "16px 24px 0"
   },
   footerYear: {
     fontSize: 10,
