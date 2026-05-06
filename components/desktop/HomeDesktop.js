@@ -1,10 +1,44 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../../lib/supabase";
 
 const EVENT_DATE = new Date("2026-05-09T16:00:00+03:00");
+
+// Visualizer constants
+const BAR_COUNT = 72;
+const INNER_RADIUS = 150;     // bars start hidden behind logo
+const MAX_OUTER_RADIUS = 200; // ~50px beyond logo edge
+
+// Sunset palette — muted, refined. Each bar gets a hue in this range.
+const VIZ_COLORS = [
+  { h: 18,  s: 70, l: 70 },  // soft coral
+  { h: 32,  s: 65, l: 70 },  // warm amber
+  { h: 350, s: 55, l: 78 },  // dusty pink
+  { h: 280, s: 35, l: 72 },  // dusty violet
+  { h: 195, s: 30, l: 78 }   // pale cyan
+];
+
+// Pre-seed each bar's animation properties so motion is organic but stable
+function buildBars() {
+  const bars = [];
+  for (let i = 0; i < BAR_COUNT; i++) {
+    const angle = (i / BAR_COUNT) * Math.PI * 2;
+    const colorIdx = i % VIZ_COLORS.length;
+    bars.push({
+      angle,
+      // Each bar has its own pseudo-random phase and frequency
+      phase: (i * 0.7) % (Math.PI * 2),
+      freq: 0.6 + (i % 7) * 0.08,
+      amp: 0.7 + ((i * 13) % 100) / 333, // 0.7 - 1.0
+      colorIdx
+    });
+  }
+  return bars;
+}
+
+const BARS = buildBars();
 
 function pad(n) {
   return String(n).padStart(2, "0");
@@ -25,9 +59,108 @@ export default function HomeDesktop() {
   const [time, setTime] = useState(getRemaining());
   const [previewPhotos, setPreviewPhotos] = useState([]);
 
+  // Visualizer refs
+  const heroPinRef = useRef(null);
+  const logoRef = useRef(null);
+  const vizGroupRef = useRef(null);
+  const barRefs = useRef([]);
+  const eyebrowRef = useRef(null);
+  const taglineRef = useRef(null);
+  const metaRef = useRef(null);
+  const scrollProgressRef = useRef(0);
+  const rafRef = useRef(null);
+
   useEffect(() => {
     const id = setInterval(() => setTime(getRemaining()), 1000);
     return () => clearInterval(id);
+  }, []);
+
+  // Scroll-driven hero: track scroll progress through the pin section
+  useEffect(() => {
+    const onScroll = () => {
+      if (!heroPinRef.current) return;
+      const rect = heroPinRef.current.getBoundingClientRect();
+      const total = rect.height - window.innerHeight; // scrollable distance
+      if (total <= 0) return;
+      // progress from 0 (top of pin) to 1 (bottom of pin)
+      const p = Math.max(0, Math.min(1, -rect.top / total));
+      scrollProgressRef.current = p;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Visualizer animation loop — runs always, updates bar lengths/opacity each frame
+  useEffect(() => {
+    let startTime = performance.now();
+
+    const tick = (now) => {
+      const t = (now - startTime) / 1000; // seconds
+      const p = scrollProgressRef.current;
+
+      // EASE the scroll progress for smoother motion
+      // Visualizer emergence: 10%-50% scroll = bars grow from 0 to full
+      // After 50%: bars stay at full and animate with breathing
+      const emergeStart = 0.10;
+      const emergeEnd = 0.50;
+      const emergeProgress =
+        p < emergeStart ? 0 :
+        p > emergeEnd ? 1 :
+        (p - emergeStart) / (emergeEnd - emergeStart);
+      // Smooth ease (smoothstep)
+      const emerge = emergeProgress * emergeProgress * (3 - 2 * emergeProgress);
+
+      // Logo subtle scale-down + float
+      if (logoRef.current) {
+        const scaleAmt = 1 - p * 0.04; // shrinks up to 4%
+        const floatY = Math.sin(t * 0.4) * 4; // gentle float
+        logoRef.current.style.transform = `translateY(${floatY}px) scale(${scaleAmt})`;
+      }
+
+      // Surrounding text fades out as visualizer takes over
+      // Starts fading at 5% scroll, fully gone by 35% — out of the way before viz peaks
+      const textFade = Math.max(0, 1 - Math.max(0, (p - 0.05) / 0.30));
+      if (eyebrowRef.current) eyebrowRef.current.style.opacity = String(textFade);
+      if (taglineRef.current) taglineRef.current.style.opacity = String(textFade);
+      if (metaRef.current) metaRef.current.style.opacity = String(textFade);
+
+      // Visualizer group rotation — very slow, continuous
+      if (vizGroupRef.current) {
+        const rotation = t * 2; // 2 degrees per second
+        const groupOpacity = emerge;
+        vizGroupRef.current.style.transform = `rotate(${rotation}deg)`;
+        vizGroupRef.current.style.opacity = String(groupOpacity);
+      }
+
+      // Animate each bar's length individually
+      const range = MAX_OUTER_RADIUS - INNER_RADIUS;
+      for (let i = 0; i < BAR_COUNT; i++) {
+        const bar = BARS[i];
+        const ref = barRefs.current[i];
+        if (!ref) continue;
+
+        // Per-bar oscillation — pseudo audio reactivity
+        const wave = Math.sin(t * bar.freq + bar.phase);
+        // Continuous breathing even at rest
+        const baseAmp = 0.55 + wave * 0.45 * bar.amp;
+
+        // Combined: bar length scales with emerge AND its own oscillation
+        const length = range * emerge * baseAmp;
+        // Bar is a line from INNER_RADIUS outward
+        // We use stroke-dasharray to control visible length
+        ref.setAttribute("y2", String(-(INNER_RADIUS + length)));
+
+        // Opacity also breathes slightly
+        const op = (0.35 + (wave + 1) * 0.32) * emerge; // 0.35 - 0.99 * emerge
+        ref.style.opacity = String(op);
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafRef.current);
   }, []);
 
   // Fetch 6 real photos from the most recent event for the preview grid
@@ -92,40 +225,86 @@ export default function HomeDesktop() {
           50%      { opacity: 1; }
         }
 
-        /* HERO */
+        /* HERO — scroll-driven pinned section with visualizer */
+        .hd-hero-pin {
+          position: relative;
+          height: 200vh;
+        }
         .hd-hero {
-          min-height: calc(100vh - var(--nav-height));
+          position: sticky;
+          top: 0;
+          height: 100vh;
           display: flex;
           flex-direction: column;
           align-items: center;
           justify-content: center;
           padding: 0 var(--container-pad);
-          position: relative;
+          overflow: hidden;
+        }
+        @keyframes hdElementIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
         .hd-hero-eyebrow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, calc(-50% - 220px));
           font-size: 10px;
           font-weight: 500;
           letter-spacing: 0.32em;
           text-transform: uppercase;
           color: var(--ink-mute);
           opacity: 0;
-          animation: hdFadeUp 0.9s var(--ease) 0.1s forwards;
+          animation: hdElementIn 0.9s var(--ease) 0.1s forwards;
+          z-index: 3;
+          white-space: nowrap;
+        }
+        .hd-hero-stage {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .hd-hero-viz {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          z-index: 1;
+          mix-blend-mode: multiply;
+          will-change: transform, opacity;
+        }
+        @keyframes hdLogoIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
         }
         .hd-hero-logo {
+          position: relative;
+          z-index: 2;
           width: clamp(280px, 32vw, 480px);
-          margin-top: 32px;
           opacity: 0;
-          animation: hdFadeUp 1.1s var(--ease) 0.25s forwards;
+          animation: hdLogoIn 1.1s var(--ease) 0.25s forwards;
+          will-change: transform;
         }
         .hd-hero-tagline {
-          margin-top: 32px;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, calc(-50% + 200px));
           font-family: var(--serif);
           font-style: italic;
           font-size: clamp(20px, 2vw, 28px);
           color: var(--ink-soft);
           letter-spacing: -0.01em;
           opacity: 0;
-          animation: hdFadeUp 1.1s var(--ease) 0.45s forwards;
+          animation: hdElementIn 1.1s var(--ease) 0.45s forwards;
+          z-index: 3;
+          margin: 0;
+          white-space: nowrap;
         }
         .hd-hero-meta {
           position: absolute;
@@ -142,6 +321,7 @@ export default function HomeDesktop() {
           color: var(--ink-mute);
           opacity: 0;
           animation: hdFadeUp 1s var(--ease) 0.7s forwards;
+          z-index: 3;
         }
         .hd-hero-meta .scroll-cue {
           display: flex;
@@ -541,19 +721,68 @@ export default function HomeDesktop() {
         }
       `}</style>
 
-      {/* HERO */}
-      <section className="hd-hero">
-        <span className="hd-hero-eyebrow">Timișoara · 2026</span>
-        <img src="/nooise.svg" alt="nooise" className="hd-hero-logo" />
-        <p className="hd-hero-tagline">Events. Energy. Moments.</p>
-        <div className="hd-hero-meta">
-          <span>Issue 02 — Spring</span>
-          <div className="scroll-cue">
-            <span>Scroll</span>
-            <span className="scroll-line" />
+      {/* HERO — pinned with scroll-driven visualizer */}
+      <div className="hd-hero-pin" ref={heroPinRef}>
+        <section className="hd-hero">
+          <span className="hd-hero-eyebrow" ref={eyebrowRef}>Timișoara · 2026</span>
+
+          <div className="hd-hero-stage">
+            <svg
+              className="hd-hero-viz"
+              width={MAX_OUTER_RADIUS * 2 + 60}
+              height={MAX_OUTER_RADIUS * 2 + 60}
+              viewBox={`${-(MAX_OUTER_RADIUS + 30)} ${-(MAX_OUTER_RADIUS + 30)} ${MAX_OUTER_RADIUS * 2 + 60} ${MAX_OUTER_RADIUS * 2 + 60}`}
+            >
+              <defs>
+                <filter id="vizGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="1.4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+              <g ref={vizGroupRef} style={{ transformOrigin: "0 0", transformBox: "view-box" }} filter="url(#vizGlow)">
+                {BARS.map((bar, i) => {
+                  const c = VIZ_COLORS[bar.colorIdx];
+                  const angleDeg = (bar.angle * 180) / Math.PI;
+                  return (
+                    <line
+                      key={i}
+                      ref={(el) => (barRefs.current[i] = el)}
+                      x1="0"
+                      y1={-INNER_RADIUS}
+                      x2="0"
+                      y2={-INNER_RADIUS}
+                      stroke={`hsl(${c.h}, ${c.s}%, ${c.l}%)`}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      transform={`rotate(${angleDeg})`}
+                      style={{ opacity: 0 }}
+                    />
+                  );
+                })}
+              </g>
+            </svg>
+
+            <img
+              ref={logoRef}
+              src="/nooise.svg"
+              alt="nooise"
+              className="hd-hero-logo"
+            />
           </div>
-        </div>
-      </section>
+
+          <p className="hd-hero-tagline" ref={taglineRef}>Events. Energy. Moments.</p>
+          <div className="hd-hero-meta" ref={metaRef}>
+            <span>Issue 02 — Spring</span>
+            <div className="scroll-cue">
+              <span>Scroll</span>
+              <span className="scroll-line" />
+            </div>
+          </div>
+        </section>
+      </div>
 
       {/* SPLIT PANELS */}
       <div className="hd-split">
