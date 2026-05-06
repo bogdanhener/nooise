@@ -116,7 +116,7 @@ export default function HomeMobile() {
       {showIntro && (
         <div className={`intro-overlay ${isDiving ? "diving" : ""}`}>
           <img
-            src="/nooise.jpg"
+            src="/nooise.png"
             alt="nooise"
             className={`intro-logo ${isDiving ? "diving" : ""}`}
             style={styles.logoImgIntro}
@@ -148,7 +148,7 @@ export default function HomeMobile() {
 
           {/* HERO */}
           <div style={styles.hero}>
-            <img src="/nooise.jpg" alt="nooise" style={styles.logoImg} />
+            <img src="/nooise.png" alt="nooise" style={styles.logoImg} />
           </div>
 
           {/* CARDS */}
