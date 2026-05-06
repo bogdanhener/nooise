@@ -56,7 +56,8 @@ function getRemaining() {
 }
 
 export default function HomeDesktop() {
-  const [time, setTime] = useState(getRemaining());
+  const [mounted, setMounted] = useState(false);
+  const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, expired: false });
   const [previewPhotos, setPreviewPhotos] = useState([]);
 
   // Visualizer refs
@@ -70,13 +71,21 @@ export default function HomeDesktop() {
   const scrollProgressRef = useRef(0);
   const rafRef = useRef(null);
 
+  // Mark mounted after first client render to avoid hydration mismatch
   useEffect(() => {
+    setMounted(true);
+    setTime(getRemaining());
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const id = setInterval(() => setTime(getRemaining()), 1000);
     return () => clearInterval(id);
-  }, []);
+  }, [mounted]);
 
   // Scroll-driven hero: track scroll progress through the pin section
   useEffect(() => {
+    if (!mounted) return;
     const onScroll = () => {
       if (!heroPinRef.current) return;
       const rect = heroPinRef.current.getBoundingClientRect();
@@ -89,10 +98,11 @@ export default function HomeDesktop() {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [mounted]);
 
   // Visualizer animation loop — runs always, updates bar lengths/opacity each frame
   useEffect(() => {
+    if (!mounted) return;
     let startTime = performance.now();
 
     const tick = (now) => {
@@ -161,7 +171,7 @@ export default function HomeDesktop() {
 
     rafRef.current = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  }, [mounted]);
 
   // Fetch 6 real photos from the most recent event for the preview grid
   useEffect(() => {
@@ -727,43 +737,45 @@ export default function HomeDesktop() {
           <span className="hd-hero-eyebrow" ref={eyebrowRef}>Timișoara · 2026</span>
 
           <div className="hd-hero-stage">
-            <svg
-              className="hd-hero-viz"
-              width={MAX_OUTER_RADIUS * 2 + 60}
-              height={MAX_OUTER_RADIUS * 2 + 60}
-              viewBox={`${-(MAX_OUTER_RADIUS + 30)} ${-(MAX_OUTER_RADIUS + 30)} ${MAX_OUTER_RADIUS * 2 + 60} ${MAX_OUTER_RADIUS * 2 + 60}`}
-            >
-              <defs>
-                <filter id="vizGlow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="1.4" result="blur" />
-                  <feMerge>
-                    <feMergeNode in="blur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-              <g ref={vizGroupRef} style={{ transformOrigin: "0 0", transformBox: "view-box" }} filter="url(#vizGlow)">
-                {BARS.map((bar, i) => {
-                  const c = VIZ_COLORS[bar.colorIdx];
-                  const angleDeg = (bar.angle * 180) / Math.PI;
-                  return (
-                    <line
-                      key={i}
-                      ref={(el) => (barRefs.current[i] = el)}
-                      x1="0"
-                      y1={-INNER_RADIUS}
-                      x2="0"
-                      y2={-INNER_RADIUS}
-                      stroke={`hsl(${c.h}, ${c.s}%, ${c.l}%)`}
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      transform={`rotate(${angleDeg})`}
-                      style={{ opacity: 0 }}
-                    />
-                  );
-                })}
-              </g>
-            </svg>
+            {mounted && (
+              <svg
+                className="hd-hero-viz"
+                width={MAX_OUTER_RADIUS * 2 + 60}
+                height={MAX_OUTER_RADIUS * 2 + 60}
+                viewBox={`${-(MAX_OUTER_RADIUS + 30)} ${-(MAX_OUTER_RADIUS + 30)} ${MAX_OUTER_RADIUS * 2 + 60} ${MAX_OUTER_RADIUS * 2 + 60}`}
+              >
+                <defs>
+                  <filter id="vizGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="1.4" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+                <g ref={vizGroupRef} style={{ transformOrigin: "0 0", transformBox: "view-box" }} filter="url(#vizGlow)">
+                  {BARS.map((bar, i) => {
+                    const c = VIZ_COLORS[bar.colorIdx];
+                    const angleDeg = (bar.angle * 180) / Math.PI;
+                    return (
+                      <line
+                        key={i}
+                        ref={(el) => (barRefs.current[i] = el)}
+                        x1="0"
+                        y1={-INNER_RADIUS}
+                        x2="0"
+                        y2={-INNER_RADIUS}
+                        stroke={`hsl(${c.h}, ${c.s}%, ${c.l}%)`}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        transform={`rotate(${angleDeg})`}
+                        style={{ opacity: 0 }}
+                      />
+                    );
+                  })}
+                </g>
+              </svg>
+            )}
 
             <img
               ref={logoRef}
@@ -807,10 +819,10 @@ export default function HomeDesktop() {
 
             <div className="hd-countdown">
               {[
-                { val: pad(time.days), label: "Days" },
-                { val: pad(time.hours), label: "Hours" },
-                { val: pad(time.minutes), label: "Minutes" },
-                { val: pad(time.seconds), label: "Seconds" }
+                { val: mounted ? pad(time.days) : "—", label: "Days" },
+                { val: mounted ? pad(time.hours) : "—", label: "Hours" },
+                { val: mounted ? pad(time.minutes) : "—", label: "Minutes" },
+                { val: mounted ? pad(time.seconds) : "—", label: "Seconds" }
               ].map((c) => (
                 <div key={c.label} className="hd-count-cell">
                   <div className="hd-count-num">{c.val}</div>
