@@ -697,7 +697,7 @@ export default function HomeDesktop() {
 
             <img
               ref={logoRef}
-              src="/nooise.svg"
+              src="/nooise.png"
               alt="nooise"
               className="hd-hero-logo"
             />
