@@ -6,40 +6,6 @@ import { supabase } from "../../lib/supabase";
 
 const EVENT_DATE = new Date("2026-05-09T16:00:00+03:00");
 
-// Visualizer constants
-const BAR_COUNT = 72;
-const INNER_RADIUS = 150;     // bars start hidden behind logo
-const MAX_OUTER_RADIUS = 200; // ~50px beyond logo edge
-
-// Sunset palette — muted, refined. Each bar gets a hue in this range.
-const VIZ_COLORS = [
-  { h: 18,  s: 70, l: 70 },  // soft coral
-  { h: 32,  s: 65, l: 70 },  // warm amber
-  { h: 350, s: 55, l: 78 },  // dusty pink
-  { h: 280, s: 35, l: 72 },  // dusty violet
-  { h: 195, s: 30, l: 78 }   // pale cyan
-];
-
-// Pre-seed each bar's animation properties so motion is organic but stable
-function buildBars() {
-  const bars = [];
-  for (let i = 0; i < BAR_COUNT; i++) {
-    const angle = (i / BAR_COUNT) * Math.PI * 2;
-    const colorIdx = i % VIZ_COLORS.length;
-    bars.push({
-      angle,
-      // Each bar has its own pseudo-random phase and frequency
-      phase: (i * 0.7) % (Math.PI * 2),
-      freq: 0.6 + (i % 7) * 0.08,
-      amp: 0.7 + ((i * 13) % 100) / 333, // 0.7 - 1.0
-      colorIdx
-    });
-  }
-  return bars;
-}
-
-const BARS = buildBars();
-
 function pad(n) {
   return String(n).padStart(2, "0");
 }
@@ -60,18 +26,17 @@ export default function HomeDesktop() {
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, expired: false });
   const [previewPhotos, setPreviewPhotos] = useState([]);
 
-  // Visualizer refs
+  // Refs for scroll-driven visualizer
   const heroPinRef = useRef(null);
   const logoRef = useRef(null);
-  const vizGroupRef = useRef(null);
-  const barRefs = useRef([]);
+  const vizRef = useRef(null);
   const eyebrowRef = useRef(null);
   const taglineRef = useRef(null);
   const metaRef = useRef(null);
   const scrollProgressRef = useRef(0);
   const rafRef = useRef(null);
 
-  // Mark mounted after first client render to avoid hydration mismatch
+  // Mark mounted after first client render
   useEffect(() => {
     setMounted(true);
     setTime(getRemaining());
@@ -83,15 +48,14 @@ export default function HomeDesktop() {
     return () => clearInterval(id);
   }, [mounted]);
 
-  // Scroll-driven hero: track scroll progress through the pin section
+  // Track scroll progress through the pin section
   useEffect(() => {
     if (!mounted) return;
     const onScroll = () => {
       if (!heroPinRef.current) return;
       const rect = heroPinRef.current.getBoundingClientRect();
-      const total = rect.height - window.innerHeight; // scrollable distance
+      const total = rect.height - window.innerHeight;
       if (total <= 0) return;
-      // progress from 0 (top of pin) to 1 (bottom of pin)
       const p = Math.max(0, Math.min(1, -rect.top / total));
       scrollProgressRef.current = p;
     };
@@ -100,71 +64,49 @@ export default function HomeDesktop() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [mounted]);
 
-  // Visualizer animation loop — runs always, updates bar lengths/opacity each frame
+  // RAF loop — applies scroll-driven transforms smoothly
   useEffect(() => {
     if (!mounted) return;
-    let startTime = performance.now();
+    const startTime = performance.now();
 
     const tick = (now) => {
-      const t = (now - startTime) / 1000; // seconds
+      const t = (now - startTime) / 1000;
       const p = scrollProgressRef.current;
 
-      // EASE the scroll progress for smoother motion
-      // Visualizer emergence: 10%-50% scroll = bars grow from 0 to full
-      // After 50%: bars stay at full and animate with breathing
+      // Visualizer emergence:
+      // 0% — hidden behind logo (scale ~0.45, opacity 0)
+      // 10–60% — grows and fades in
+      // 60%+ — at full size (scale 1, fully visible), continuing gentle rotation
       const emergeStart = 0.10;
-      const emergeEnd = 0.50;
-      const emergeProgress =
+      const emergeEnd = 0.60;
+      const emergeRaw =
         p < emergeStart ? 0 :
         p > emergeEnd ? 1 :
         (p - emergeStart) / (emergeEnd - emergeStart);
-      // Smooth ease (smoothstep)
-      const emerge = emergeProgress * emergeProgress * (3 - 2 * emergeProgress);
+      // Smoothstep easing
+      const emerge = emergeRaw * emergeRaw * (3 - 2 * emergeRaw);
 
-      // Logo subtle scale-down + float
+      // Logo: subtle scale-down + gentle float
       if (logoRef.current) {
-        const scaleAmt = 1 - p * 0.04; // shrinks up to 4%
-        const floatY = Math.sin(t * 0.4) * 4; // gentle float
+        const scaleAmt = 1 - p * 0.04;
+        const floatY = Math.sin(t * 0.4) * 4;
         logoRef.current.style.transform = `translateY(${floatY}px) scale(${scaleAmt})`;
       }
 
-      // Surrounding text fades out as visualizer takes over
-      // Starts fading at 5% scroll, fully gone by 35% — out of the way before viz peaks
+      // Visualizer: scale from 0.45 (hidden behind logo) to 1.0 (encircling),
+      // opacity from 0 to 1, slow continuous rotation
+      if (vizRef.current) {
+        const vizScale = 0.45 + emerge * 0.55;
+        const rotation = t * 1.2; // very slow, ~1.2°/s
+        vizRef.current.style.transform = `translate(-50%, -50%) scale(${vizScale}) rotate(${rotation}deg)`;
+        vizRef.current.style.opacity = String(emerge);
+      }
+
+      // Surrounding text fades out as visualizer emerges
       const textFade = Math.max(0, 1 - Math.max(0, (p - 0.05) / 0.30));
       if (eyebrowRef.current) eyebrowRef.current.style.opacity = String(textFade);
       if (taglineRef.current) taglineRef.current.style.opacity = String(textFade);
       if (metaRef.current) metaRef.current.style.opacity = String(textFade);
-
-      // Visualizer group rotation — very slow, continuous
-      if (vizGroupRef.current) {
-        const rotation = t * 2; // 2 degrees per second
-        const groupOpacity = emerge;
-        vizGroupRef.current.style.transform = `rotate(${rotation}deg)`;
-        vizGroupRef.current.style.opacity = String(groupOpacity);
-      }
-
-      // Animate each bar's length individually
-      const range = MAX_OUTER_RADIUS - INNER_RADIUS;
-      for (let i = 0; i < BAR_COUNT; i++) {
-        const bar = BARS[i];
-        const ref = barRefs.current[i];
-        if (!ref) continue;
-
-        // Per-bar oscillation — pseudo audio reactivity
-        const wave = Math.sin(t * bar.freq + bar.phase);
-        // Continuous breathing even at rest
-        const baseAmp = 0.55 + wave * 0.45 * bar.amp;
-
-        // Combined: bar length scales with emerge AND its own oscillation
-        const length = range * emerge * baseAmp;
-        // Bar is a line from INNER_RADIUS outward
-        // We use stroke-dasharray to control visible length
-        ref.setAttribute("y2", String(-(INNER_RADIUS + length)));
-
-        // Opacity also breathes slightly
-        const op = (0.35 + (wave + 1) * 0.32) * emerge; // 0.35 - 0.99 * emerge
-        ref.style.opacity = String(op);
-      }
 
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -238,7 +180,7 @@ export default function HomeDesktop() {
         /* HERO — scroll-driven pinned section with visualizer */
         .hd-hero-pin {
           position: relative;
-          height: 200vh;
+          height: 150vh;
         }
         .hd-hero {
           position: sticky;
@@ -282,11 +224,21 @@ export default function HomeDesktop() {
           position: absolute;
           top: 50%;
           left: 50%;
-          transform: translate(-50%, -50%);
+          width: 720px;
+          height: 720px;
           pointer-events: none;
           z-index: 1;
-          mix-blend-mode: multiply;
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.45);
           will-change: transform, opacity;
+        }
+        .hd-hero-viz img {
+          width: 100%;
+          height: 100%;
+          display: block;
+          /* Drop the black background via invert+hue-rotate, multiply against white keeps only the colored bars visible */
+          filter: invert(1) hue-rotate(180deg);
+          mix-blend-mode: multiply;
         }
         @keyframes hdLogoIn {
           from { opacity: 0; }
@@ -738,43 +690,9 @@ export default function HomeDesktop() {
 
           <div className="hd-hero-stage">
             {mounted && (
-              <svg
-                className="hd-hero-viz"
-                width={MAX_OUTER_RADIUS * 2 + 60}
-                height={MAX_OUTER_RADIUS * 2 + 60}
-                viewBox={`${-(MAX_OUTER_RADIUS + 30)} ${-(MAX_OUTER_RADIUS + 30)} ${MAX_OUTER_RADIUS * 2 + 60} ${MAX_OUTER_RADIUS * 2 + 60}`}
-              >
-                <defs>
-                  <filter id="vizGlow" x="-50%" y="-50%" width="200%" height="200%">
-                    <feGaussianBlur stdDeviation="1.4" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-                <g ref={vizGroupRef} style={{ transformOrigin: "0 0", transformBox: "view-box" }} filter="url(#vizGlow)">
-                  {BARS.map((bar, i) => {
-                    const c = VIZ_COLORS[bar.colorIdx];
-                    const angleDeg = (bar.angle * 180) / Math.PI;
-                    return (
-                      <line
-                        key={i}
-                        ref={(el) => (barRefs.current[i] = el)}
-                        x1="0"
-                        y1={-INNER_RADIUS}
-                        x2="0"
-                        y2={-INNER_RADIUS}
-                        stroke={`hsl(${c.h}, ${c.s}%, ${c.l}%)`}
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        transform={`rotate(${angleDeg})`}
-                        style={{ opacity: 0 }}
-                      />
-                    );
-                  })}
-                </g>
-              </svg>
+              <div ref={vizRef} className="hd-hero-viz">
+                <img src="/music_wave.png" alt="" />
+              </div>
             )}
 
             <img
